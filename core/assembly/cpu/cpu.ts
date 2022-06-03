@@ -9,8 +9,8 @@ class Cpu {
   bus: Bus
   instructions: StaticArray<Instruction | null> = new StaticArray(0x100)
 
-  pc: u16 = 0x600
-  sp: u8 = 0xff
+  pc: u16
+  sp: u8
   sr: u8
   ac: u8
   x: u8
@@ -18,11 +18,21 @@ class Cpu {
 
   constructor(bus: Bus) {
     this.bus = bus
+    this.reset()
     for (let i = 0; i < bindings.length; i += 1) bindings.at(i)(this)
   }
 
   bind(opcode: u8, handler: InstructionHandler, mode: Address): void {
     this.instructions[opcode] = new Instruction(this, handler, mode)
+  }
+
+  reset(): void {
+    this.pc = this.loadWord(0xfffc)
+    this.sp = 0xff
+    this.sr = 0b100100
+    this.ac = 0
+    this.x = 0
+    this.y = 0
   }
 
   step(): void {

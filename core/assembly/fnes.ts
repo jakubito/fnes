@@ -6,6 +6,11 @@ class Fnes {
   cpu: Cpu = new Cpu(this.bus)
 
   constructor() {}
+
+  loadRom(buffer: ArrayBuffer): void {
+    this.bus.setRom(buffer)
+    this.cpu.reset()
+  }
 }
 
 export default Fnes
