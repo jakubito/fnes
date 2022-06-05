@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url'
 import { equal } from 'assert'
 import { instantiate } from '../../build/core.js'
 
+type CpuState = [pc: number, sp: number, sr: number, ac: number, x: number, y: number]
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const moduleBuffer = readFileSync(join(__dirname, '../../build/core.wasm'))
 const romBuffer = readFileSync(join(__dirname, 'nestest.nes'))
@@ -17,7 +19,7 @@ module.loadRom(fnes, romBuffer)
 module.setPc(fnes, 0xc000)
 
 for (let i = 0; i < log.length - 1; i += 1) {
-  const cpuState = formatCpuState(module.getCpuState(fnes))
+  const cpuState = formatCpuState(<CpuState>module.getCpuState(fnes))
   const logState = formatLine(log[i])
   try {
     equal(cpuState, logState)
@@ -30,11 +32,11 @@ for (let i = 0; i < log.length - 1; i += 1) {
 
 console.info('nestest passed')
 
-function hex(value, pad = 2) {
+function hex(value: number, pad = 2) {
   return value.toString(16).padStart(pad, '0').toUpperCase()
 }
 
-function formatCpuState([pc, sp, sr, ac, x, y]) {
+function formatCpuState([pc, sp, sr, ac, x, y]: CpuState) {
   return [
     hex(pc, 4),
     `A:${hex(ac)}`,
@@ -45,6 +47,6 @@ function formatCpuState([pc, sp, sr, ac, x, y]) {
   ].join(' ')
 }
 
-function formatLine(line) {
+function formatLine(line: string) {
   return `${line.substring(0, 4)} ${line.substring(48, 73)}`
 }
