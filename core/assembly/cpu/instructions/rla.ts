@@ -13,9 +13,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x33, rla, Address.IndirectY)
 }
 
-function rla(cpu: Cpu, value: u16, mode: Address): void {
-  rol(cpu, value, mode)
-  and(cpu, value, mode)
+function rla(cpu: Cpu, param: u16, mode: Address): void {
+  rol(cpu, param, mode)
+  and(cpu, param, mode)
 }
 
 export default bind

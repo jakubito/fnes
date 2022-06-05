@@ -12,10 +12,10 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x71, adc, Address.IndirectY)
 }
 
-export function adc(cpu: Cpu, value: u16, mode: Address): void {
-  const val = mode == Address.Immediate ? <u8>value : cpu.load(value)
-  const sum = <u16>cpu.ac + val + <u8>cpu.getStatus(Status.Carry)
-  const overflow = ~(cpu.ac ^ val) & (cpu.ac ^ sum) & 0b1000_0000
+export function adc(cpu: Cpu, param: u16, mode: Address): void {
+  const value = mode == Address.Immediate ? <u8>param : cpu.load(param)
+  const sum = <u16>cpu.ac + value + <u8>cpu.getStatus(Status.Carry)
+  const overflow = ~(cpu.ac ^ value) & (cpu.ac ^ sum) & 0b1000_0000
   cpu.ac = <u8>sum
   cpu.setStatus(Status.Carry, sum > 0xff)
   cpu.setStatus(Status.Zero, cpu.ac == 0)

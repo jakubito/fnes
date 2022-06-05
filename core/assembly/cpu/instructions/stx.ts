@@ -7,8 +7,8 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x8e, stx, Address.Absolute)
 }
 
-function stx(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.store(value, cpu.x)
+function stx(cpu: Cpu, param: u16, mode: Address): void {
+  cpu.store(param, cpu.x)
 }
 
 export default bind

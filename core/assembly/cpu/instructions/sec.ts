@@ -5,7 +5,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x38, sec, Address.Implied)
 }
 
-function sec(cpu: Cpu, value: u16, mode: Address): void {
+function sec(cpu: Cpu, param: u16, mode: Address): void {
   cpu.setStatus(Status.Carry, true)
 }
 

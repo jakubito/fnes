@@ -11,8 +11,8 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x91, sta, Address.IndirectY)
 }
 
-function sta(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.store(value, cpu.ac)
+function sta(cpu: Cpu, param: u16, mode: Address): void {
+  cpu.store(param, cpu.ac)
 }
 
 export default bind

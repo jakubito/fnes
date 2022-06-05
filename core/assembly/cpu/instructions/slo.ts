@@ -13,9 +13,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x13, slo, Address.IndirectY)
 }
 
-function slo(cpu: Cpu, value: u16, mode: Address): void {
-  asl(cpu, value, mode)
-  ora(cpu, value, mode)
+function slo(cpu: Cpu, param: u16, mode: Address): void {
+  asl(cpu, param, mode)
+  ora(cpu, param, mode)
 }
 
 export default bind

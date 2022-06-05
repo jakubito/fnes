@@ -8,8 +8,8 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x83, sax, Address.IndirectX)
 }
 
-function sax(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.store(value, cpu.ac & cpu.x)
+function sax(cpu: Cpu, param: u16, mode: Address): void {
+  cpu.store(param, cpu.ac & cpu.x)
 }
 
 export default bind

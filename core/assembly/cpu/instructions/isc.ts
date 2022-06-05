@@ -13,9 +13,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xf3, isc, Address.IndirectY)
 }
 
-function isc(cpu: Cpu, value: u16, mode: Address): void {
-  inc(cpu, value, mode)
-  sbc(cpu, value, mode)
+function isc(cpu: Cpu, param: u16, mode: Address): void {
+  inc(cpu, param, mode)
+  sbc(cpu, param, mode)
 }
 
 export default bind

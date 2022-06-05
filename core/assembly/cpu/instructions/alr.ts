@@ -6,8 +6,8 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x4b, alr, Address.Immediate)
 }
 
-function alr(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.ac &= <u8>value
+function alr(cpu: Cpu, param: u16, mode: Address): void {
+  cpu.ac &= <u8>param
   lsrAc(cpu, 0, Address.Accumulator)
 }
 

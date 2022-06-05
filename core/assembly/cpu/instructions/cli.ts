@@ -5,7 +5,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x58, cli, Address.Implied)
 }
 
-function cli(cpu: Cpu, value: u16, mode: Address): void {
+function cli(cpu: Cpu, param: u16, mode: Address): void {
   cpu.setStatus(Status.Interrupt, false)
 }
 

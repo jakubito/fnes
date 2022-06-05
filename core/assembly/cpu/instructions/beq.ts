@@ -5,8 +5,8 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xf0, beq, Address.Relative)
 }
 
-function beq(cpu: Cpu, value: u16, mode: Address): void {
-  if (cpu.getStatus(Status.Zero)) cpu.pc += <i8>value
+function beq(cpu: Cpu, param: u16, mode: Address): void {
+  if (cpu.getStatus(Status.Zero)) cpu.pc += <i8>param
 }
 
 export default bind

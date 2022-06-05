@@ -14,10 +14,10 @@ class Instruction {
   }
 
   execute(): void {
-    this.handler(this.cpu, this.getValue(), this.mode)
+    this.handler(this.cpu, this.getParam(), this.mode)
   }
 
-  getValue(): u16 {
+  getParam(): u16 {
     switch (this.mode) {
       case Address.Immediate:
       case Address.Relative:

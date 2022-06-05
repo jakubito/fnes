@@ -9,8 +9,8 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xbc, ldy, Address.AbsoluteX)
 }
 
-function ldy(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.y = mode == Address.Immediate ? <u8>value : cpu.load(value)
+function ldy(cpu: Cpu, param: u16, mode: Address): void {
+  cpu.y = mode == Address.Immediate ? <u8>param : cpu.load(param)
   cpu.setStatus(Status.Zero, cpu.y == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.y >> 7))
 }

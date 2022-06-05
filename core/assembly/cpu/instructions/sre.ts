@@ -13,9 +13,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x53, sre, Address.IndirectY)
 }
 
-function sre(cpu: Cpu, value: u16, mode: Address): void {
-  lsr(cpu, value, mode)
-  eor(cpu, value, mode)
+function sre(cpu: Cpu, param: u16, mode: Address): void {
+  lsr(cpu, param, mode)
+  eor(cpu, param, mode)
 }
 
 export default bind

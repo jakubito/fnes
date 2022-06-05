@@ -13,9 +13,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x73, rra, Address.IndirectY)
 }
 
-function rra(cpu: Cpu, value: u16, mode: Address): void {
-  ror(cpu, value, mode)
-  adc(cpu, value, mode)
+function rra(cpu: Cpu, param: u16, mode: Address): void {
+  ror(cpu, param, mode)
+  adc(cpu, param, mode)
 }
 
 export default bind

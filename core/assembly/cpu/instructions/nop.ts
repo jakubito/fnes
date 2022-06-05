@@ -32,6 +32,6 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xfc, nop, Address.AbsoluteX)
 }
 
-function nop(cpu: Cpu, value: u16, mode: Address): void {}
+function nop(cpu: Cpu, param: u16, mode: Address): void {}
 
 export default bind

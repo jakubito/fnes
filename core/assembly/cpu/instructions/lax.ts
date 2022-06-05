@@ -12,9 +12,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xb3, lax, Address.IndirectY)
 }
 
-function lax(cpu: Cpu, value: u16, mode: Address): void {
-  lda(cpu, value, mode)
-  ldx(cpu, value, mode)
+function lax(cpu: Cpu, param: u16, mode: Address): void {
+  lda(cpu, param, mode)
+  ldx(cpu, param, mode)
 }
 
 export default bind

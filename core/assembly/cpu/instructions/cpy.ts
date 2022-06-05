@@ -7,11 +7,11 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xcc, cpy, Address.Absolute)
 }
 
-function cpy(cpu: Cpu, value: u16, mode: Address): void {
-  const val = mode == Address.Immediate ? <u8>value : cpu.load(value)
-  cpu.setStatus(Status.Carry, cpu.y >= val)
-  cpu.setStatus(Status.Zero, cpu.y == val)
-  cpu.setStatus(Status.Negative, <bool>((cpu.y - val) >> 7))
+function cpy(cpu: Cpu, param: u16, mode: Address): void {
+  const value = mode == Address.Immediate ? <u8>param : cpu.load(param)
+  cpu.setStatus(Status.Carry, cpu.y >= value)
+  cpu.setStatus(Status.Zero, cpu.y == value)
+  cpu.setStatus(Status.Negative, <bool>((cpu.y - value) >> 7))
 }
 
 export default bind

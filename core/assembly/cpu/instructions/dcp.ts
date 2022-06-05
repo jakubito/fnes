@@ -13,9 +13,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xd3, dcp, Address.IndirectY)
 }
 
-function dcp(cpu: Cpu, value: u16, mode: Address): void {
-  dec(cpu, value, mode)
-  cmp(cpu, value, mode)
+function dcp(cpu: Cpu, param: u16, mode: Address): void {
+  dec(cpu, param, mode)
+  cmp(cpu, param, mode)
 }
 
 export default bind

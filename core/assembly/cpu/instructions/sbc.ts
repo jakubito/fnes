@@ -14,9 +14,9 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xf1, sbc, Address.IndirectY)
 }
 
-export function sbc(cpu: Cpu, value: u16, mode: Address): void {
-  const val = mode == Address.Immediate ? <u8>value : cpu.load(value)
-  adc(cpu, ~val, Address.Immediate)
+export function sbc(cpu: Cpu, param: u16, mode: Address): void {
+  const value = mode == Address.Immediate ? <u8>param : cpu.load(param)
+  adc(cpu, ~value, Address.Immediate)
 }
 
 export default bind

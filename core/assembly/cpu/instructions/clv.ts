@@ -5,7 +5,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xb8, clv, Address.Implied)
 }
 
-function clv(cpu: Cpu, value: u16, mode: Address): void {
+function clv(cpu: Cpu, param: u16, mode: Address): void {
   cpu.setStatus(Status.Overflow, false)
 }
 

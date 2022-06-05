@@ -5,7 +5,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x48, pha, Address.Implied)
 }
 
-function pha(cpu: Cpu, value: u16, mode: Address): void {
+function pha(cpu: Cpu, param: u16, mode: Address): void {
   cpu.pushToStack(cpu.ac)
 }
 

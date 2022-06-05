@@ -12,8 +12,8 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x11, ora, Address.IndirectY)
 }
 
-export function ora(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.ac |= mode == Address.Immediate ? <u8>value : cpu.load(value)
+export function ora(cpu: Cpu, param: u16, mode: Address): void {
+  cpu.ac |= mode == Address.Immediate ? <u8>param : cpu.load(param)
   cpu.setStatus(Status.Zero, cpu.ac == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
 }

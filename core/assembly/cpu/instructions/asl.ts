@@ -9,18 +9,18 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x1e, asl, Address.AbsoluteX)
 }
 
-function aslAc(cpu: Cpu, value: u16, mode: Address): void {
+function aslAc(cpu: Cpu, param: u16, mode: Address): void {
   cpu.setStatus(Status.Carry, <bool>(cpu.ac >> 7))
   cpu.ac <<= 1
   cpu.setStatus(Status.Zero, cpu.ac == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
 }
 
-export function asl(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.setStatus(Status.Carry, <bool>(cpu.load(value) >> 7))
-  cpu.store(value, cpu.load(value) << 1)
-  cpu.setStatus(Status.Zero, cpu.load(value) == 0)
-  cpu.setStatus(Status.Negative, <bool>(cpu.load(value) >> 7))
+export function asl(cpu: Cpu, param: u16, mode: Address): void {
+  cpu.setStatus(Status.Carry, <bool>(cpu.load(param) >> 7))
+  cpu.store(param, cpu.load(param) << 1)
+  cpu.setStatus(Status.Zero, cpu.load(param) == 0)
+  cpu.setStatus(Status.Negative, <bool>(cpu.load(param) >> 7))
 }
 
 export default bind
