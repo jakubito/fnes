@@ -12,7 +12,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xd1, cmp, Address.IndirectY)
 }
 
-function cmp(cpu: Cpu, value: u16, mode: Address): void {
+export function cmp(cpu: Cpu, value: u16, mode: Address): void {
   const val = mode == Address.Immediate ? <u8>value : cpu.load(value)
   cpu.setStatus(Status.Carry, cpu.ac >= val)
   cpu.setStatus(Status.Zero, cpu.ac == val)

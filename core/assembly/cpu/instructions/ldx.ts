@@ -9,7 +9,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xbe, ldx, Address.AbsoluteY)
 }
 
-function ldx(cpu: Cpu, value: u16, mode: Address): void {
+export function ldx(cpu: Cpu, value: u16, mode: Address): void {
   cpu.x = mode == Address.Immediate ? <u8>value : cpu.load(value)
   cpu.setStatus(Status.Zero, cpu.x == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.x >> 7))

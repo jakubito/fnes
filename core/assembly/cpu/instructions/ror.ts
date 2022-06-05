@@ -9,7 +9,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x7e, ror, Address.AbsoluteX)
 }
 
-function rorAc(cpu: Cpu, value: u16, mode: Address): void {
+export function rorAc(cpu: Cpu, value: u16, mode: Address): void {
   const oldCarry = cpu.getStatus(Status.Carry)
   cpu.setStatus(Status.Carry, <bool>(cpu.ac & 1))
   cpu.ac = (cpu.ac >> 1) | ((<u8>oldCarry) << 7)
@@ -17,7 +17,7 @@ function rorAc(cpu: Cpu, value: u16, mode: Address): void {
   cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
 }
 
-function ror(cpu: Cpu, value: u16, mode: Address): void {
+export function ror(cpu: Cpu, value: u16, mode: Address): void {
   const oldCarry = cpu.getStatus(Status.Carry)
   cpu.setStatus(Status.Carry, <bool>(cpu.load(value) & 1))
   cpu.store(value, (cpu.load(value) >> 1) | ((<u8>oldCarry) << 7))

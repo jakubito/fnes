@@ -16,7 +16,7 @@ const fnes = module.createInstance()
 module.loadRom(fnes, romBuffer)
 module.setPc(fnes, 0xc000)
 
-for (let i = 0; i < log.length; i += 1) {
+for (let i = 0; i < log.length - 1; i += 1) {
   const cpuState = formatCpuState(module.getCpuState(fnes))
   const logState = formatLine(log[i])
   try {
@@ -27,6 +27,8 @@ for (let i = 0; i < log.length; i += 1) {
     throw error
   }
 }
+
+console.info('nestest passed')
 
 function hex(value, pad = 2) {
   return value.toString(16).padStart(pad, '0').toUpperCase()

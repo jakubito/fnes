@@ -8,7 +8,7 @@ function bind(cpu: Cpu): void {
   cpu.bind(0xfe, inc, Address.AbsoluteX)
 }
 
-function inc(cpu: Cpu, value: u16, mode: Address): void {
+export function inc(cpu: Cpu, value: u16, mode: Address): void {
   cpu.store(value, cpu.load(value) + 1)
   cpu.setStatus(Status.Zero, cpu.load(value) == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.load(value) >> 7))

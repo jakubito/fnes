@@ -17,7 +17,7 @@ function rolAc(cpu: Cpu, value: u16, mode: Address): void {
   cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
 }
 
-function rol(cpu: Cpu, value: u16, mode: Address): void {
+export function rol(cpu: Cpu, value: u16, mode: Address): void {
   const oldCarry = cpu.getStatus(Status.Carry)
   cpu.setStatus(Status.Carry, <bool>(cpu.load(value) >> 7))
   cpu.store(value, (cpu.load(value) << 1) | (<u8>oldCarry))

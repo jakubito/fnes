@@ -9,14 +9,14 @@ function bind(cpu: Cpu): void {
   cpu.bind(0x5e, lsr, Address.AbsoluteX)
 }
 
-function lsrAc(cpu: Cpu, value: u16, mode: Address): void {
+export function lsrAc(cpu: Cpu, value: u16, mode: Address): void {
   cpu.setStatus(Status.Carry, <bool>(cpu.ac & 1))
   cpu.ac >>= 1
   cpu.setStatus(Status.Zero, cpu.ac == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
 }
 
-function lsr(cpu: Cpu, value: u16, mode: Address): void {
+export function lsr(cpu: Cpu, value: u16, mode: Address): void {
   cpu.setStatus(Status.Carry, <bool>(cpu.load(value) & 1))
   cpu.store(value, cpu.load(value) >> 1)
   cpu.setStatus(Status.Zero, cpu.load(value) == 0)
