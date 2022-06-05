@@ -28,15 +28,14 @@ class Cpu {
 
   reset(): void {
     this.pc = this.loadWord(0xfffc)
-    this.sp = 0xff
-    this.sr = 0b100100
+    this.sp = 0xfd
+    this.sr = 0b0010_0100
     this.ac = 0
     this.x = 0
     this.y = 0
   }
 
   step(): void {
-    this.store(0xfe, <u8>Math.round(Math.random() * 0xff))
     const opcode = this.readByte()
     const instruction = this.instructions[opcode]
     if (instruction) instruction.execute()

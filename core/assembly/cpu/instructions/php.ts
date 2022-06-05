@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function php(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.pushToStack(cpu.sr)
+  cpu.pushToStack(cpu.sr | 0b0011_0000)
 }
 
 export default bind

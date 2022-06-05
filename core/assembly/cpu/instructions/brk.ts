@@ -6,7 +6,9 @@ function bind(cpu: Cpu): void {
 }
 
 function brk(cpu: Cpu, value: u16, mode: Address): void {
-  // TODO
+  cpu.pushToStack(<u8>((cpu.pc + 1) >> 8))
+  cpu.pushToStack(<u8>cpu.pc + 1)
+  cpu.pushToStack(cpu.sr | 0b0011_0000)
   cpu.setStatus(Status.Break, true)
 }
 

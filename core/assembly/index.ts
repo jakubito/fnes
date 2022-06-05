@@ -19,3 +19,7 @@ export function getWramPointer(instance: Fnes): usize {
 export function loadRom(instance: Fnes, buffer: ArrayBuffer): void {
   instance.loadRom(buffer)
 }
+
+export function setPc(instance: Fnes, pc: u16): void {
+  instance.cpu.pc = pc
+}

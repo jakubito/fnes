@@ -21,7 +21,8 @@ class Bus {
   }
 
   loadWord(address: u16): u16 {
-    return word(this.load(address), this.load(address + 1))
+    const highByte = ((<u16>address) & 0xff00) | (<u8>(address & 0xff) + 1)
+    return word(this.load(<u16>address), this.load(highByte))
   }
 
   storeWord(address: u16, value: u16): void {

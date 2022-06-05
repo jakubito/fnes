@@ -12,8 +12,7 @@ function bind(cpu: Cpu): void {
 function rolAc(cpu: Cpu, value: u16, mode: Address): void {
   const oldCarry = cpu.getStatus(Status.Carry)
   cpu.setStatus(Status.Carry, <bool>(cpu.ac >> 7))
-  cpu.ac <<= 1
-  cpu.ac |= <u8>oldCarry
+  cpu.ac = (cpu.ac << 1) | (<u8>oldCarry)
   cpu.setStatus(Status.Zero, cpu.ac == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
 }

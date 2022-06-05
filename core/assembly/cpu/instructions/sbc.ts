@@ -1,5 +1,6 @@
 import Cpu from '../cpu'
-import { Address, Status } from '../enums'
+import { Address } from '../enums'
+import { adc } from './adc'
 
 function bind(cpu: Cpu): void {
   cpu.bind(0xe9, sbc, Address.Immediate)
@@ -13,12 +14,8 @@ function bind(cpu: Cpu): void {
 }
 
 function sbc(cpu: Cpu, value: u16, mode: Address): void {
-  const oldAc = cpu.ac
-  cpu.ac -= mode == Address.Immediate ? <u8>value : cpu.load(value)
-  cpu.setStatus(Status.Carry, oldAc < cpu.ac)
-  cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Overflow, <i8>oldAc < <i8>cpu.ac)
-  cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
+  const val = mode == Address.Immediate ? <u8>value : cpu.load(value)
+  adc(cpu, ~val, Address.Immediate)
 }
 
 export default bind

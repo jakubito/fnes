@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function plp(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.sr = cpu.pullFromStack()
+  cpu.sr = (cpu.sr & 0b0011_0000) | (cpu.pullFromStack() & 0b1100_1111)
 }
 
 export default bind

@@ -7,7 +7,7 @@ function bind(cpu: Cpu): void {
 }
 
 function rts(cpu: Cpu, value: u16, mode: Address): void {
-  cpu.pc = word(cpu.pullFromStack(), cpu.pullFromStack())
+  cpu.pc = word(cpu.pullFromStack(), cpu.pullFromStack()) + 1
 }
 
 export default bind
