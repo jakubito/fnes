@@ -1,3 +1,4 @@
+import { pageCrossed } from '../helpers'
 import Cpu from './cpu'
 import { Address } from './enums'
 import { InstructionHandler } from './types'
@@ -31,13 +32,13 @@ class Instruction {
       case Address.AbsoluteX: {
         const word = this.cpu.readWord()
         const param = word + this.cpu.x
-        if (this.pageCheck && word >> 8 != param >> 8) this.cpu.cycles += 1
+        if (this.pageCheck && pageCrossed(word, param)) this.cpu.cycles++
         return param
       }
       case Address.AbsoluteY: {
         const word = this.cpu.readWord()
         const param = word + this.cpu.y
-        if (this.pageCheck && word >> 8 != param >> 8) this.cpu.cycles += 1
+        if (this.pageCheck && pageCrossed(word, param)) this.cpu.cycles++
         return param
       }
       case Address.Indirect:
@@ -47,7 +48,7 @@ class Instruction {
       case Address.IndirectY: {
         const word = this.cpu.loadWord(this.cpu.readByte())
         const param = word + this.cpu.y
-        if (this.pageCheck && word >> 8 != param >> 8) this.cpu.cycles += 1
+        if (this.pageCheck && pageCrossed(word, param)) this.cpu.cycles++
         return param
       }
       default:
