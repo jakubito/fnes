@@ -3,7 +3,7 @@ import { Address, Status } from '../enums'
 import { rorAc } from './ror'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x6b, arr, Address.Immediate)
+  cpu.bind(0x6b, arr, Address.Immediate, 2)
 }
 
 function arr(cpu: Cpu, param: u16, mode: Address): void {

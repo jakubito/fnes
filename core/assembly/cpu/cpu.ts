@@ -6,8 +6,9 @@ import bindings from './instructions'
 import { InstructionHandler } from './types'
 
 class Cpu {
-  bus: Bus
   instructions: StaticArray<Instruction | null> = new StaticArray(0x100)
+  totalCycles: usize
+  cycles: u8
 
   pc: u16
   sp: u8
@@ -16,17 +17,24 @@ class Cpu {
   x: u8
   y: u8
 
-  constructor(bus: Bus) {
-    this.bus = bus
-    this.reset()
+  constructor(public bus: Bus) {
     for (let i = 0; i < bindings.length; i += 1) bindings.at(i)(this)
+    this.reset()
   }
 
-  bind(opcode: u8, handler: InstructionHandler, mode: Address): void {
-    this.instructions[opcode] = new Instruction(this, handler, mode)
+  bind(
+    opcode: u8,
+    handler: InstructionHandler,
+    mode: Address,
+    cycles: u8,
+    pageCheck: bool = false
+  ): void {
+    this.instructions[opcode] = new Instruction(this, handler, mode, cycles, pageCheck)
   }
 
   reset(): void {
+    this.totalCycles = 0
+    this.cycles = 0
     this.pc = this.loadWord(0xfffc)
     this.sp = 0xfd
     this.sr = 0b0010_0100
@@ -38,8 +46,10 @@ class Cpu {
   step(): void {
     const opcode = this.readByte()
     const instruction = this.instructions[opcode]
-    if (instruction) instruction.execute()
-    else throw new Error(`Unknown opcode 0x${opcode.toString(16)}`)
+    if (!instruction) throw new Error(`Unknown opcode 0x${opcode.toString(16)}`)
+    this.cycles = 0
+    instruction.execute()
+    this.totalCycles += this.cycles
   }
 
   readByte(): u8 {
@@ -90,8 +100,8 @@ class Cpu {
     this.sp -= 1
   }
 
-  getState(): StaticArray<u16> {
-    return [this.pc, this.sp, this.sr, this.ac, this.x, this.y]
+  getState(): StaticArray<usize> {
+    return [this.pc, this.sp, this.sr, this.ac, this.x, this.y, this.totalCycles]
   }
 }
 

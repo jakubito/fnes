@@ -2,7 +2,7 @@ import Cpu from '../cpu'
 import { Address } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x9a, txs, Address.Implied)
+  cpu.bind(0x9a, txs, Address.Implied, 2)
 }
 
 function txs(cpu: Cpu, param: u16, mode: Address): void {

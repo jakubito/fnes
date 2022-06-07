@@ -2,14 +2,14 @@ import Cpu from '../cpu'
 import { Address, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x49, eor, Address.Immediate)
-  cpu.bind(0x45, eor, Address.Zeropage)
-  cpu.bind(0x55, eor, Address.ZeropageX)
-  cpu.bind(0x4d, eor, Address.Absolute)
-  cpu.bind(0x5d, eor, Address.AbsoluteX)
-  cpu.bind(0x59, eor, Address.AbsoluteY)
-  cpu.bind(0x41, eor, Address.IndirectX)
-  cpu.bind(0x51, eor, Address.IndirectY)
+  cpu.bind(0x49, eor, Address.Immediate, 2)
+  cpu.bind(0x45, eor, Address.Zeropage, 3)
+  cpu.bind(0x55, eor, Address.ZeropageX, 4)
+  cpu.bind(0x4d, eor, Address.Absolute, 4)
+  cpu.bind(0x5d, eor, Address.AbsoluteX, 4, true)
+  cpu.bind(0x59, eor, Address.AbsoluteY, 4, true)
+  cpu.bind(0x41, eor, Address.IndirectX, 6)
+  cpu.bind(0x51, eor, Address.IndirectY, 5, true)
 }
 
 export function eor(cpu: Cpu, param: u16, mode: Address): void {

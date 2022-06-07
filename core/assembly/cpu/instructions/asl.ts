@@ -2,11 +2,11 @@ import Cpu from '../cpu'
 import { Address, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x0a, aslAc, Address.Accumulator)
-  cpu.bind(0x06, asl, Address.Zeropage)
-  cpu.bind(0x16, asl, Address.ZeropageX)
-  cpu.bind(0x0e, asl, Address.Absolute)
-  cpu.bind(0x1e, asl, Address.AbsoluteX)
+  cpu.bind(0x0a, aslAc, Address.Accumulator, 2)
+  cpu.bind(0x06, asl, Address.Zeropage, 5)
+  cpu.bind(0x16, asl, Address.ZeropageX, 6)
+  cpu.bind(0x0e, asl, Address.Absolute, 6)
+  cpu.bind(0x1e, asl, Address.AbsoluteX, 7)
 }
 
 function aslAc(cpu: Cpu, param: u16, mode: Address): void {

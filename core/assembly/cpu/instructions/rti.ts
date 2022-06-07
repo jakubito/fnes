@@ -3,7 +3,7 @@ import Cpu from '../cpu'
 import { Address } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x40, rti, Address.Implied)
+  cpu.bind(0x40, rti, Address.Implied, 6)
 }
 
 function rti(cpu: Cpu, param: u16, mode: Address): void {

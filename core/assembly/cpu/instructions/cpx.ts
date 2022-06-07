@@ -2,9 +2,9 @@ import Cpu from '../cpu'
 import { Address, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0xe0, cpx, Address.Immediate)
-  cpu.bind(0xe4, cpx, Address.Zeropage)
-  cpu.bind(0xec, cpx, Address.Absolute)
+  cpu.bind(0xe0, cpx, Address.Immediate, 2)
+  cpu.bind(0xe4, cpx, Address.Zeropage, 3)
+  cpu.bind(0xec, cpx, Address.Absolute, 4)
 }
 
 function cpx(cpu: Cpu, param: u16, mode: Address): void {

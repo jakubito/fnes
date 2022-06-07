@@ -2,14 +2,14 @@ import Cpu from '../cpu'
 import { Address, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0xc9, cmp, Address.Immediate)
-  cpu.bind(0xc5, cmp, Address.Zeropage)
-  cpu.bind(0xd5, cmp, Address.ZeropageX)
-  cpu.bind(0xcd, cmp, Address.Absolute)
-  cpu.bind(0xdd, cmp, Address.AbsoluteX)
-  cpu.bind(0xd9, cmp, Address.AbsoluteY)
-  cpu.bind(0xc1, cmp, Address.IndirectX)
-  cpu.bind(0xd1, cmp, Address.IndirectY)
+  cpu.bind(0xc9, cmp, Address.Immediate, 2)
+  cpu.bind(0xc5, cmp, Address.Zeropage, 3)
+  cpu.bind(0xd5, cmp, Address.ZeropageX, 4)
+  cpu.bind(0xcd, cmp, Address.Absolute, 4)
+  cpu.bind(0xdd, cmp, Address.AbsoluteX, 4, true)
+  cpu.bind(0xd9, cmp, Address.AbsoluteY, 4, true)
+  cpu.bind(0xc1, cmp, Address.IndirectX, 6)
+  cpu.bind(0xd1, cmp, Address.IndirectY, 5, true)
 }
 
 export function cmp(cpu: Cpu, param: u16, mode: Address): void {

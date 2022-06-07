@@ -8,7 +8,7 @@ export function step(instance: Fnes): void {
   instance.cpu.step()
 }
 
-export function getCpuState(instance: Fnes): StaticArray<u16> {
+export function getCpuState(instance: Fnes): StaticArray<usize> {
   return instance.cpu.getState()
 }
 
@@ -20,6 +20,10 @@ export function loadRom(instance: Fnes, buffer: ArrayBuffer): void {
   instance.loadRom(buffer)
 }
 
-export function setPc(instance: Fnes, pc: u16): void {
-  instance.cpu.pc = pc
+export function setPc(instance: Fnes, value: u16): void {
+  instance.cpu.pc = value
+}
+
+export function setTotalCycles(instance: Fnes, value: usize): void {
+  instance.cpu.totalCycles = value
 }
