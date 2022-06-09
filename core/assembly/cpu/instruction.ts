@@ -1,13 +1,13 @@
 import { pageCrossed } from '../helpers'
-import Cpu from './cpu'
-import { Address } from './enums'
+import Cpu from './Cpu'
+import { Mode } from './enums'
 import { InstructionHandler } from './types'
 
 class Instruction {
   constructor(
     public cpu: Cpu,
     public handler: InstructionHandler,
-    public mode: Address,
+    public mode: Mode,
     public cycles: u8,
     public pageCheck: bool
   ) {}
@@ -17,35 +17,36 @@ class Instruction {
     this.cpu.cycles += this.cycles
   }
 
+  @inline
   getParam(): u16 {
     switch (this.mode) {
-      case Address.Immediate:
-      case Address.Relative:
-      case Address.Zeropage:
+      case Mode.Immediate:
+      case Mode.Relative:
+      case Mode.Zeropage:
         return this.cpu.readByte()
-      case Address.ZeropageX:
+      case Mode.ZeropageX:
         return this.cpu.readByte() + this.cpu.x
-      case Address.ZeropageY:
+      case Mode.ZeropageY:
         return this.cpu.readByte() + this.cpu.y
-      case Address.Absolute:
+      case Mode.Absolute:
         return this.cpu.readWord()
-      case Address.AbsoluteX: {
+      case Mode.AbsoluteX: {
         const word = this.cpu.readWord()
         const param = word + this.cpu.x
         if (this.pageCheck && pageCrossed(word, param)) this.cpu.cycles++
         return param
       }
-      case Address.AbsoluteY: {
+      case Mode.AbsoluteY: {
         const word = this.cpu.readWord()
         const param = word + this.cpu.y
         if (this.pageCheck && pageCrossed(word, param)) this.cpu.cycles++
         return param
       }
-      case Address.Indirect:
+      case Mode.Indirect:
         return this.cpu.loadWord(this.cpu.readWord())
-      case Address.IndirectX:
+      case Mode.IndirectX:
         return this.cpu.loadWord(this.cpu.readByte() + this.cpu.x)
-      case Address.IndirectY: {
+      case Mode.IndirectY: {
         const word = this.cpu.loadWord(this.cpu.readByte())
         const param = word + this.cpu.y
         if (this.pageCheck && pageCrossed(word, param)) this.cpu.cycles++

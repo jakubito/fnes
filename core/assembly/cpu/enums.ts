@@ -1,4 +1,4 @@
-export enum Address {
+export enum Mode {
   Implied,
   Immediate,
   Relative,

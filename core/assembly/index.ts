@@ -1,4 +1,4 @@
-import Fnes from './fnes'
+import Fnes from './Fnes'
 
 export function createInstance(): Fnes {
   return new Fnes()
@@ -13,7 +13,7 @@ export function getCpuState(instance: Fnes): StaticArray<usize> {
 }
 
 export function getWramPointer(instance: Fnes): usize {
-  return changetype<usize>(instance.bus.wram.buffer) + instance.bus.wram.byteOffset
+  return changetype<usize>(instance.cpuBus.wram.buffer) + instance.cpuBus.wram.byteOffset
 }
 
 export function loadRom(instance: Fnes, buffer: ArrayBuffer): void {

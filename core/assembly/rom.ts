@@ -30,23 +30,33 @@ class Rom {
     if (address >= <u16>this.prgRom.length) return this.prgRom[address & 0x3fff]
     return this.prgRom[address]
   }
-}
 
-function validateFormat(header: Uint8Array): void {
-  for (let i = 0; i < 4; i += 1) {
-    if (header[i] != Rom.tag[i]) throw new Error('Unknown rom format')
+  loadChrRom(address: u16): u8 {
+    return this.chrRom[address]
   }
 }
 
-function validateVersion(header: Uint8Array): void {
-  const version = (header[7] >> 2) & 0b11
-  if (version != 0) throw new Error('NES 2.0 format not supported')
+// @ts-ignore
+@inline
+function validateFormat(header: Uint8Array): void {
+  for (let i = 0; i < 4; i += 1) assert(header[i] == Rom.tag[i], 'Unknown rom format')
 }
 
+// @ts-ignore
+@inline
+function validateVersion(header: Uint8Array): void {
+  const version = (header[7] >> 2) & 0b11
+  assert(version == 0, 'Unsupported version')
+}
+
+// @ts-ignore
+@inline
 function extractMapper(header: Uint8Array): u8 {
   return (header[7] & 0xf0) | (header[6] >> 4)
 }
 
+// @ts-ignore
+@inline
 function extractMirroring(header: Uint8Array): Mirroring {
   if ((header[6] >> 3) & 1) return Mirroring.FourScreen
   return header[6] & 1 ? Mirroring.Vertical : Mirroring.Horizontal

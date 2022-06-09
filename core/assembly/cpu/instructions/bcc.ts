@@ -1,12 +1,12 @@
 import { pageCrossed } from '../../helpers'
-import Cpu from '../cpu'
-import { Address, Status } from '../enums'
+import Cpu from '../Cpu'
+import { Mode, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x90, bcc, Address.Relative, 2)
+  cpu.bind(0x90, bcc, Mode.Relative, 2)
 }
 
-function bcc(cpu: Cpu, param: u16, mode: Address): void {
+function bcc(cpu: Cpu, param: u16, mode: Mode): void {
   if (!cpu.getStatus(Status.Carry)) {
     const oldPc = cpu.pc
     cpu.pc += <i8>param

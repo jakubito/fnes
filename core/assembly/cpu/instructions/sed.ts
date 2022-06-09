@@ -1,11 +1,11 @@
-import Cpu from '../cpu'
-import { Address, Status } from '../enums'
+import Cpu from '../Cpu'
+import { Mode, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0xf8, sed, Address.Implied, 2)
+  cpu.bind(0xf8, sed, Mode.Implied, 2)
 }
 
-function sed(cpu: Cpu, param: u16, mode: Address): void {
+function sed(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.setStatus(Status.Decimal, true)
 }
 

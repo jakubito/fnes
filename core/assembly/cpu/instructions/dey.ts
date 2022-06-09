@@ -1,11 +1,11 @@
-import Cpu from '../cpu'
-import { Address, Status } from '../enums'
+import Cpu from '../Cpu'
+import { Mode, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x88, dey, Address.Implied, 2)
+  cpu.bind(0x88, dey, Mode.Implied, 2)
 }
 
-function dey(cpu: Cpu, param: u16, mode: Address): void {
+function dey(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.y -= 1
   cpu.setStatus(Status.Zero, cpu.y == 0)
   cpu.setStatus(Status.Negative, <bool>(cpu.y >> 7))

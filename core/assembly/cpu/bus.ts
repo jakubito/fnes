@@ -1,23 +1,24 @@
-import Rom from './rom'
-import { inRange, word } from './helpers'
+import Drive from '../Drive'
+import { Ppu } from '../ppu'
+import { inRange, word } from '../helpers'
 
 class Bus {
   wram: Uint8Array = new Uint8Array(0x800)
-  rom: Rom | null
 
-  setRom(buffer: ArrayBuffer): void {
-    this.rom = new Rom(buffer)
-  }
+  constructor(public drive: Drive, public ppu: Ppu) {}
 
   load(address: u16): u8 {
     if (inRange(address, 0, 0x1fff)) return this.loadWram(address)
     if (inRange(address, 0x8000, 0xffff)) return this.loadPrgRom(address)
-    return 0
+    if (address == 0x2007) return this.ppu.loadAddress()
+    throw new Error(`Cannot read from address 0x${address.toString(16)}`)
   }
 
   store(address: u16, value: u8): void {
-    if (inRange(address, 0, 0x1fff)) this.storeWram(address, value)
-    if (inRange(address, 0x8000, 0xffff)) throw new Error('Read-only memory space')
+    if (inRange(address, 0, 0x1fff)) return this.storeWram(address, value)
+    if (address == 0x2006) return this.ppu.updateAddress(value)
+    if (address == 0x2007) return this.ppu.storeAddress(value)
+    throw new Error(`Cannot write to address 0x${address.toString(16)}`)
   }
 
   loadWord(address: u16): u16 {
@@ -30,17 +31,20 @@ class Bus {
     this.store(address + 1, <u8>(value >> 8))
   }
 
+  @inline
   loadWram(address: u16): u8 {
     return this.wram[address & 0x7ff]
   }
 
+  @inline
   storeWram(address: u16, value: u8): void {
     this.wram[address & 0x7ff] = value
   }
 
+  @inline
   loadPrgRom(address: u16): u8 {
-    if (!this.rom) return 0
-    return this.rom!.loadPrgRom(address & 0x7fff)
+    if (!this.drive.rom) return 0
+    return this.drive.rom!.loadPrgRom(address & 0x7fff)
   }
 }
 

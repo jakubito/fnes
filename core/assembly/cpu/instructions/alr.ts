@@ -1,14 +1,14 @@
-import Cpu from '../cpu'
-import { Address } from '../enums'
+import Cpu from '../Cpu'
+import { Mode } from '../enums'
 import { lsrAc } from './lsr'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x4b, alr, Address.Immediate, 2)
+  cpu.bind(0x4b, alr, Mode.Immediate, 2)
 }
 
-function alr(cpu: Cpu, param: u16, mode: Address): void {
+function alr(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.ac &= <u8>param
-  lsrAc(cpu, 0, Address.Accumulator)
+  lsrAc(cpu, 0, Mode.Accumulator)
 }
 
 export default bind

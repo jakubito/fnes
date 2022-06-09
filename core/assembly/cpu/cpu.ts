@@ -1,8 +1,9 @@
-import Bus from '../bus'
+import BitRegister from '../BitRegister'
 import { word } from '../helpers'
-import { Address, Status } from './enums'
-import Instruction from './instruction'
+import Bus from './Bus'
+import Instruction from './Instruction'
 import bindings from './instructions'
+import { Mode, Status } from './enums'
 import { InstructionHandler } from './types'
 
 class Cpu {
@@ -10,9 +11,9 @@ class Cpu {
   totalCycles: usize
   cycles: u8
 
+  sr: BitRegister = new BitRegister()
   pc: u16
   sp: u8
-  sr: u8
   ac: u8
   x: u8
   y: u8
@@ -25,7 +26,7 @@ class Cpu {
   bind(
     opcode: u8,
     handler: InstructionHandler,
-    mode: Address,
+    mode: Mode,
     cycles: u8,
     pageCheck: bool = false
   ): void {
@@ -37,7 +38,7 @@ class Cpu {
     this.cycles = 0
     this.pc = this.loadWord(0xfffc)
     this.sp = 0xfd
-    this.sr = 0b0010_0100
+    this.sr.value = 0b0010_0100
     this.ac = 0
     this.x = 0
     this.y = 0
@@ -46,9 +47,9 @@ class Cpu {
   step(): void {
     const opcode = this.readByte()
     const instruction = this.instructions[opcode]
-    if (!instruction) throw new Error(`Unknown opcode 0x${opcode.toString(16)}`)
+    assert(instruction, `Unknown opcode 0x${opcode.toString(16)}`)
     this.cycles = 0
-    instruction.execute()
+    instruction!.execute()
     this.totalCycles += this.cycles
   }
 
@@ -78,16 +79,12 @@ class Cpu {
     this.bus.storeWord(address, value)
   }
 
-  getStatus(flag: Status): bool {
-    return <bool>((this.sr >> (<u8>flag)) & 1)
+  getStatus(bit: Status): bool {
+    return this.sr.get(<u8>bit)
   }
 
-  setStatus(flag: Status, value: bool): void {
-    if (value) {
-      this.sr |= 1 << (<u8>flag)
-    } else {
-      this.sr &= ~(1 << (<u8>flag))
-    }
+  setStatus(bit: Status, value: bool): void {
+    this.sr.set(<u8>bit, value)
   }
 
   pullFromStack(): u8 {
@@ -101,7 +98,7 @@ class Cpu {
   }
 
   getState(): StaticArray<usize> {
-    return [this.pc, this.sp, this.sr, this.ac, this.x, this.y, this.totalCycles]
+    return [this.pc, this.sp, this.sr.value, this.ac, this.x, this.y, this.totalCycles]
   }
 }
 

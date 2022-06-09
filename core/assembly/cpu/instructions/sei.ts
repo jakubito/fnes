@@ -1,11 +1,11 @@
-import Cpu from '../cpu'
-import { Address, Status } from '../enums'
+import Cpu from '../Cpu'
+import { Mode, Status } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x78, sei, Address.Implied, 2)
+  cpu.bind(0x78, sei, Mode.Implied, 2)
 }
 
-function sei(cpu: Cpu, param: u16, mode: Address): void {
+function sei(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.setStatus(Status.Interrupt, true)
 }
 

@@ -1,4 +1,4 @@
-import Cpu from '../cpu'
+import Cpu from '../Cpu'
 import adc from './adc'
 import alr from './alr'
 import anc from './anc'

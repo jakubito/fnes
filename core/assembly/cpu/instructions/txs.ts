@@ -1,11 +1,11 @@
-import Cpu from '../cpu'
-import { Address } from '../enums'
+import Cpu from '../Cpu'
+import { Mode } from '../enums'
 
 function bind(cpu: Cpu): void {
-  cpu.bind(0x9a, txs, Address.Implied, 2)
+  cpu.bind(0x9a, txs, Mode.Implied, 2)
 }
 
-function txs(cpu: Cpu, param: u16, mode: Address): void {
+function txs(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.sp = cpu.x
 }
 
