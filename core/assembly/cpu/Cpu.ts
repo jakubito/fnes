@@ -1,8 +1,8 @@
-import BitRegister from '../BitRegister'
-import { word } from '../helpers'
+import { BitRegister } from '../common'
 import Bus from './Bus'
 import Instruction from './Instruction'
 import bindings from './instructions'
+import { word } from './helpers'
 import { Mode, Status } from './enums'
 import { InstructionHandler } from './types'
 

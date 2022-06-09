@@ -1,5 +1,5 @@
-import { pageCrossed } from '../../helpers'
 import Cpu from '../Cpu'
+import { pageCrossed } from '../helpers'
 import { Mode, Status } from '../enums'
 
 function bind(cpu: Cpu): void {

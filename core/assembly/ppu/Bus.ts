@@ -1,5 +1,5 @@
-import Drive from '../Drive'
-import { inRange } from '../helpers'
+import { Drive } from '../drive'
+import { inRange } from '../common/helpers'
 
 class Bus {
   static CHR_START: u16 = 0

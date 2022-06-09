@@ -1,4 +1,4 @@
-import BitRegister from '../BitRegister'
+import { BitRegister } from '../common'
 import Address from './Address'
 import Bus from './Bus'
 import { Control } from './enums'

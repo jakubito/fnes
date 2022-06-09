@@ -1,6 +1,7 @@
-import Drive from '../Drive'
+import { Drive } from '../drive'
 import { Ppu } from '../ppu'
-import { inRange, word } from '../helpers'
+import { inRange } from '../common/helpers'
+import { word } from './helpers'
 
 class Bus {
   static WRAM_START: u16 = 0

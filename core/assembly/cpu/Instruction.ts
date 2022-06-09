@@ -1,5 +1,5 @@
-import { pageCrossed } from '../helpers'
 import Cpu from './Cpu'
+import { pageCrossed } from './helpers'
 import { Mode } from './enums'
 import { InstructionHandler } from './types'
 

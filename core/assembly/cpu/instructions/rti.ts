@@ -1,4 +1,4 @@
-import { word } from '../../helpers'
+import { word } from '../helpers'
 import Cpu from '../Cpu'
 import { Mode } from '../enums'
 

@@ -1,4 +1,4 @@
-import Drive from './Drive'
+import { Drive } from './drive'
 import { Cpu, Bus as CpuBus } from './cpu'
 import { Ppu, Bus as PpuBus } from './ppu'
 

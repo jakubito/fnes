@@ -1,4 +1,4 @@
-import { Mirroring } from './ppu/enums'
+import { Mirroring } from '../ppu/enums'
 
 class Rom {
   static TAG: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
