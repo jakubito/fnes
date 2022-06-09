@@ -9,6 +9,10 @@ class Ppu {
 
   constructor(public bus: Bus) {}
 
+  updateControl(value: u8): void {
+    this.control.value = value
+  }
+
   updateAddress(value: u8): void {
     this.address.update(value)
   }

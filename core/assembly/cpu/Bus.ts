@@ -9,6 +9,8 @@ class Bus {
   static PPU_CTRL: u16 = 0x2000
   static PPU_ADDR: u16 = 0x2006
   static PPU_DATA: u16 = 0x2007
+  static PPU_MIRR_START: u16 = 0x2008
+  static PPU_MIRR_END: u16 = 0x3fff
   static PRG_START: u16 = 0x8000
   static PRG_END: u16 = 0xffff
 
@@ -17,17 +19,35 @@ class Bus {
   constructor(public drive: Drive, public ppu: Ppu) {}
 
   load(address: u16): u8 {
-    if (inRange(address, Bus.WRAM_START, Bus.WRAM_END)) return this.loadWram(address)
-    if (inRange(address, Bus.PRG_START, Bus.PRG_END)) return this.loadPrgRom(address)
-    if (address == Bus.PPU_DATA) return this.ppu.loadAddress()
-    throw new Error(`Cannot read from address 0x${address.toString(16)}`)
+    switch (address) {
+      case inRange(address, Bus.WRAM_START, Bus.WRAM_END):
+        return this.loadWram(address)
+      case inRange(address, Bus.PRG_START, Bus.PRG_END):
+        return this.loadPrgRom(address)
+      case inRange(address, Bus.PPU_MIRR_START, Bus.PPU_MIRR_END):
+        return this.load(address & Bus.PPU_DATA)
+      case Bus.PPU_DATA:
+        return this.ppu.loadAddress()
+      default:
+        throw new Error(`Cannot read from address 0x${address.toString(16)}`)
+    }
   }
 
   store(address: u16, value: u8): void {
-    if (inRange(address, Bus.WRAM_START, Bus.WRAM_END)) return this.storeWram(address, value)
-    if (address == Bus.PPU_ADDR) return this.ppu.updateAddress(value)
-    if (address == Bus.PPU_DATA) return this.ppu.storeAddress(value)
-    throw new Error(`Cannot write to address 0x${address.toString(16)}`)
+    switch (address) {
+      case inRange(address, Bus.WRAM_START, Bus.WRAM_END):
+        return this.storeWram(address, value)
+      case inRange(address, Bus.PPU_MIRR_START, Bus.PPU_MIRR_END):
+        return this.store(address & Bus.PPU_DATA, value)
+      case Bus.PPU_CTRL:
+        return this.ppu.updateControl(value)
+      case Bus.PPU_ADDR:
+        return this.ppu.updateAddress(value)
+      case Bus.PPU_DATA:
+        return this.ppu.storeAddress(value)
+      default:
+        throw new Error(`Cannot write to address 0x${address.toString(16)}`)
+    }
   }
 
   loadWord(address: u16): u16 {

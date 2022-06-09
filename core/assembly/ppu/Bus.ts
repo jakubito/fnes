@@ -11,12 +11,19 @@ class Bus {
   constructor(public drive: Drive) {}
 
   load(address: u16): u8 {
-    if (inRange(address, Bus.CHR_START, Bus.CHR_END)) return this.loadChrRom(address)
-    throw new Error(`Cannot read from address 0x${address.toString(16)}`)
+    switch (address) {
+      case inRange(address, Bus.CHR_START, Bus.CHR_END):
+        return this.loadChrRom(address)
+      default:
+        throw new Error(`Cannot read from address 0x${address.toString(16)}`)
+    }
   }
 
   store(address: u16, value: u8): void {
-    throw new Error(`Cannot write to address 0x${address.toString(16)}`)
+    switch (address) {
+      default:
+        throw new Error(`Cannot write to address 0x${address.toString(16)}`)
+    }
   }
 
   @inline
