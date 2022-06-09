@@ -4,10 +4,8 @@ import { Ppu, Bus as PpuBus } from './ppu'
 
 class Fnes {
   drive: Drive = new Drive()
-  ppuBus: PpuBus = new PpuBus(this.drive)
-  ppu: Ppu = new Ppu(this.ppuBus)
-  cpuBus: CpuBus = new CpuBus(this.drive, this.ppu)
-  cpu: Cpu = new Cpu(this.cpuBus)
+  ppu: Ppu = new Ppu(new PpuBus(this.drive))
+  cpu: Cpu = new Cpu(new CpuBus(this.drive, this.ppu))
 
   constructor() {}
 
