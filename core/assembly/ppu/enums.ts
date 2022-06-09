@@ -8,3 +8,9 @@ export enum Control {
   PpuMode,
   GenerateNmi,
 }
+
+export enum Mirroring {
+  Vertical,
+  Horizontal,
+  FourScreen,
+}

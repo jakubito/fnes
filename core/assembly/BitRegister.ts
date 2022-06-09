@@ -6,11 +6,8 @@ class BitRegister {
   }
 
   set(bit: u8, value: bool): void {
-    if (value) {
-      this.value |= 1 << bit
-    } else {
-      this.value &= ~(1 << bit)
-    }
+    if (value) this.value |= 1 << bit
+    else this.value &= ~(1 << bit)
   }
 }
 
