@@ -2,13 +2,16 @@ import Drive from '../Drive'
 import { inRange } from '../helpers'
 
 class Bus {
+  static CHR_START: u16 = 0
+  static CHR_END: u16 = 0x1fff
+
   vram: Uint8Array = new Uint8Array(0x800)
   dataBuffer: u8
 
   constructor(public drive: Drive) {}
 
   load(address: u16): u8 {
-    if (inRange(address, 0, 0x1fff)) return this.loadChrRom(address)
+    if (inRange(address, Bus.CHR_START, Bus.CHR_END)) return this.loadChrRom(address)
     throw new Error(`Cannot read from address 0x${address.toString(16)}`)
   }
 

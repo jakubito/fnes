@@ -3,21 +3,29 @@ import { Ppu } from '../ppu'
 import { inRange, word } from '../helpers'
 
 class Bus {
+  static WRAM_START: u16 = 0
+  static WRAM_END: u16 = 0x1fff
+  static PPU_CTRL: u16 = 0x2000
+  static PPU_ADDR: u16 = 0x2006
+  static PPU_DATA: u16 = 0x2007
+  static PRG_START: u16 = 0x8000
+  static PRG_END: u16 = 0xffff
+
   wram: Uint8Array = new Uint8Array(0x800)
 
   constructor(public drive: Drive, public ppu: Ppu) {}
 
   load(address: u16): u8 {
-    if (inRange(address, 0, 0x1fff)) return this.loadWram(address)
-    if (inRange(address, 0x8000, 0xffff)) return this.loadPrgRom(address)
-    if (address == 0x2007) return this.ppu.loadAddress()
+    if (inRange(address, Bus.WRAM_START, Bus.WRAM_END)) return this.loadWram(address)
+    if (inRange(address, Bus.PRG_START, Bus.PRG_END)) return this.loadPrgRom(address)
+    if (address == Bus.PPU_DATA) return this.ppu.loadAddress()
     throw new Error(`Cannot read from address 0x${address.toString(16)}`)
   }
 
   store(address: u16, value: u8): void {
-    if (inRange(address, 0, 0x1fff)) return this.storeWram(address, value)
-    if (address == 0x2006) return this.ppu.updateAddress(value)
-    if (address == 0x2007) return this.ppu.storeAddress(value)
+    if (inRange(address, Bus.WRAM_START, Bus.WRAM_END)) return this.storeWram(address, value)
+    if (address == Bus.PPU_ADDR) return this.ppu.updateAddress(value)
+    if (address == Bus.PPU_DATA) return this.ppu.storeAddress(value)
     throw new Error(`Cannot write to address 0x${address.toString(16)}`)
   }
 

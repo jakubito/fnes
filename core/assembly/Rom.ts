@@ -1,9 +1,9 @@
 import { Mirroring } from './ppu/enums'
 
 class Rom {
-  static tag: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
-  static prgPageSize: u16 = 0x4000
-  static chrPageSize: u16 = 0x2000
+  static TAG: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
+  static PRG_PAGE_SIZE: u16 = 0x4000
+  static CHR_PAGE_SIZE: u16 = 0x2000
 
   prgRom: Uint8Array
   chrRom: Uint8Array
@@ -16,8 +16,8 @@ class Rom {
     validateFormat(header)
     validateVersion(header)
 
-    const prgSize = header[4] * Rom.prgPageSize
-    const chrSize = header[5] * Rom.chrPageSize
+    const prgSize = header[4] * Rom.PRG_PAGE_SIZE
+    const chrSize = header[5] * Rom.CHR_PAGE_SIZE
     const start = ((header[6] >> 2) & 1) * 512 + 16
 
     this.prgRom = Uint8Array.wrap(buffer, start, prgSize)
@@ -39,7 +39,7 @@ class Rom {
 // @ts-ignore
 @inline
 function validateFormat(header: Uint8Array): void {
-  for (let i = 0; i < 4; i += 1) assert(header[i] == Rom.tag[i], 'Unknown rom format')
+  for (let i = 0; i < 4; i += 1) assert(header[i] == Rom.TAG[i], 'Unknown rom format')
 }
 
 // @ts-ignore
