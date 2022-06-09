@@ -10,17 +10,17 @@ function bind(cpu: Cpu): void {
 }
 
 function aslAc(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Carry, <bool>(cpu.ac >> 7))
+  cpu.setStatus(Status.Carry, cpu.ac >> 7)
   cpu.ac <<= 1
   cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
+  cpu.setStatus(Status.Negative, cpu.ac >> 7)
 }
 
 export function asl(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Carry, <bool>(cpu.load(param) >> 7))
+  cpu.setStatus(Status.Carry, cpu.load(param) >> 7)
   cpu.store(param, cpu.load(param) << 1)
   cpu.setStatus(Status.Zero, cpu.load(param) == 0)
-  cpu.setStatus(Status.Negative, <bool>(cpu.load(param) >> 7))
+  cpu.setStatus(Status.Negative, cpu.load(param) >> 7)
 }
 
 export default bind

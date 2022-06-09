@@ -5,7 +5,7 @@ class BitRegister {
     return <bool>((this.value >> bit) & 1)
   }
 
-  set(bit: u8, value: bool): void {
+  set<T>(bit: u8, value: T): void {
     if (value) this.value |= 1 << bit
     else this.value &= ~(1 << bit)
   }

@@ -19,8 +19,8 @@ export function adc(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.ac = <u8>sum
   cpu.setStatus(Status.Carry, sum > 0xff)
   cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Overflow, <bool>overflow)
-  cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
+  cpu.setStatus(Status.Overflow, overflow)
+  cpu.setStatus(Status.Negative, cpu.ac >> 7)
 }
 
 export default bind

@@ -8,9 +8,9 @@ function bind(cpu: Cpu): void {
 
 function anc(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.ac &= <u8>param
-  cpu.setStatus(Status.Carry, <bool>(cpu.ac >> 7))
+  cpu.setStatus(Status.Carry, cpu.ac >> 7)
   cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
+  cpu.setStatus(Status.Negative, cpu.ac >> 7)
 }
 
 export default bind

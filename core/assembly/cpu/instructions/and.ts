@@ -15,7 +15,7 @@ function bind(cpu: Cpu): void {
 export function and(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.ac &= mode == Mode.Immediate ? <u8>param : cpu.load(param)
   cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
+  cpu.setStatus(Status.Negative, cpu.ac >> 7)
 }
 
 export default bind

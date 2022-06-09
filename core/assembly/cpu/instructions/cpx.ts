@@ -11,7 +11,7 @@ function cpx(cpu: Cpu, param: u16, mode: Mode): void {
   const value = mode == Mode.Immediate ? <u8>param : cpu.load(param)
   cpu.setStatus(Status.Carry, cpu.x >= value)
   cpu.setStatus(Status.Zero, cpu.x == value)
-  cpu.setStatus(Status.Negative, <bool>((cpu.x - value) >> 7))
+  cpu.setStatus(Status.Negative, (cpu.x - value) >> 7)
 }
 
 export default bind

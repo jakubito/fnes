@@ -10,19 +10,19 @@ function bind(cpu: Cpu): void {
 }
 
 function rolAc(cpu: Cpu, param: u16, mode: Mode): void {
-  const oldCarry = cpu.getStatus(Status.Carry)
-  cpu.setStatus(Status.Carry, <bool>(cpu.ac >> 7))
-  cpu.ac = (cpu.ac << 1) | (<u8>oldCarry)
+  const oldCarry = <u8>cpu.getStatus(Status.Carry)
+  cpu.setStatus(Status.Carry, cpu.ac >> 7)
+  cpu.ac = (cpu.ac << 1) | oldCarry
   cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Negative, <bool>(cpu.ac >> 7))
+  cpu.setStatus(Status.Negative, cpu.ac >> 7)
 }
 
 export function rol(cpu: Cpu, param: u16, mode: Mode): void {
-  const oldCarry = cpu.getStatus(Status.Carry)
-  cpu.setStatus(Status.Carry, <bool>(cpu.load(param) >> 7))
-  cpu.store(param, (cpu.load(param) << 1) | (<u8>oldCarry))
+  const oldCarry = <u8>cpu.getStatus(Status.Carry)
+  cpu.setStatus(Status.Carry, cpu.load(param) >> 7)
+  cpu.store(param, (cpu.load(param) << 1) | oldCarry)
   cpu.setStatus(Status.Zero, cpu.load(param) == 0)
-  cpu.setStatus(Status.Negative, <bool>(cpu.load(param) >> 7))
+  cpu.setStatus(Status.Negative, cpu.load(param) >> 7)
 }
 
 export default bind

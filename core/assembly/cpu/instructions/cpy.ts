@@ -11,7 +11,7 @@ function cpy(cpu: Cpu, param: u16, mode: Mode): void {
   const value = mode == Mode.Immediate ? <u8>param : cpu.load(param)
   cpu.setStatus(Status.Carry, cpu.y >= value)
   cpu.setStatus(Status.Zero, cpu.y == value)
-  cpu.setStatus(Status.Negative, <bool>((cpu.y - value) >> 7))
+  cpu.setStatus(Status.Negative, (cpu.y - value) >> 7)
 }
 
 export default bind

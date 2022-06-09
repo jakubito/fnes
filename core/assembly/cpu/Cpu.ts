@@ -83,7 +83,7 @@ class Cpu {
     return this.sr.get(<u8>bit)
   }
 
-  setStatus(bit: Status, value: bool): void {
+  setStatus<T>(bit: Status, value: T): void {
     this.sr.set(<u8>bit, value)
   }
 

@@ -27,7 +27,7 @@ class Ppu {
     return this.control.get(<u8>bit)
   }
 
-  setControl(bit: Control, value: bool): void {
+  setControl<T>(bit: Control, value: T): void {
     this.control.set(<u8>bit, value)
   }
 }
