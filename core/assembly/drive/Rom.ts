@@ -25,15 +25,6 @@ class Rom {
     this.mapper = extractMapper(header)
     this.mirroring = extractMirroring(header)
   }
-
-  loadPrgRom(address: u16): u8 {
-    if (address >= <u16>this.prgRom.length) return this.prgRom[address & 0x3fff]
-    return this.prgRom[address]
-  }
-
-  loadChrRom(address: u16): u8 {
-    return this.chrRom[address]
-  }
 }
 
 // @ts-ignore

@@ -4,30 +4,20 @@ import { inRange } from '../common/helpers'
 import { word } from './helpers'
 
 class Bus {
-  static WRAM_START: u16 = 0
-  static WRAM_END: u16 = 0x1fff
-  static PPU_CTRL: u16 = 0x2000
-  static PPU_ADDR: u16 = 0x2006
-  static PPU_DATA: u16 = 0x2007
-  static PPU_MIRR_START: u16 = 0x2008
-  static PPU_MIRR_END: u16 = 0x3fff
-  static PRG_START: u16 = 0x8000
-  static PRG_END: u16 = 0xffff
-
   wram: Uint8Array = new Uint8Array(0x800)
 
   constructor(public drive: Drive, public ppu: Ppu) {}
 
   load(address: u16): u8 {
     switch (address) {
-      case inRange(address, Bus.WRAM_START, Bus.WRAM_END):
+      case inRange(address, 0, 0x1fff):
         return this.loadWram(address)
-      case inRange(address, Bus.PRG_START, Bus.PRG_END):
-        return this.loadPrgRom(address)
-      case inRange(address, Bus.PPU_MIRR_START, Bus.PPU_MIRR_END):
-        return this.load(address & Bus.PPU_DATA)
-      case Bus.PPU_DATA:
+      case 0x2007:
         return this.ppu.loadAddress()
+      case inRange(address, 0x2008, 0x3fff):
+        return this.load(address & 0x2007)
+      case inRange(address, 0x8000, 0xffff):
+        return this.loadPrgRom(address)
       default:
         throw new Error(`Cannot read from address 0x${address.toString(16)}`)
     }
@@ -35,16 +25,16 @@ class Bus {
 
   store(address: u16, value: u8): void {
     switch (address) {
-      case inRange(address, Bus.WRAM_START, Bus.WRAM_END):
+      case inRange(address, 0, 0x1fff):
         return this.storeWram(address, value)
-      case inRange(address, Bus.PPU_MIRR_START, Bus.PPU_MIRR_END):
-        return this.store(address & Bus.PPU_DATA, value)
-      case Bus.PPU_CTRL:
+      case 0x2000:
         return this.ppu.updateControl(value)
-      case Bus.PPU_ADDR:
+      case 0x2006:
         return this.ppu.updateAddress(value)
-      case Bus.PPU_DATA:
+      case 0x2007:
         return this.ppu.storeAddress(value)
+      case inRange(address, 0x2008, 0x3fff):
+        return this.store(address & 0x2007, value)
       default:
         throw new Error(`Cannot write to address 0x${address.toString(16)}`)
     }
@@ -72,8 +62,7 @@ class Bus {
 
   @inline
   loadPrgRom(address: u16): u8 {
-    if (!this.drive.rom) return 0
-    return this.drive.rom!.loadPrgRom(address & 0x7fff)
+    return this.drive.loadPrgRom(address & 0x7fff)
   }
 }
 

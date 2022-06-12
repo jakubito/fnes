@@ -10,7 +10,7 @@ class Fnes {
   constructor() {}
 
   loadRom(buffer: ArrayBuffer): void {
-    this.drive.loadRom(buffer)
+    this.drive.setRom(buffer)
     this.cpu.reset()
   }
 }
