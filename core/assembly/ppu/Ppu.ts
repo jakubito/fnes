@@ -1,4 +1,5 @@
 import { BitRegister } from '../common'
+import { Interrupt } from '../common/enums'
 import Address from './Address'
 import Bus from './Bus'
 import { Control } from './enums'
@@ -6,6 +7,7 @@ import { Control } from './enums'
 class Ppu {
   control: BitRegister = new BitRegister()
   address: Address = new Address()
+  cycles: u8
 
   constructor(public bus: Bus) {}
 
@@ -33,6 +35,14 @@ class Ppu {
 
   setControl<T>(bit: Control, value: T): void {
     this.control.set(<u8>bit, value)
+  }
+
+  run(cycles: u8): void {
+    for (let i: u8 = 0; i <= cycles; i++) this.step()
+  }
+
+  step(): void {
+    // this.bus.interrupts.push(Interrupt.Nmi)
   }
 }
 

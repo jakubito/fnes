@@ -1,4 +1,4 @@
-import { Drive } from '../drive'
+import { Drive, Interrupts } from '../common'
 import { inRange } from '../common/helpers'
 import { Mirroring } from './enums'
 
@@ -7,7 +7,7 @@ class Bus {
   palette: Uint8Array = new Uint8Array(0x20)
   dataBuffer: u8
 
-  constructor(public drive: Drive) {}
+  constructor(public drive: Drive, public interrupts: Interrupts) {}
 
   load(address: u16): u8 {
     switch (address) {

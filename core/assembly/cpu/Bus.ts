@@ -1,4 +1,4 @@
-import { Drive } from '../drive'
+import { Drive, Interrupts } from '../common'
 import { Ppu } from '../ppu'
 import { inRange } from '../common/helpers'
 import { word } from './helpers'
@@ -6,7 +6,7 @@ import { word } from './helpers'
 class Bus {
   wram: Uint8Array = new Uint8Array(0x800)
 
-  constructor(public drive: Drive, public ppu: Ppu) {}
+  constructor(public drive: Drive, public interrupts: Interrupts, public ppu: Ppu) {}
 
   load(address: u16): u8 {
     switch (address) {
@@ -41,13 +41,17 @@ class Bus {
   }
 
   loadWord(address: u16): u16 {
-    const highByte = ((<u16>address) & 0xff00) | (<u8>(address & 0xff) + 1)
-    return word(this.load(<u16>address), this.load(highByte))
+    const highByte = (address & 0xff00) | (<u8>(address & 0xff) + 1)
+    return word(this.load(address), this.load(highByte))
   }
 
   storeWord(address: u16, value: u16): void {
     this.store(address, <u8>(value & 0xff))
     this.store(address + 1, <u8>(value >> 8))
+  }
+
+  tick(cycles: u8): void {
+    this.ppu.run(cycles * 3)
   }
 
   @inline

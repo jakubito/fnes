@@ -1,11 +1,12 @@
-import { Drive } from './drive'
+import { Drive, Interrupts } from './common'
 import { Cpu, Bus as CpuBus } from './cpu'
 import { Ppu, Bus as PpuBus } from './ppu'
 
 class Fnes {
   drive: Drive = new Drive()
-  ppu: Ppu = new Ppu(new PpuBus(this.drive))
-  cpu: Cpu = new Cpu(new CpuBus(this.drive, this.ppu))
+  interrupts: Interrupts = new Interrupts()
+  ppu: Ppu = new Ppu(new PpuBus(this.drive, this.interrupts))
+  cpu: Cpu = new Cpu(new CpuBus(this.drive, this.interrupts, this.ppu))
 
   constructor() {}
 

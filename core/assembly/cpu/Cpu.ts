@@ -1,4 +1,5 @@
 import { BitRegister } from '../common'
+import { Interrupt } from '../common/enums'
 import Bus from './Bus'
 import Instruction from './Instruction'
 import bindings from './instructions'
@@ -45,12 +46,27 @@ class Cpu {
   }
 
   step(): void {
+    if (this.bus.interrupts.empty()) this.nextInstruction()
+    else this.handleInterrupt(this.bus.interrupts.shift())
+    this.bus.tick(this.cycles)
+    this.totalCycles += this.cycles
+    this.cycles = 0
+  }
+
+  @inline
+  nextInstruction(): void {
     const opcode = this.readByte()
     const instruction = this.instructions[opcode]
     assert(instruction, `Unknown opcode 0x${opcode.toString(16)}`)
-    this.cycles = 0
     instruction!.execute()
-    this.totalCycles += this.cycles
+  }
+
+  @inline
+  handleInterrupt(interrupt: Interrupt): void {
+    switch (interrupt) {
+      case Interrupt.Nmi:
+        return this.nmiInterrupt()
+    }
   }
 
   readByte(): u8 {
@@ -96,6 +112,9 @@ class Cpu {
     this.store(0x100 + this.sp, value)
     this.sp -= 1
   }
+
+  @inline
+  nmiInterrupt(): void {}
 
   getState(): StaticArray<usize> {
     return [this.pc, this.sp, this.sr.value, this.ac, this.x, this.y, this.totalCycles]
