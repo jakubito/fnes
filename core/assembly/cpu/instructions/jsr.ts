@@ -6,8 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function jsr(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.pushToStack(<u8>((cpu.pc - 1) >> 8))
-  cpu.pushToStack(<u8>cpu.pc - 1)
+  cpu.pushWordToStack(cpu.pc - 1)
   cpu.pc = param
 }
 

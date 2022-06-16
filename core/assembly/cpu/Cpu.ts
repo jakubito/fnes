@@ -1,5 +1,5 @@
 import { BitRegister } from '../common'
-import { Interrupt } from '../common/enums'
+import { Interrupt, InterruptVector } from '../common/enums'
 import Bus from './Bus'
 import Instruction from './Instruction'
 import bindings from './instructions'
@@ -37,36 +37,42 @@ class Cpu {
   reset(): void {
     this.totalCycles = 0
     this.cycles = 0
-    this.pc = this.loadWord(0xfffc)
-    this.sp = 0xfd
-    this.sr.value = 0b0010_0100
+    this.pc = 0
+    this.sp = 0
+    this.sr.value = 0b0010_0000
     this.ac = 0
     this.x = 0
     this.y = 0
   }
 
   step(): void {
-    if (this.bus.interrupts.empty()) this.nextInstruction()
-    else this.handleInterrupt(this.bus.interrupts.shift())
+    const interrupt = this.pollInterrupt()
+    if (<i8>interrupt == -1) this.nextInstruction()
+    else this.triggerInterrupt(interrupt)
     this.bus.tick(this.cycles)
     this.totalCycles += this.cycles
     this.cycles = 0
   }
 
-  @inline
+  pollInterrupt(): Interrupt {
+    const interrupt = this.bus.interrupts.poll()
+    if (interrupt == Interrupt.Irq && this.getStatus(Status.IrqDisable)) return -1
+    return interrupt
+  }
+
+  triggerInterrupt(interrupt: Interrupt): void {
+    this.pushWordToStack(this.pc)
+    this.pushToStack(this.sr.value | 0b0010_0000)
+    this.setStatus(Status.IrqDisable, true)
+    this.pc = this.loadWord(InterruptVector[interrupt])
+    this.cycles += 7
+  }
+
   nextInstruction(): void {
     const opcode = this.readByte()
     const instruction = this.instructions[opcode]
     assert(instruction, `Unknown opcode 0x${opcode.toString(16)}`)
     instruction!.execute()
-  }
-
-  @inline
-  handleInterrupt(interrupt: Interrupt): void {
-    switch (interrupt) {
-      case Interrupt.Nmi:
-        return this.nmiInterrupt()
-    }
   }
 
   readByte(): u8 {
@@ -113,8 +119,14 @@ class Cpu {
     this.sp -= 1
   }
 
-  @inline
-  nmiInterrupt(): void {}
+  pullWordFromStack(): u16 {
+    return word(this.pullFromStack(), this.pullFromStack())
+  }
+
+  pushWordToStack(value: u16): void {
+    this.pushToStack(<u8>(value >> 8))
+    this.pushToStack(<u8>value)
+  }
 
   getState(): StaticArray<usize> {
     return [this.pc, this.sp, this.sr.value, this.ac, this.x, this.y, this.totalCycles]

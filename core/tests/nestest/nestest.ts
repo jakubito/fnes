@@ -24,8 +24,7 @@ const module = await instantiate(compiledModule, { env: {} })
 const fnes = module.createInstance()
 
 module.loadRom(fnes, romBuffer)
-module.setPc(fnes, 0xc000)
-module.setTotalCycles(fnes, 7)
+module.setProgramCounter(fnes, 0xc000)
 
 for (let i = 0; i < log.length - 1; i += 1) {
   const cpuState = formatCpuState(<CpuState>module.getCpuState(fnes))

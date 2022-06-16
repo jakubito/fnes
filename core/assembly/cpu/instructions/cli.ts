@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function cli(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Interrupt, false)
+  cpu.setStatus(Status.IrqDisable, false)
 }
 
 export default bind

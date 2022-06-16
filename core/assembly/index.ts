@@ -20,10 +20,6 @@ export function loadRom(instance: Fnes, buffer: ArrayBuffer): void {
   instance.loadRom(buffer)
 }
 
-export function setPc(instance: Fnes, value: u16): void {
+export function setProgramCounter(instance: Fnes, value: u16): void {
   instance.cpu.pc = value
-}
-
-export function setTotalCycles(instance: Fnes, value: usize): void {
-  instance.cpu.totalCycles = value
 }

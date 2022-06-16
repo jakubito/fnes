@@ -17,7 +17,6 @@ class Instruction {
     this.cpu.cycles += this.cycles
   }
 
-  @inline
   getParam(): u16 {
     switch (this.mode) {
       case Mode.Immediate:

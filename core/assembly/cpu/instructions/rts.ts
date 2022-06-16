@@ -1,4 +1,3 @@
-import { word } from '../helpers'
 import Cpu from '../Cpu'
 import { Mode } from '../enums'
 
@@ -7,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function rts(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.pc = word(cpu.pullFromStack(), cpu.pullFromStack()) + 1
+  cpu.pc = cpu.pullWordFromStack() + 1
 }
 
 export default bind

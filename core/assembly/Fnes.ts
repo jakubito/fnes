@@ -1,6 +1,7 @@
 import { Drive, Interrupts } from './common'
-import { Cpu, Bus as CpuBus } from './cpu'
+import { Interrupt } from './common/enums'
 import { Ppu, Bus as PpuBus } from './ppu'
+import { Cpu, Bus as CpuBus } from './cpu'
 
 class Fnes {
   drive: Drive = new Drive()
@@ -12,7 +13,14 @@ class Fnes {
 
   loadRom(buffer: ArrayBuffer): void {
     this.drive.setRom(buffer)
+    this.reset()
+  }
+
+  reset(): void {
+    this.interrupts.reset()
+    this.interrupts.set(Interrupt.Reset)
     this.cpu.reset()
+    this.cpu.step()
   }
 }
 

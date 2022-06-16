@@ -1,18 +1,24 @@
 import { Interrupt } from './enums'
 
 class Interrupts {
-  buffer: Interrupt[] = []
+  value: StaticArray<bool> = new StaticArray(3)
 
-  empty(): bool {
-    return this.buffer.length == 0
+  poll(): Interrupt {
+    for (let i: i32 = 0; i < this.value.length; i++) {
+      if (this.value[i]) {
+        this.value[i] = false
+        return i
+      }
+    }
+    return -1
   }
 
-  push(value: Interrupt): void {
-    this.buffer.push(value)
+  set(interrupt: Interrupt): void {
+    this.value[interrupt] = true
   }
 
-  shift(): Interrupt {
-    return this.buffer.shift()
+  reset(): void {
+    this.value.fill(false)
   }
 }
 

@@ -17,7 +17,7 @@ export enum Mode {
 export enum Status {
   Carry = 0,
   Zero = 1,
-  Interrupt = 2,
+  IrqDisable = 2,
   Decimal = 3,
   Break = 4,
   Overflow = 6,

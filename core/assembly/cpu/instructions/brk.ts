@@ -1,3 +1,4 @@
+import { Interrupt, InterruptVector } from '../../common/enums'
 import Cpu from '../Cpu'
 import { Mode, Status } from '../enums'
 
@@ -6,10 +7,9 @@ function bind(cpu: Cpu): void {
 }
 
 function brk(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.pushToStack(<u8>((cpu.pc + 1) >> 8))
-  cpu.pushToStack(<u8>cpu.pc + 1)
+  cpu.pushWordToStack(cpu.pc + 1)
   cpu.pushToStack(cpu.sr.value | 0b0011_0000)
-  cpu.setStatus(Status.Break, true)
+  cpu.pc = cpu.loadWord(InterruptVector[Interrupt.Irq])
 }
 
 export default bind

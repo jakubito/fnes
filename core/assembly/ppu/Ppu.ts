@@ -42,7 +42,7 @@ class Ppu {
   }
 
   step(): void {
-    // this.bus.interrupts.push(Interrupt.Nmi)
+    // if (this.getControl(Control.GenerateNmi)) this.bus.interrupts.set(Interrupt.Nmi)
   }
 }
 
