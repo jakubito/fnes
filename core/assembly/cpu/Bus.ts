@@ -1,6 +1,6 @@
-import { Drive, Interrupts } from '../common'
+import { Drive, Interrupts } from '../main'
 import { Ppu } from '../ppu'
-import { inRange } from '../common/helpers'
+import { inRange } from '../main/helpers'
 import { word } from './helpers'
 
 class Bus {

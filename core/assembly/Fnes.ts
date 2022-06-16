@@ -1,5 +1,5 @@
-import { Drive, Interrupts } from './common'
-import { Interrupt } from './common/enums'
+import { Drive, Interrupts } from './main'
+import { Interrupt } from './main/enums'
 import { Ppu, Bus as PpuBus } from './ppu'
 import { Cpu, Bus as CpuBus } from './cpu'
 

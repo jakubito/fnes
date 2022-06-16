@@ -1,5 +1,5 @@
-import { Drive, Interrupts } from '../common'
-import { inRange } from '../common/helpers'
+import { Drive, Interrupts } from '../main'
+import { inRange } from '../main/helpers'
 import { Mirroring } from './enums'
 
 class Bus {

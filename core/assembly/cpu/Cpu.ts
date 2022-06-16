@@ -1,5 +1,5 @@
-import { BitRegister } from '../common'
-import { Interrupt, InterruptVector } from '../common/enums'
+import { BitRegister } from '../main'
+import { Interrupt, InterruptVector } from '../main/enums'
 import Bus from './Bus'
 import Instruction from './Instruction'
 import bindings from './instructions'

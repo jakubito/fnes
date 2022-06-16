@@ -1,4 +1,4 @@
-import { Interrupt, InterruptVector } from '../../common/enums'
+import { Interrupt, InterruptVector } from '../../main/enums'
 import Cpu from '../Cpu'
 import { Mode, Status } from '../enums'
 
