@@ -9,7 +9,7 @@ class Ppu {
   address: Address = new Address()
   cycles: u8
 
-  constructor(public bus: Bus) {}
+  constructor(private bus: Bus) {}
 
   updateControl(value: u8): void {
     this.control.value = value

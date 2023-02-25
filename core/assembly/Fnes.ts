@@ -6,8 +6,10 @@ import { Cpu, Bus as CpuBus } from './cpu'
 class Fnes {
   drive: Drive = new Drive()
   interrupts: Interrupts = new Interrupts()
-  ppu: Ppu = new Ppu(new PpuBus(this.drive, this.interrupts))
-  cpu: Cpu = new Cpu(new CpuBus(this.drive, this.interrupts, this.ppu))
+  ppuBus: PpuBus = new PpuBus(this.drive)
+  ppu: Ppu = new Ppu(this.ppuBus)
+  cpuBus: CpuBus = new CpuBus(this.drive, this.ppu)
+  cpu: Cpu = new Cpu(this.cpuBus, this.interrupts)
 
   constructor() {}
 

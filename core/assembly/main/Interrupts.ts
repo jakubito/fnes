@@ -10,6 +10,7 @@ class Interrupts {
         return i
       }
     }
+
     return -1
   }
 

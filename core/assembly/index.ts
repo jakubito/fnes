@@ -13,7 +13,7 @@ export function getCpuState(instance: Fnes): StaticArray<usize> {
 }
 
 export function getWramPointer(instance: Fnes): usize {
-  return changetype<usize>(instance.cpu.bus.wram.buffer) + instance.cpu.bus.wram.byteOffset
+  return changetype<usize>(instance.cpuBus.wram.buffer) + instance.cpuBus.wram.byteOffset
 }
 
 export function loadRom(instance: Fnes, buffer: ArrayBuffer): void {

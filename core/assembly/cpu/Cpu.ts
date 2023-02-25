@@ -1,4 +1,4 @@
-import { BitRegister } from '../main'
+import { BitRegister, Interrupts } from '../main'
 import { Interrupt, InterruptVector } from '../main/enums'
 import Bus from './Bus'
 import Instruction from './Instruction'
@@ -19,7 +19,7 @@ class Cpu {
   x: u8
   y: u8
 
-  constructor(public bus: Bus) {
+  constructor(private bus: Bus, private interrupts: Interrupts) {
     for (let i = 0; i < bindings.length; i += 1) bindings.at(i)(this)
     this.reset()
   }
@@ -55,7 +55,7 @@ class Cpu {
   }
 
   pollInterrupt(): Interrupt {
-    const interrupt = this.bus.interrupts.poll()
+    const interrupt = this.interrupts.poll()
     if (interrupt == Interrupt.Irq && this.getStatus(Status.IrqDisable)) return -1
     return interrupt
   }

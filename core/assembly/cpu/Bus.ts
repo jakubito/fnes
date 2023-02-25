@@ -1,22 +1,22 @@
-import { Drive, Interrupts } from '../main'
+import { Drive } from '../main'
 import { Ppu } from '../ppu'
-import { inRange } from '../main/helpers'
+import { between } from '../main/helpers'
 import { word } from './helpers'
 
 class Bus {
   wram: Uint8Array = new Uint8Array(0x800)
 
-  constructor(public drive: Drive, public interrupts: Interrupts, public ppu: Ppu) {}
+  constructor(private drive: Drive, private ppu: Ppu) {}
 
   load(address: u16): u8 {
     switch (address) {
-      case inRange(address, 0, 0x1fff):
+      case between(address, 0, 0x1fff):
         return this.loadWram(address)
       case 0x2007:
         return this.ppu.loadAddress()
-      case inRange(address, 0x2008, 0x3fff):
+      case between(address, 0x2008, 0x3fff):
         return this.load(address & 0x2007)
-      case inRange(address, 0x8000, 0xffff):
+      case between(address, 0x8000, 0xffff):
         return this.loadPrgRom(address)
       default:
         throw new Error(`Cannot read from address 0x${address.toString(16)}`)
@@ -25,7 +25,7 @@ class Bus {
 
   store(address: u16, value: u8): void {
     switch (address) {
-      case inRange(address, 0, 0x1fff):
+      case between(address, 0, 0x1fff):
         return this.storeWram(address, value)
       case 0x2000:
         return this.ppu.updateControl(value)
@@ -33,7 +33,7 @@ class Bus {
         return this.ppu.updateAddress(value)
       case 0x2007:
         return this.ppu.storeAddress(value)
-      case inRange(address, 0x2008, 0x3fff):
+      case between(address, 0x2008, 0x3fff):
         return this.store(address & 0x2007, value)
       default:
         throw new Error(`Cannot write to address 0x${address.toString(16)}`)
