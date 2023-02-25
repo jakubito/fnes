@@ -11,8 +11,8 @@ function bind(cpu: Cpu): void {
 
 function ldy(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.y = mode == Mode.Immediate ? <u8>param : cpu.load(param)
-  cpu.setStatus(Status.Zero, cpu.y == 0)
-  cpu.setStatus(Status.Negative, cpu.y >> 7)
+  cpu.sr.set(Status.Zero, cpu.y == 0)
+  cpu.sr.set(Status.Negative, cpu.y >> 7)
 }
 
 export default bind

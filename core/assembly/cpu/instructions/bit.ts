@@ -7,9 +7,9 @@ function bind(cpu: Cpu): void {
 }
 
 function bit(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Zero, (cpu.ac & cpu.load(param)) == 0)
-  cpu.setStatus(Status.Overflow, (cpu.load(param) >> 6) & 1)
-  cpu.setStatus(Status.Negative, cpu.load(param) >> 7)
+  cpu.sr.set(Status.Zero, (cpu.ac & cpu.load(param)) == 0)
+  cpu.sr.set(Status.Overflow, (cpu.load(param) >> 6) & 1)
+  cpu.sr.set(Status.Negative, cpu.load(param) >> 7)
 }
 
 export default bind

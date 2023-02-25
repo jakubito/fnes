@@ -14,13 +14,13 @@ function bind(cpu: Cpu): void {
 
 export function adc(cpu: Cpu, param: u16, mode: Mode): void {
   const value = mode == Mode.Immediate ? <u8>param : cpu.load(param)
-  const sum = <u16>cpu.ac + value + <u8>cpu.getStatus(Status.Carry)
+  const sum = <u16>cpu.ac + value + <u8>cpu.sr.get(Status.Carry)
   const overflow = ~(cpu.ac ^ value) & (cpu.ac ^ sum) & 0b1000_0000
   cpu.ac = <u8>sum
-  cpu.setStatus(Status.Carry, sum > 0xff)
-  cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Overflow, overflow)
-  cpu.setStatus(Status.Negative, cpu.ac >> 7)
+  cpu.sr.set(Status.Carry, sum > 0xff)
+  cpu.sr.set(Status.Zero, cpu.ac == 0)
+  cpu.sr.set(Status.Overflow, overflow)
+  cpu.sr.set(Status.Negative, cpu.ac >> 7)
 }
 
 export default bind

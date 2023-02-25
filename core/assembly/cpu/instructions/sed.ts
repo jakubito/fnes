@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function sed(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Decimal, true)
+  cpu.sr.set(Status.Decimal, true)
 }
 
 export default bind

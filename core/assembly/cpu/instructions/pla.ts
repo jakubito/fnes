@@ -7,8 +7,8 @@ function bind(cpu: Cpu): void {
 
 function pla(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.ac = cpu.pullFromStack()
-  cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Negative, cpu.ac >> 7)
+  cpu.sr.set(Status.Zero, cpu.ac == 0)
+  cpu.sr.set(Status.Negative, cpu.ac >> 7)
 }
 
 export default bind

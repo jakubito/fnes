@@ -7,8 +7,8 @@ function bind(cpu: Cpu): void {
 
 function dey(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.y -= 1
-  cpu.setStatus(Status.Zero, cpu.y == 0)
-  cpu.setStatus(Status.Negative, cpu.y >> 7)
+  cpu.sr.set(Status.Zero, cpu.y == 0)
+  cpu.sr.set(Status.Negative, cpu.y >> 7)
 }
 
 export default bind

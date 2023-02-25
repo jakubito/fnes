@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function sei(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.IrqDisable, true)
+  cpu.sr.set(Status.IrqDisable, true)
 }
 
 export default bind

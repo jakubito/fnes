@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function rti(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.sr.value = (cpu.sr.value & 0b0011_0000) | (cpu.pullFromStack() & 0b1100_1111)
+  cpu.sr.setValue((cpu.sr.value & 0b0011_0000) | (cpu.pullFromStack() & 0b1100_1111))
   cpu.pc = cpu.pullWordFromStack()
 }
 

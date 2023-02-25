@@ -12,8 +12,10 @@ class Bus {
     switch (address) {
       case between(address, 0, 0x1fff):
         return this.loadWram(address)
+      case 0x2002:
+        return this.ppu.status.value
       case 0x2007:
-        return this.ppu.loadAddress()
+        return this.ppu.loadFromAddress()
       case between(address, 0x2008, 0x3fff):
         return this.load(address & 0x2007)
       case between(address, 0x8000, 0xffff):
@@ -28,11 +30,13 @@ class Bus {
       case between(address, 0, 0x1fff):
         return this.storeWram(address, value)
       case 0x2000:
-        return this.ppu.updateControl(value)
+        return this.ppu.control.setValue(value)
+      case 0x2001:
+        return this.ppu.mask.setValue(value)
       case 0x2006:
         return this.ppu.updateAddress(value)
       case 0x2007:
-        return this.ppu.storeAddress(value)
+        return this.ppu.storeToAddress(value)
       case between(address, 0x2008, 0x3fff):
         return this.store(address & 0x2007, value)
       default:

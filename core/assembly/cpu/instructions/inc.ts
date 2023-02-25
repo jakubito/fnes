@@ -10,8 +10,8 @@ function bind(cpu: Cpu): void {
 
 export function inc(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.store(param, cpu.load(param) + 1)
-  cpu.setStatus(Status.Zero, cpu.load(param) == 0)
-  cpu.setStatus(Status.Negative, cpu.load(param) >> 7)
+  cpu.sr.set(Status.Zero, cpu.load(param) == 0)
+  cpu.sr.set(Status.Negative, cpu.load(param) >> 7)
 }
 
 export default bind

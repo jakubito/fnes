@@ -9,6 +9,23 @@ export enum Control {
   GenerateNmi,
 }
 
+export enum Mask {
+  Grayscale,
+  ShowLeftBackground,
+  ShowLeftSprites,
+  ShowBackground,
+  ShowSprites,
+  EmphasizeRed,
+  EmphasizeGreen,
+  EmphasizeBlue,
+}
+
+export enum Status {
+  SpriteOverflow,
+  Sprite0Hit,
+  VerticalBlank,
+}
+
 export enum Mirroring {
   Vertical,
   Horizontal,

@@ -7,8 +7,8 @@ function bind(cpu: Cpu): void {
 
 function inx(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.x += 1
-  cpu.setStatus(Status.Zero, cpu.x == 0)
-  cpu.setStatus(Status.Negative, cpu.x >> 7)
+  cpu.sr.set(Status.Zero, cpu.x == 0)
+  cpu.sr.set(Status.Negative, cpu.x >> 7)
 }
 
 export default bind

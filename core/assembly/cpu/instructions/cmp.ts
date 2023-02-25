@@ -14,9 +14,9 @@ function bind(cpu: Cpu): void {
 
 export function cmp(cpu: Cpu, param: u16, mode: Mode): void {
   const value = mode == Mode.Immediate ? <u8>param : cpu.load(param)
-  cpu.setStatus(Status.Carry, cpu.ac >= value)
-  cpu.setStatus(Status.Zero, cpu.ac == value)
-  cpu.setStatus(Status.Negative, (cpu.ac - value) >> 7)
+  cpu.sr.set(Status.Carry, cpu.ac >= value)
+  cpu.sr.set(Status.Zero, cpu.ac == value)
+  cpu.sr.set(Status.Negative, (cpu.ac - value) >> 7)
 }
 
 export default bind

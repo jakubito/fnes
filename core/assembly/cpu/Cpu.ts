@@ -1,4 +1,4 @@
-import { BitRegister, Interrupts } from '../main'
+import { Register, Interrupts } from '../main'
 import { Interrupt, InterruptVector } from '../main/enums'
 import Bus from './Bus'
 import Instruction from './Instruction'
@@ -12,7 +12,7 @@ class Cpu {
   totalCycles: usize
   cycles: u8
 
-  sr: BitRegister = new BitRegister()
+  sr: Register<Status> = new Register<Status>()
   pc: u16
   sp: u8
   ac: u8
@@ -37,9 +37,9 @@ class Cpu {
   reset(): void {
     this.totalCycles = 0
     this.cycles = 0
+    this.sr.setValue(0b0010_0000)
     this.pc = 0
     this.sp = 0
-    this.sr.value = 0b0010_0000
     this.ac = 0
     this.x = 0
     this.y = 0
@@ -56,14 +56,14 @@ class Cpu {
 
   pollInterrupt(): Interrupt {
     const interrupt = this.interrupts.poll()
-    if (interrupt == Interrupt.Irq && this.getStatus(Status.IrqDisable)) return -1
+    if (interrupt == Interrupt.Irq && this.sr.get(Status.IrqDisable)) return -1
     return interrupt
   }
 
   triggerInterrupt(interrupt: Interrupt): void {
     this.pushWordToStack(this.pc)
     this.pushToStack(this.sr.value | 0b0010_0000)
-    this.setStatus(Status.IrqDisable, true)
+    this.sr.set(Status.IrqDisable, true)
     this.pc = this.loadWord(InterruptVector[interrupt])
     this.cycles += 7
   }
@@ -99,14 +99,6 @@ class Cpu {
 
   storeWord(address: u16, value: u16): void {
     this.bus.storeWord(address, value)
-  }
-
-  getStatus(bit: Status): bool {
-    return this.sr.get(<u8>bit)
-  }
-
-  setStatus<T>(bit: Status, value: T): void {
-    this.sr.set(<u8>bit, value)
   }
 
   pullFromStack(): u8 {

@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function clv(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Overflow, false)
+  cpu.sr.set(Status.Overflow, false)
 }
 
 export default bind

@@ -10,17 +10,17 @@ function bind(cpu: Cpu): void {
 }
 
 export function lsrAc(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Carry, cpu.ac & 1)
+  cpu.sr.set(Status.Carry, cpu.ac & 1)
   cpu.ac >>= 1
-  cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Negative, cpu.ac >> 7)
+  cpu.sr.set(Status.Zero, cpu.ac == 0)
+  cpu.sr.set(Status.Negative, cpu.ac >> 7)
 }
 
 export function lsr(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Carry, cpu.load(param) & 1)
+  cpu.sr.set(Status.Carry, cpu.load(param) & 1)
   cpu.store(param, cpu.load(param) >> 1)
-  cpu.setStatus(Status.Zero, cpu.load(param) == 0)
-  cpu.setStatus(Status.Negative, cpu.load(param) >> 7)
+  cpu.sr.set(Status.Zero, cpu.load(param) == 0)
+  cpu.sr.set(Status.Negative, cpu.load(param) >> 7)
 }
 
 export default bind

@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function cld(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Decimal, false)
+  cpu.sr.set(Status.Decimal, false)
 }
 
 export default bind

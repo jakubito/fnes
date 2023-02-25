@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function clc(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Carry, false)
+  cpu.sr.set(Status.Carry, false)
 }
 
 export default bind

@@ -7,7 +7,7 @@ function bind(cpu: Cpu): void {
 }
 
 function bvs(cpu: Cpu, param: u16, mode: Mode): void {
-  if (cpu.getStatus(Status.Overflow)) {
+  if (cpu.sr.get(Status.Overflow)) {
     const oldPc = cpu.pc
     cpu.pc += <i8>param
     cpu.cycles += <u8>pageCrossed(oldPc, cpu.pc) + 1

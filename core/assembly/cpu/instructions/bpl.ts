@@ -7,7 +7,7 @@ function bind(cpu: Cpu): void {
 }
 
 function bpl(cpu: Cpu, param: u16, mode: Mode): void {
-  if (!cpu.getStatus(Status.Negative)) {
+  if (!cpu.sr.get(Status.Negative)) {
     const oldPc = cpu.pc
     cpu.pc += <i8>param
     cpu.cycles += <u8>pageCrossed(oldPc, cpu.pc) + 1

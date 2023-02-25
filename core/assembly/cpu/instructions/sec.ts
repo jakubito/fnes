@@ -6,7 +6,7 @@ function bind(cpu: Cpu): void {
 }
 
 function sec(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.setStatus(Status.Carry, true)
+  cpu.sr.set(Status.Carry, true)
 }
 
 export default bind

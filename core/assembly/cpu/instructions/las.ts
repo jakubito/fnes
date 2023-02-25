@@ -7,8 +7,8 @@ function bind(cpu: Cpu): void {
 
 function las(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.ac = cpu.x = cpu.sp = cpu.load(param) & cpu.sp
-  cpu.setStatus(Status.Zero, cpu.ac == 0)
-  cpu.setStatus(Status.Negative, cpu.ac >> 7)
+  cpu.sr.set(Status.Zero, cpu.ac == 0)
+  cpu.sr.set(Status.Negative, cpu.ac >> 7)
 }
 
 export default bind

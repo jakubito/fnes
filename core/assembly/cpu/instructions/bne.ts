@@ -7,7 +7,7 @@ function bind(cpu: Cpu): void {
 }
 
 function bne(cpu: Cpu, param: u16, mode: Mode): void {
-  if (!cpu.getStatus(Status.Zero)) {
+  if (!cpu.sr.get(Status.Zero)) {
     const oldPc = cpu.pc
     cpu.pc += <i8>param
     cpu.cycles += <u8>pageCrossed(oldPc, cpu.pc) + 1
