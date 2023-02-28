@@ -12,7 +12,7 @@ class Instruction {
     public pageCheck: bool
   ) {}
 
-  execute(): void {
+  run(): void {
     this.handler(this.cpu, this.getParam(), this.mode)
     this.cpu.cycles += this.cycles
   }

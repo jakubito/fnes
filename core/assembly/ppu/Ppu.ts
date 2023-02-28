@@ -1,4 +1,4 @@
-import { Register } from '../main'
+import { Interrupts, Register } from '../main'
 import { Interrupt } from '../main/enums'
 import Address from './Address'
 import Scroll from './Scroll'
@@ -14,11 +14,24 @@ class Ppu {
   address: Address = new Address(this.control)
   scroll: Scroll = new Scroll()
   oamAddress: u8
-  scanline: u16
-  position: u16
+  line: u16
+  dot: u16
   frames: usize
 
-  constructor(private bus: Bus) {}
+  constructor(private bus: Bus, private interrupts: Interrupts) {}
+
+  setControl(value: u8): void {
+    const previousGenerateNmi = this.control.get(Control.GenerateNmi)
+    this.control.setValue(value)
+    this.handleControlNmiChange(previousGenerateNmi)
+  }
+
+  handleControlNmiChange(previousValue: bool): void {
+    if (previousValue) return
+    if (!this.control.get(Control.GenerateNmi)) return
+    if (!this.status.get(Status.VerticalBlank)) return
+    this.interrupts.trigger(Interrupt.Nmi)
+  }
 
   loadFromAddress(): u8 {
     const address = this.address.value
@@ -44,10 +57,6 @@ class Ppu {
     this.oamAddress++
   }
 
-  run(cycles: usize): void {
-    for (let i: usize = 0; i < cycles; i++) this.step()
-  }
-
   readStatus(): u8 {
     const value = this.status.value
     this.status.set(Status.VerticalBlank, false)
@@ -56,36 +65,30 @@ class Ppu {
     return value
   }
 
+  run(cycles: usize): void {
+    for (let i: usize = 0; i < cycles; i++) this.step()
+  }
+
   step(): void {
-    // if (this.scanline == 0 && this.position == 0) {
-    //   this.status.set(Status.VerticalBlank, false)
-    //   this.status.set(Status.SpriteZeroHit, false)
-    //   this.status.set(Status.SpriteOverflow, false)
-    // }
-
-    // if (this.scanline == 241 && this.position == 1) {
-    //   this.status.set(Status.VerticalBlank, true)
-    //   // if (this.getControl(Control.GenerateNmi)) this.bus.interrupts.set(Interrupt.Nmi)
-    // }
-
-    // if (this.scanline == 261 && this.position == 1) {
-    //   this.evenFrame = !this.evenFrame
-    //   this.scanline = 0
-    //   this.position = 0
-    //   return
-    // }
-
-    this.position++
-
-    if (this.position == 341) {
-      this.position = 0
-      this.scanline++
+    if (this.line == 241 && this.dot == 1 && this.control.get(Control.GenerateNmi)) {
+      this.status.set(Status.VerticalBlank, true)
+      this.interrupts.trigger(Interrupt.Nmi)
     }
 
-    if (this.scanline == 262) {
-      this.position = 0
-      this.scanline = 0
-      this.frames++
+    if (this.line == 261 && this.dot == 1) {
+      this.status.set(Status.VerticalBlank, false)
+    }
+
+    this.dot++
+
+    if (this.dot == 341) {
+      this.dot = 0
+      this.line++
+
+      if (this.line == 262) {
+        this.line = 0
+        this.frames++
+      }
     }
   }
 }

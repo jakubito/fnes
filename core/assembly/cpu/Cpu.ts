@@ -47,8 +47,8 @@ class Cpu {
 
   step(): void {
     const interrupt = this.pollInterrupt()
-    if (<i8>interrupt == -1) this.nextInstruction()
-    else this.triggerInterrupt(interrupt)
+    if (<i8>interrupt == -1) this.runNextInstruction()
+    else this.handleInterrupt(interrupt)
     this.bus.tick(this.cycles)
     this.totalCycles += this.cycles
     this.cycles = 0
@@ -60,7 +60,7 @@ class Cpu {
     return interrupt
   }
 
-  triggerInterrupt(interrupt: Interrupt): void {
+  handleInterrupt(interrupt: Interrupt): void {
     this.pushWordToStack(this.pc)
     this.pushToStack(this.sr.value | 0b0010_0000)
     this.sr.set(Status.IrqDisable, true)
@@ -68,11 +68,11 @@ class Cpu {
     this.cycles += 7
   }
 
-  nextInstruction(): void {
+  runNextInstruction(): void {
     const opcode = this.readByte()
     const instruction = this.instructions[opcode]
     assert(instruction, `Unknown opcode 0x${opcode.toString(16)}`)
-    instruction!.execute()
+    instruction!.run()
   }
 
   readByte(): u8 {

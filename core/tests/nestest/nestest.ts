@@ -12,8 +12,8 @@ type State = [
   x: number,
   y: number,
   cycles: number,
-  ppuScanline: number,
-  ppuPosition: number
+  ppuLine: number,
+  ppuDot: number
 ]
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -47,7 +47,7 @@ function hex(value: number, pad = 2) {
 }
 
 function formatState(state: State) {
-  const [pc, sp, sr, ac, x, y, cycles, ppuScanline, ppuPosition] = state
+  const [pc, sp, sr, ac, x, y, cycles, ppuLine, ppuDot] = state
   return [
     hex(pc, 4),
     `A:${hex(ac)}`,
@@ -55,7 +55,7 @@ function formatState(state: State) {
     `Y:${hex(y)}`,
     `P:${hex(sr)}`,
     `SP:${hex(sp)}`,
-    `PPU:${ppuScanline.toString().padStart(3)},${ppuPosition.toString().padStart(3)}`,
+    `PPU:${ppuLine.toString().padStart(3)},${ppuDot.toString().padStart(3)}`,
     `CYC:${cycles}`,
   ].join(' ')
 }

@@ -14,7 +14,7 @@ class Interrupts {
     return -1
   }
 
-  set(interrupt: Interrupt): void {
+  trigger(interrupt: Interrupt): void {
     this.value[interrupt] = true
   }
 

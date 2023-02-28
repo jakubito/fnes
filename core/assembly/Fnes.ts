@@ -7,7 +7,7 @@ class Fnes {
   drive: Drive = new Drive()
   interrupts: Interrupts = new Interrupts()
   ppuBus: PpuBus = new PpuBus(this.drive)
-  ppu: Ppu = new Ppu(this.ppuBus)
+  ppu: Ppu = new Ppu(this.ppuBus, this.interrupts)
   cpuBus: CpuBus = new CpuBus(this.drive, this.ppu)
   cpu: Cpu = new Cpu(this.cpuBus, this.interrupts)
 
@@ -20,7 +20,7 @@ class Fnes {
 
   reset(): void {
     this.interrupts.reset()
-    this.interrupts.set(Interrupt.Reset)
+    this.interrupts.trigger(Interrupt.Reset)
     this.cpu.reset()
     this.cpu.step()
   }
@@ -34,8 +34,8 @@ class Fnes {
       this.cpu.x,
       this.cpu.y,
       this.cpu.totalCycles,
-      this.ppu.scanline,
-      this.ppu.position,
+      this.ppu.line,
+      this.ppu.dot,
     ]
   }
 }
