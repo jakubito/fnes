@@ -4,8 +4,9 @@ import { Mirroring } from './enums'
 
 class Bus {
   vram: Uint8Array = new Uint8Array(0x800)
+  oam: Uint8Array = new Uint8Array(0x100)
   palette: Uint8Array = new Uint8Array(0x20)
-  dataBuffer: u8
+  readBuffer: u8
 
   constructor(private drive: Drive) {}
 
@@ -49,16 +50,16 @@ class Bus {
 
   @inline
   loadChrRom(address: u16): u8 {
-    const value = this.dataBuffer
-    this.dataBuffer = this.drive.loadChrRom(address)
+    const value = this.readBuffer
+    this.readBuffer = this.drive.loadChrRom(address)
     return value
   }
 
   @inline
   loadVram(address: u16): u8 {
+    const value = this.readBuffer
     const index = this.getVramIndex(address)
-    const value = this.dataBuffer
-    this.dataBuffer = this.vram[index]
+    this.readBuffer = this.vram[index]
     return value
   }
 

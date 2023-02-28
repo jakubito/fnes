@@ -23,3 +23,15 @@ export enum Status {
   Overflow = 6,
   Negative = 7,
 }
+
+export enum PpuRegister {
+  Control = 0x2000,
+  Mask = 0x2001,
+  Status = 0x2002,
+  OamAddress = 0x2003,
+  OamData = 0x2004,
+  Scroll = 0x2005,
+  Address = 0x2006,
+  Data = 0x2007,
+  OamDma = 0x4014,
+}

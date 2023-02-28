@@ -2,6 +2,7 @@ import { Drive } from '../main'
 import { Ppu } from '../ppu'
 import { between } from '../main/helpers'
 import { word } from './helpers'
+import { PpuRegister } from './enums'
 
 class Bus {
   wram: Uint8Array = new Uint8Array(0x800)
@@ -12,9 +13,11 @@ class Bus {
     switch (address) {
       case between(address, 0, 0x1fff):
         return this.loadWram(address)
-      case 0x2002:
-        return this.ppu.status.value
-      case 0x2007:
+      case PpuRegister.Control:
+        return this.ppu.readStatus()
+      case PpuRegister.OamData:
+        return this.ppu.loadFromOam()
+      case PpuRegister.Data:
         return this.ppu.loadFromAddress()
       case between(address, 0x2008, 0x3fff):
         return this.load(address & 0x2007)
@@ -29,16 +32,24 @@ class Bus {
     switch (address) {
       case between(address, 0, 0x1fff):
         return this.storeWram(address, value)
-      case 0x2000:
+      case PpuRegister.Control:
         return this.ppu.control.setValue(value)
-      case 0x2001:
+      case PpuRegister.Mask:
         return this.ppu.mask.setValue(value)
-      case 0x2006:
-        return this.ppu.updateAddress(value)
-      case 0x2007:
+      case PpuRegister.OamAddress:
+        return this.ppu.setOamAddress(value)
+      case PpuRegister.OamData:
+        return this.ppu.storeToOam(value)
+      case PpuRegister.Scroll:
+        return this.ppu.scroll.update(value)
+      case PpuRegister.Address:
+        return this.ppu.address.update(value)
+      case PpuRegister.Data:
         return this.ppu.storeToAddress(value)
       case between(address, 0x2008, 0x3fff):
         return this.store(address & 0x2007, value)
+      case PpuRegister.OamDma:
+        return this.oamDmaTransfer(value)
       default:
         throw new Error(`Cannot write to address 0x${address.toString(16)}`)
     }
@@ -54,7 +65,7 @@ class Bus {
     this.store(address + 1, <u8>(value >> 8))
   }
 
-  tick(cycles: u8): void {
+  tick(cycles: usize): void {
     this.ppu.run(cycles * 3)
   }
 
@@ -71,6 +82,14 @@ class Bus {
   @inline
   loadPrgRom(address: u16): u8 {
     return this.drive.loadPrgRom(address & 0x7fff)
+  }
+
+  @inline
+  oamDmaTransfer(highByte: u8): void {
+    const startAddress: u16 = highByte << 8
+    for (let i: u16 = 0; i < 0x100; i++) {
+      this.ppu.storeToOam(this.load(startAddress + i))
+    }
   }
 }
 

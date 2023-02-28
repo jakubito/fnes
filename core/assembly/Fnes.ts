@@ -24,6 +24,20 @@ class Fnes {
     this.cpu.reset()
     this.cpu.step()
   }
+
+  getState(): StaticArray<usize> {
+    return [
+      this.cpu.pc,
+      this.cpu.sp,
+      this.cpu.sr.value,
+      this.cpu.ac,
+      this.cpu.x,
+      this.cpu.y,
+      this.cpu.totalCycles,
+      this.ppu.scanline,
+      this.ppu.position,
+    ]
+  }
 }
 
 export default Fnes

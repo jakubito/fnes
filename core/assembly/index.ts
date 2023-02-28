@@ -8,8 +8,8 @@ export function step(instance: Fnes): void {
   instance.cpu.step()
 }
 
-export function getCpuState(instance: Fnes): StaticArray<usize> {
-  return instance.cpu.getState()
+export function getState(instance: Fnes): StaticArray<usize> {
+  return instance.getState()
 }
 
 export function getWramPointer(instance: Fnes): usize {

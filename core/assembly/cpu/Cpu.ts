@@ -4,13 +4,13 @@ import Bus from './Bus'
 import Instruction from './Instruction'
 import bindings from './instructions'
 import { word } from './helpers'
-import { Mode, Status } from './enums'
+import { Mode, PpuRegister, Status } from './enums'
 import { InstructionHandler } from './types'
 
 class Cpu {
   instructions: StaticArray<Instruction | null> = new StaticArray(0x100)
   totalCycles: usize
-  cycles: u8
+  cycles: usize
 
   sr: Register<Status> = new Register<Status>()
   pc: u16
@@ -91,6 +91,7 @@ class Cpu {
 
   store(address: u16, value: u8): void {
     this.bus.store(address, value)
+    if (address == PpuRegister.OamDma) this.cycles += 513 + (this.totalCycles & 1)
   }
 
   loadWord(address: u16): u16 {
@@ -118,10 +119,6 @@ class Cpu {
   pushWordToStack(value: u16): void {
     this.pushToStack(<u8>(value >> 8))
     this.pushToStack(<u8>value)
-  }
-
-  getState(): StaticArray<usize> {
-    return [this.pc, this.sp, this.sr.value, this.ac, this.x, this.y, this.totalCycles]
   }
 }
 

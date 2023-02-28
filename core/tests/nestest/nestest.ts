@@ -4,14 +4,16 @@ import { fileURLToPath } from 'url'
 import { equal } from 'assert'
 import { instantiate } from '../../build/core.js'
 
-type CpuState = [
+type State = [
   pc: number,
   sp: number,
   sr: number,
   ac: number,
   x: number,
   y: number,
-  cycles: number
+  cycles: number,
+  ppuScanline: number,
+  ppuPosition: number
 ]
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -27,10 +29,10 @@ module.loadRom(fnes, romBuffer)
 module.setProgramCounter(fnes, 0xc000)
 
 for (let i = 0; i < log.length - 1; i += 1) {
-  const cpuState = formatCpuState(<CpuState>module.getCpuState(fnes))
+  const state = formatState(<State>module.getState(fnes))
   const logState = formatLine(log[i])
   try {
-    equal(cpuState, logState)
+    equal(state, logState)
     module.step(fnes)
   } catch (error) {
     error.logLine = i + 1
@@ -44,7 +46,8 @@ function hex(value: number, pad = 2) {
   return value.toString(16).padStart(pad, '0').toUpperCase()
 }
 
-function formatCpuState([pc, sp, sr, ac, x, y, cycles]: CpuState) {
+function formatState(state: State) {
+  const [pc, sp, sr, ac, x, y, cycles, ppuScanline, ppuPosition] = state
   return [
     hex(pc, 4),
     `A:${hex(ac)}`,
@@ -52,10 +55,11 @@ function formatCpuState([pc, sp, sr, ac, x, y, cycles]: CpuState) {
     `Y:${hex(y)}`,
     `P:${hex(sr)}`,
     `SP:${hex(sp)}`,
+    `PPU:${ppuScanline.toString().padStart(3)},${ppuPosition.toString().padStart(3)}`,
     `CYC:${cycles}`,
   ].join(' ')
 }
 
 function formatLine(line: string) {
-  return `${line.substring(0, 4)} ${line.substring(48, 73)} ${line.substring(86)}`
+  return `${line.substring(0, 4)} ${line.substring(48)}`
 }

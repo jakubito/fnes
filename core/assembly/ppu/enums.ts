@@ -21,9 +21,9 @@ export enum Mask {
 }
 
 export enum Status {
-  SpriteOverflow,
-  Sprite0Hit,
-  VerticalBlank,
+  SpriteOverflow = 5,
+  SpriteZeroHit = 6,
+  VerticalBlank = 7,
 }
 
 export enum Mirroring {
