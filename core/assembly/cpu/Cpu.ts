@@ -45,13 +45,18 @@ class Cpu {
     this.instructions[opcode] = new Instruction(this, handler, mode, cycles, pageCheck)
   }
 
-  step(): void {
+  runUntilNmi(): void {
+    while (this.step() != Interrupt.Nmi) {}
+  }
+
+  step(): Interrupt {
     const interrupt = this.pollInterrupt()
     if (<i8>interrupt == -1) this.runNextInstruction()
     else this.handleInterrupt(interrupt)
     this.bus.tick(this.cycles)
     this.totalCycles += this.cycles
     this.cycles = 0
+    return interrupt
   }
 
   pollInterrupt(): Interrupt {

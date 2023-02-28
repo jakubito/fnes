@@ -13,7 +13,7 @@ class Bus {
     switch (address) {
       case between(address, 0, 0x1fff):
         return this.loadWram(address)
-      case PpuRegister.Control:
+      case PpuRegister.Status:
         return this.ppu.readStatus()
       case PpuRegister.OamData:
         return this.ppu.loadFromOam()
@@ -33,7 +33,7 @@ class Bus {
       case between(address, 0, 0x1fff):
         return this.storeWram(address, value)
       case PpuRegister.Control:
-        return this.ppu.control.setValue(value)
+        return this.ppu.setControl(value)
       case PpuRegister.Mask:
         return this.ppu.mask.setValue(value)
       case PpuRegister.OamAddress:

@@ -15,6 +15,7 @@ class Ppu {
   status: Register<Status> = new Register<Status>()
   address: Address = new Address(this.control)
   scroll: Scroll = new Scroll()
+  oam: Uint8Array = new Uint8Array(0x100)
   oamAddress: u8
   line: u16
   dot: u16
@@ -34,7 +35,35 @@ class Ppu {
     this.address.reset()
     this.scroll.reset()
     this.frameBuffer.fill(0)
+    this.oam.fill(0)
     for (let i = 3; i < this.frameBuffer.length; i += 4) this.frameBuffer[i] = 0xff
+  }
+
+  run(cycles: usize): void {
+    for (let i: usize = 0; i < cycles; i++) this.step()
+  }
+
+  step(): void {
+    if (this.line == 241 && this.dot == 1) {
+      this.status.set(Status.VerticalBlank, true)
+      if (this.control.get(Control.GenerateNmi)) this.interrupts.trigger(Interrupt.Nmi)
+    }
+
+    if (this.line == 261 && this.dot == 1) {
+      this.status.set(Status.VerticalBlank, false)
+    }
+
+    this.dot++
+
+    if (this.dot == 341) {
+      this.dot = 0
+      this.line++
+
+      if (this.line == 262) {
+        this.line = 0
+        this.frameCount++
+      }
+    }
   }
 
   setControl(value: u8): void {
@@ -70,7 +99,7 @@ class Ppu {
   }
 
   storeToOam(value: u8): void {
-    this.bus.store(this.oamAddress, value)
+    this.oam[this.oamAddress] = value
     this.oamAddress++
   }
 
@@ -80,33 +109,6 @@ class Ppu {
     this.scroll.resetLatch()
     this.address.resetLatch()
     return value
-  }
-
-  run(cycles: usize): void {
-    for (let i: usize = 0; i < cycles; i++) this.step()
-  }
-
-  step(): void {
-    if (this.line == 241 && this.dot == 1 && this.control.get(Control.GenerateNmi)) {
-      this.status.set(Status.VerticalBlank, true)
-      this.interrupts.trigger(Interrupt.Nmi)
-    }
-
-    if (this.line == 261 && this.dot == 1) {
-      this.status.set(Status.VerticalBlank, false)
-    }
-
-    this.dot++
-
-    if (this.dot == 341) {
-      this.dot = 0
-      this.line++
-
-      if (this.line == 262) {
-        this.line = 0
-        this.frameCount++
-      }
-    }
   }
 }
 

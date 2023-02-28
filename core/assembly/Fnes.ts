@@ -26,6 +26,10 @@ class Fnes {
     this.cpu.step()
   }
 
+  renderFrame(): void {
+    this.cpu.runUntilNmi()
+  }
+
   getState(): StaticArray<usize> {
     return [
       this.cpu.pc,

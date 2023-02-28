@@ -4,7 +4,6 @@ import { Mirroring } from './enums'
 
 class Bus {
   vram: Uint8Array = new Uint8Array(0x800)
-  oam: Uint8Array = new Uint8Array(0x100)
   palette: Uint8Array = new Uint8Array(0x20)
   readBuffer: u8
 

@@ -4,6 +4,10 @@ export function createInstance(): Fnes {
   return new Fnes()
 }
 
+export function renderFrame(instance: Fnes): void {
+  instance.renderFrame()
+}
+
 export function step(instance: Fnes): void {
   instance.cpu.step()
 }
