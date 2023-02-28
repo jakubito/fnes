@@ -16,6 +16,10 @@ export function getWramPointer(instance: Fnes): usize {
   return changetype<usize>(instance.cpuBus.wram.buffer) + instance.cpuBus.wram.byteOffset
 }
 
+export function getFrameBufferPointer(instance: Fnes): usize {
+  return changetype<usize>(instance.ppu.frameBuffer.buffer) + instance.ppu.frameBuffer.byteOffset
+}
+
 export function loadRom(instance: Fnes, buffer: ArrayBuffer): void {
   instance.loadRom(buffer)
 }

@@ -13,6 +13,10 @@ class Register<T extends u8> {
   setValue(value: u8): void {
     this.value = value
   }
+
+  reset(): void {
+    this.value = 0
+  }
 }
 
 export default Register

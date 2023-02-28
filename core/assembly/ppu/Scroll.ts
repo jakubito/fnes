@@ -12,6 +12,12 @@ class Scroll {
   resetLatch(): void {
     this.latch = false
   }
+
+  reset(): void {
+    this.x = 0
+    this.y = 0
+    this.latch = false
+  }
 }
 
 export default Scroll

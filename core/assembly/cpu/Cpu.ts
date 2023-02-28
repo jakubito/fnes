@@ -24,16 +24,6 @@ class Cpu {
     this.reset()
   }
 
-  bind(
-    opcode: u8,
-    handler: InstructionHandler,
-    mode: Mode,
-    cycles: u8,
-    pageCheck: bool = false
-  ): void {
-    this.instructions[opcode] = new Instruction(this, handler, mode, cycles, pageCheck)
-  }
-
   reset(): void {
     this.totalCycles = 0
     this.cycles = 0
@@ -43,6 +33,16 @@ class Cpu {
     this.ac = 0
     this.x = 0
     this.y = 0
+  }
+
+  bind(
+    opcode: u8,
+    handler: InstructionHandler,
+    mode: Mode,
+    cycles: u8,
+    pageCheck: bool = false
+  ): void {
+    this.instructions[opcode] = new Instruction(this, handler, mode, cycles, pageCheck)
   }
 
   step(): void {

@@ -8,6 +8,8 @@ import palette from './palette'
 
 class Ppu {
   palette: StaticArray<StaticArray<u8>> = palette
+  frameBuffer: Uint8Array = new Uint8Array(256 * 240 * 4)
+  frameCount: usize
   control: Register<Control> = new Register<Control>()
   mask: Register<Mask> = new Register<Mask>()
   status: Register<Status> = new Register<Status>()
@@ -16,9 +18,24 @@ class Ppu {
   oamAddress: u8
   line: u16
   dot: u16
-  frames: usize
 
-  constructor(private bus: Bus, private interrupts: Interrupts) {}
+  constructor(private bus: Bus, private interrupts: Interrupts) {
+    this.reset()
+  }
+
+  reset(): void {
+    this.frameCount = 0
+    this.line = 0
+    this.dot = 0
+    this.oamAddress = 0
+    this.control.reset()
+    this.mask.reset()
+    this.status.reset()
+    this.address.reset()
+    this.scroll.reset()
+    this.frameBuffer.fill(0)
+    for (let i = 3; i < this.frameBuffer.length; i += 4) this.frameBuffer[i] = 0xff
+  }
 
   setControl(value: u8): void {
     const previousGenerateNmi = this.control.get(Control.GenerateNmi)
@@ -87,7 +104,7 @@ class Ppu {
 
       if (this.line == 262) {
         this.line = 0
-        this.frames++
+        this.frameCount++
       }
     }
   }

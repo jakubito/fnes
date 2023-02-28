@@ -19,9 +19,10 @@ class Fnes {
   }
 
   reset(): void {
+    this.cpu.reset()
+    this.ppu.reset()
     this.interrupts.reset()
     this.interrupts.trigger(Interrupt.Reset)
-    this.cpu.reset()
     this.cpu.step()
   }
 

@@ -23,6 +23,11 @@ class Address {
   resetLatch(): void {
     this.latch = false
   }
+
+  reset(): void {
+    this.value = 0
+    this.latch = false
+  }
 }
 
 export default Address
