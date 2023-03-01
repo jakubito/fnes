@@ -12,7 +12,7 @@
       "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": false,
-      "noAssert": false
+      "noAssert": true
     }
   },
   "options": {

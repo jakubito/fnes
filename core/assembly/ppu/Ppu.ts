@@ -40,10 +40,12 @@ class Ppu {
     for (let i = 3; i < this.frameBuffer.length; i += 4) this.frameBuffer[i] = 0xff
   }
 
+  @inline
   run(cycles: usize): void {
     for (let i: usize = 0; i < cycles; i++) this.step()
   }
 
+  @inline
   step(): void {
     // TODO handle BG + odd skip
 
@@ -61,14 +63,11 @@ class Ppu {
 
   @inline
   renderDot(): void {
-    // TODO
-    // const x = this.dot
-    // const y = this.line
-    // const index = (y * 256 + x) * 4
-    // const color = this.palette[0][0]
-    // this.frameBuffer[index] = color
-    // this.frameBuffer[index + 1] = color
-    // this.frameBuffer[index + 2] = color
+    const index = (<i32>this.line * 256 + this.dot) * 4
+    this.frameBuffer[index] = <u8>Math.floor(Math.random() * 0xff)
+    this.frameBuffer[index + 1] = <u8>Math.floor(Math.random() * 0xff)
+    this.frameBuffer[index + 2] = <u8>Math.floor(Math.random() * 0xff)
+    for (let i = 0; i < 100; i++) {}
   }
 
   @inline
@@ -86,12 +85,14 @@ class Ppu {
     }
   }
 
+  @inline
   setControl(value: u8): void {
     const previousGenerateNmi = this.control.get(Control.GenerateNmi)
     this.control.setValue(value)
     this.handleControlNmiChange(previousGenerateNmi)
   }
 
+  @inline
   handleControlNmiChange(previousValue: bool): void {
     if (previousValue) return
     if (!this.control.get(Control.GenerateNmi)) return
@@ -105,11 +106,13 @@ class Ppu {
     return this.bus.load(address)
   }
 
+  @inline
   storeToAddress(value: u8): void {
     this.bus.store(this.address.value, value)
     this.address.increment()
   }
 
+  @inline
   setOamAddress(value: u8): void {
     this.oamAddress = value
   }
@@ -118,11 +121,13 @@ class Ppu {
     return this.bus.load(this.oamAddress)
   }
 
+  @inline
   storeToOam(value: u8): void {
     this.oam[this.oamAddress] = value
     this.oamAddress++
   }
 
+  @inline
   readStatus(): u8 {
     const value = this.status.value
     this.status.set(Status.VerticalBlank, false)

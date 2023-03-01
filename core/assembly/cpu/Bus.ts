@@ -55,16 +55,19 @@ class Bus {
     }
   }
 
+  @inline
   loadWord(address: u16): u16 {
     const highByte = (address & 0xff00) | (<u8>(address & 0xff) + 1)
     return word(this.load(address), this.load(highByte))
   }
 
+  @inline
   storeWord(address: u16, value: u16): void {
     this.store(address, <u8>(value & 0xff))
     this.store(address + 1, <u8>(value >> 8))
   }
 
+  @inline
   tick(cycles: usize): void {
     this.ppu.run(cycles * 3)
   }

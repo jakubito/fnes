@@ -55,12 +55,14 @@ class Cpu {
     return interrupt
   }
 
+  @inline
   pollInterrupt(): Interrupt {
     const interrupt = this.interrupts.poll()
     if (interrupt == Interrupt.Irq && this.sr.get(Status.IrqDisable)) return -1
     return interrupt
   }
 
+  @inline
   handleInterrupt(interrupt: Interrupt): void {
     this.pushWordToStack(this.pc)
     this.pushToStack(this.sr.value | 0b0010_0000)
@@ -69,6 +71,7 @@ class Cpu {
     this.cycles += 7
   }
 
+  @inline
   runNextInstruction(): void {
     const opcode = this.readByte()
     const instruction = this.instructions[opcode]
@@ -76,47 +79,57 @@ class Cpu {
     instruction!.run()
   }
 
+  @inline
   readByte(): u8 {
     const byte = this.load(this.pc)
     this.pc += 1
     return byte
   }
 
+  @inline
   readWord(): u16 {
     return word(this.readByte(), this.readByte())
   }
 
+  @inline
   load(address: u16): u8 {
     return this.bus.load(address)
   }
 
+  @inline
   store(address: u16, value: u8): void {
     this.bus.store(address, value)
     if (address == PpuRegister.OamDma) this.cycles += 513 + (this.totalCycles & 1)
   }
 
+  @inline
   loadWord(address: u16): u16 {
     return this.bus.loadWord(address)
   }
 
+  @inline
   storeWord(address: u16, value: u16): void {
     this.bus.storeWord(address, value)
   }
 
+  @inline
   pullFromStack(): u8 {
     this.sp += 1
     return this.load(0x100 + this.sp)
   }
 
+  @inline
   pushToStack(value: u8): void {
     this.store(0x100 + this.sp, value)
     this.sp -= 1
   }
 
+  @inline
   pullWordFromStack(): u16 {
     return word(this.pullFromStack(), this.pullFromStack())
   }
 
+  @inline
   pushWordToStack(value: u16): void {
     this.pushToStack(<u8>(value >> 8))
     this.pushToStack(<u8>value)
