@@ -13,8 +13,8 @@ class Fnes {
 
   constructor() {}
 
-  loadRom(buffer: ArrayBuffer): void {
-    this.drive.setRom(buffer)
+  loadFile(buffer: ArrayBuffer): void {
+    this.drive.loadFile(buffer)
     this.reset()
   }
 
@@ -27,7 +27,7 @@ class Fnes {
   }
 
   renderFrame(): void {
-    this.cpu.runUntilNmi()
+    while (this.cpu.step() != Interrupt.Nmi) {}
   }
 
   getState(): StaticArray<usize> {

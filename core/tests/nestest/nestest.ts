@@ -23,17 +23,17 @@ const log = readFileSync(join(__dirname, 'nestest.log'), 'utf-8').split(/\r?\n/)
 
 const compiledModule = await WebAssembly.compile(moduleBuffer)
 const module = await instantiate(compiledModule, { env: {} })
-const fnes = module.createInstance()
+const instance = module.createInstance()
 
-module.loadRom(fnes, romBuffer)
-module.setProgramCounter(fnes, 0xc000)
+module.loadFile(instance, romBuffer)
+module.setProgramCounter(instance, 0xc000)
 
 for (let i = 0; i < log.length - 1; i += 1) {
-  const state = formatState(<State>module.getState(fnes))
+  const state = formatState(<State>module.getState(instance))
   const logState = formatLine(log[i])
   try {
     equal(state, logState)
-    module.step(fnes)
+    module.step(instance)
   } catch (error) {
     error.logLine = i + 1
     throw error

@@ -24,8 +24,8 @@ export function getFrameBufferPointer(instance: Fnes): usize {
   return changetype<usize>(instance.ppu.frameBuffer.buffer) + instance.ppu.frameBuffer.byteOffset
 }
 
-export function loadRom(instance: Fnes, buffer: ArrayBuffer): void {
-  instance.loadRom(buffer)
+export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {
+  instance.loadFile(buffer)
 }
 
 export function setProgramCounter(instance: Fnes, value: u16): void {

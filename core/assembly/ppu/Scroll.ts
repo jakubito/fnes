@@ -16,7 +16,7 @@ class Scroll {
   reset(): void {
     this.x = 0
     this.y = 0
-    this.latch = false
+    this.resetLatch()
   }
 }
 

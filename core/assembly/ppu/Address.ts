@@ -26,7 +26,7 @@ class Address {
 
   reset(): void {
     this.value = 0
-    this.latch = false
+    this.resetLatch()
   }
 }
 

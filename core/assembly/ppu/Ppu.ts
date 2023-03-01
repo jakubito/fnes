@@ -10,15 +10,16 @@ class Ppu {
   palette: StaticArray<StaticArray<u8>> = palette
   frameBuffer: Uint8Array = new Uint8Array(256 * 240 * 4)
   frameCount: usize
+  oam: Uint8Array = new Uint8Array(0x100)
+  oamAddress: u8
+  line: u16
+  dot: u16
+
   control: Register<Control> = new Register<Control>()
   mask: Register<Mask> = new Register<Mask>()
   status: Register<Status> = new Register<Status>()
   address: Address = new Address(this.control)
   scroll: Scroll = new Scroll()
-  oam: Uint8Array = new Uint8Array(0x100)
-  oamAddress: u8
-  line: u16
-  dot: u16
 
   constructor(private bus: Bus, private interrupts: Interrupts) {
     this.reset()
@@ -26,16 +27,16 @@ class Ppu {
 
   reset(): void {
     this.frameCount = 0
+    this.oamAddress = 0
     this.line = 0
     this.dot = 0
-    this.oamAddress = 0
     this.control.reset()
     this.mask.reset()
     this.status.reset()
     this.address.reset()
     this.scroll.reset()
-    this.frameBuffer.fill(0)
     this.oam.fill(0)
+    this.frameBuffer.fill(0)
     for (let i = 3; i < this.frameBuffer.length; i += 4) this.frameBuffer[i] = 0xff
   }
 
@@ -44,15 +45,34 @@ class Ppu {
   }
 
   step(): void {
+    // TODO handle BG + odd skip
+
+    if (this.line < 240 && this.dot < 256) this.renderDot()
+
     if (this.line == 241 && this.dot == 1) {
       this.status.set(Status.VerticalBlank, true)
       if (this.control.get(Control.GenerateNmi)) this.interrupts.trigger(Interrupt.Nmi)
     }
 
-    if (this.line == 261 && this.dot == 1) {
-      this.status.set(Status.VerticalBlank, false)
-    }
+    if (this.line == 261 && this.dot == 1) this.status.reset()
 
+    this.advanceDot()
+  }
+
+  @inline
+  renderDot(): void {
+    // TODO
+    // const x = this.dot
+    // const y = this.line
+    // const index = (y * 256 + x) * 4
+    // const color = this.palette[0][0]
+    // this.frameBuffer[index] = color
+    // this.frameBuffer[index + 1] = color
+    // this.frameBuffer[index + 2] = color
+  }
+
+  @inline
+  advanceDot(): void {
     this.dot++
 
     if (this.dot == 341) {

@@ -1,27 +1,28 @@
 import { Mirroring } from '../ppu/enums'
-import Rom from './Rom'
+import NesFile from './NesFile'
 
 class Drive {
-  rom: Rom | null
+  file: NesFile | null
 
-  setRom(buffer: ArrayBuffer): void {
-    this.rom = new Rom(buffer)
+  loadFile(buffer: ArrayBuffer): void {
+    this.file = new NesFile(buffer)
   }
 
   loadPrgRom(address: u16): u8 {
-    if (this.rom == null) return 0
-    if (address >= <u16>this.rom!.prgRom.length) return this.rom!.prgRom[address & 0x3fff]
-    return this.rom!.prgRom[address]
+    if (this.file == null) return 0
+    const prgRomSize = <u16>this.file!.prgRom.length
+    if (address >= prgRomSize) return this.file!.prgRom[address & 0x3fff]
+    return this.file!.prgRom[address]
   }
 
   loadChrRom(address: u16): u8 {
-    if (this.rom == null) return 0
-    return this.rom!.chrRom[address]
+    if (this.file == null) return 0
+    return this.file!.chrRom[address]
   }
 
   getMirroring(): Mirroring {
-    if (this.rom == null) return 0
-    return this.rom!.mirroring
+    if (this.file == null) return 0
+    return this.file!.mirroring
   }
 }
 
