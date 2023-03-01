@@ -48,16 +48,14 @@ class Ppu {
   @inline
   step(): void {
     // TODO handle BG + odd skip
-
-    if (this.line < 240 && this.dot < 256) this.renderDot()
-
-    if (this.line == 241 && this.dot == 1) {
+    if (this.line < 240 && this.dot < 256) {
+      this.renderDot()
+    } else if (this.line == 241 && this.dot == 1) {
       this.status.set(Status.VerticalBlank, true)
       if (this.control.get(Control.GenerateNmi)) this.interrupts.trigger(Interrupt.Nmi)
+    } else if (this.line == 261 && this.dot == 1) {
+      this.status.reset()
     }
-
-    if (this.line == 261 && this.dot == 1) this.status.reset()
-
     this.advanceDot()
   }
 
@@ -67,7 +65,6 @@ class Ppu {
     this.frameBuffer[index] = <u8>Math.floor(Math.random() * 0xff)
     this.frameBuffer[index + 1] = <u8>Math.floor(Math.random() * 0xff)
     this.frameBuffer[index + 2] = <u8>Math.floor(Math.random() * 0xff)
-    for (let i = 0; i < 100; i++) {}
   }
 
   @inline

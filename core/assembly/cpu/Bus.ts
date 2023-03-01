@@ -1,13 +1,13 @@
-import { Drive } from '../main'
+import { Drive, Inputs } from '../main'
 import { Ppu } from '../ppu'
 import { between } from '../main/helpers'
 import { word } from './helpers'
-import { PpuRegister } from './enums'
+import { ControllerAddress, PpuRegister } from './enums'
 
 class Bus {
   wram: Uint8Array = new Uint8Array(0x800)
 
-  constructor(private drive: Drive, private ppu: Ppu) {}
+  constructor(private drive: Drive, private inputs: Inputs, private ppu: Ppu) {}
 
   load(address: u16): u8 {
     switch (address) {
@@ -21,6 +21,10 @@ class Bus {
         return this.ppu.loadFromAddress()
       case between(address, 0x2008, 0x3fff):
         return this.load(address & 0x2007)
+      case ControllerAddress.PlayerOne:
+        return this.inputs.playerOne.read()
+      case ControllerAddress.PlayerTwo:
+        return this.inputs.playerTwo.read()
       case between(address, 0x8000, 0xffff):
         return this.loadPrgRom(address)
       default:
@@ -50,6 +54,10 @@ class Bus {
         return this.store(address & 0x2007, value)
       case PpuRegister.OamDma:
         return this.oamDmaTransfer(value)
+      case ControllerAddress.PlayerOne:
+        return this.inputs.setStrobe(value)
+      case between(address, 0x4000, 0x4017):
+        return // TODO - APU
       default:
         throw new Error(`Cannot write to address 0x${address.toString(16)}`)
     }

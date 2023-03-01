@@ -1,14 +1,15 @@
-import { Drive, Interrupts } from './main'
+import { Drive, Inputs, Interrupts } from './main'
 import { Interrupt } from './main/enums'
 import { Ppu, Bus as PpuBus } from './ppu'
 import { Cpu, Bus as CpuBus } from './cpu'
 
 class Fnes {
   drive: Drive = new Drive()
+  inputs: Inputs = new Inputs()
   interrupts: Interrupts = new Interrupts()
   ppuBus: PpuBus = new PpuBus(this.drive)
   ppu: Ppu = new Ppu(this.ppuBus, this.interrupts)
-  cpuBus: CpuBus = new CpuBus(this.drive, this.ppu)
+  cpuBus: CpuBus = new CpuBus(this.drive, this.inputs, this.ppu)
   cpu: Cpu = new Cpu(this.cpuBus, this.interrupts)
 
   constructor() {}

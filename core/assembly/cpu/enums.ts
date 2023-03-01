@@ -35,3 +35,8 @@ export enum PpuRegister {
   Data = 0x2007,
   OamDma = 0x4014,
 }
+
+export enum ControllerAddress {
+  PlayerOne = 0x4016,
+  PlayerTwo = 0x4017,
+}

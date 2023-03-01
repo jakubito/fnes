@@ -16,12 +16,18 @@ export function getState(instance: Fnes): StaticArray<usize> {
   return instance.getState()
 }
 
-export function getWramPointer(instance: Fnes): usize {
-  return changetype<usize>(instance.cpuBus.wram.buffer) + instance.cpuBus.wram.byteOffset
-}
-
 export function getFrameBufferPointer(instance: Fnes): usize {
   return changetype<usize>(instance.ppu.frameBuffer.buffer) + instance.ppu.frameBuffer.byteOffset
+}
+
+export function getPlayerOneBufferPointer(instance: Fnes): usize {
+  const buttons = instance.inputs.playerOne.buttons
+  return changetype<usize>(buttons.buffer) + buttons.byteOffset
+}
+
+export function getPlayerTwoBufferPointer(instance: Fnes): usize {
+  const buttons = instance.inputs.playerTwo.buttons
+  return changetype<usize>(buttons.buffer) + buttons.byteOffset
 }
 
 export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {

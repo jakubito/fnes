@@ -5,10 +5,9 @@ class Interrupts {
 
   poll(): Interrupt {
     for (let i: i32 = 0; i < this.value.length; i++) {
-      if (this.value[i]) {
-        this.value[i] = false
-        return i
-      }
+      if (!this.value[i]) continue
+      this.value[i] = false
+      return i
     }
 
     return -1
