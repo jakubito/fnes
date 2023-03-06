@@ -11,8 +11,8 @@ class Character {
       const highByte = chrRom[address + y + 8]
 
       for (let x: u8 = 0; x < 8; x++) {
-        const lowBit = bit(lowByte, 8 - x)
-        const highBit = bit(highByte, 8 - x) << 1
+        const lowBit = bit(lowByte, 7 - x)
+        const highBit = bit(highByte, 7 - x) << 1
         this.data[y * 8 + x] = lowBit | highBit
       }
     }

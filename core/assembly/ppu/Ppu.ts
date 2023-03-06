@@ -63,7 +63,7 @@ class Ppu {
   @inline
   renderDot(): void {
     const nametableIndex = Math.floor(this.line / 8) * 32 + Math.floor(this.dot / 8)
-    const characterIndex = this.bus.load(<u16>(0x2000 + nametableIndex))
+    const characterIndex = this.bus.vram[<u16>nametableIndex]
 
     const page = <u8>this.control.get(Control.BackgroundPattern)
     const character = this.bus.loadCharacter(characterIndex, page)
@@ -71,7 +71,7 @@ class Ppu {
 
     const attributeIndex = Math.floor(this.line / 32) * 8 + Math.floor(this.dot / 32)
     const attributeAddress = 0x3c0 + attributeIndex
-    const attribute = this.bus.vram[<i32>attributeAddress]
+    const attribute = this.bus.vram[<u16>attributeAddress]
 
     const quadrant = Math.floor((this.line % 32) / 16) * 2 + Math.floor((this.dot % 32) / 16)
     const paletteIndex = (attribute >> (<u8>quadrant * 2)) & 0b11
