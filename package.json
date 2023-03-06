@@ -1,0 +1,23 @@
+{
+  "name": "fnes-client",
+  "private": true,
+  "version": "0.0.1",
+  "description": "FNES web client",
+  "author": "Jakub Dobes <dobes.jakub@gmail.com>",
+  "license": "ISC",
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "cd core && npm install && npm run build:release",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.2.0",
+    "typescript": "^4.7.3",
+    "vite": "^2.9.9"
+  },
+  "dependencies": {
+    "preact": "^10.7.2",
+    "tone": "^14.7.77"
+  }
+}

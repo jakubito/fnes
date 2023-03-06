@@ -1,6 +1,7 @@
 import { Drive } from '../main'
 import { between } from '../main/helpers'
 import { Mirroring } from './enums'
+import Character from './Character'
 
 class Bus {
   vram: Uint8Array = new Uint8Array(0x800)
@@ -76,6 +77,11 @@ class Bus {
   @inline
   storePalette(address: u16, value: u8): void {
     this.palette[address - 0x3f00] = value
+  }
+
+  @inline
+  loadCharacter(index: u16, page: u8): Character {
+    return this.drive.loadCharacter(index + page * <u16>0x100)
   }
 
   getVramIndex(address: u16): u16 {

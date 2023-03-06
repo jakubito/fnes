@@ -1,0 +1,26 @@
+import { bit } from '../main/helpers'
+
+class Character {
+  private data: StaticArray<u8>
+
+  constructor(chrRom: Uint8Array, address: u16) {
+    this.data = new StaticArray<u8>(64)
+
+    for (let y = 0; y < 8; y++) {
+      const lowByte = chrRom[address + y]
+      const highByte = chrRom[address + y + 8]
+
+      for (let x: u8 = 0; x < 8; x++) {
+        const lowBit = bit(lowByte, 8 - x)
+        const highBit = bit(highByte, 8 - x) << 1
+        this.data[y * 8 + x] = lowBit | highBit
+      }
+    }
+  }
+
+  getPixel(x: u8, y: u8): u8 {
+    return this.data[y * 8 + x]
+  }
+}
+
+export default Character

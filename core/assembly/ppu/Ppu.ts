@@ -4,12 +4,12 @@ import Address from './Address'
 import Scroll from './Scroll'
 import Bus from './Bus'
 import { Control, Mask, Status } from './enums'
-import palette from './palette'
+import systemPalette from './palette'
 
 class Ppu {
-  palette: StaticArray<StaticArray<u8>> = palette
+  systemPalette: StaticArray<StaticArray<u8>> = systemPalette
   frameBuffer: Uint8Array = new Uint8Array(256 * 240 * 4)
-  frameCount: usize
+  oddFrame: bool
   oam: Uint8Array = new Uint8Array(0x100)
   oamAddress: u8
   line: u16
@@ -26,7 +26,7 @@ class Ppu {
   }
 
   reset(): void {
-    this.frameCount = 0
+    this.oddFrame = false
     this.oamAddress = 0
     this.line = 0
     this.dot = 0
@@ -47,7 +47,6 @@ class Ppu {
 
   @inline
   step(): void {
-    // TODO handle BG + odd skip
     if (this.line < 240 && this.dot < 256) {
       this.renderDot()
     } else if (this.line == 241 && this.dot == 1) {
@@ -55,16 +54,38 @@ class Ppu {
       if (this.control.get(Control.GenerateNmi)) this.interrupts.trigger(Interrupt.Nmi)
     } else if (this.line == 261 && this.dot == 1) {
       this.status.reset()
+    } else if (this.oddFrame && this.renderingEnabled() && this.line == 261 && this.dot == 339) {
+      this.dot++
     }
     this.advanceDot()
   }
 
   @inline
   renderDot(): void {
+    const nametableIndex = Math.floor(this.line / 8) * 32 + Math.floor(this.dot / 8)
+    const characterIndex = this.bus.load(<u16>(0x2000 + nametableIndex))
+
+    const page = <u8>this.control.get(Control.BackgroundPattern)
+    const character = this.bus.loadCharacter(characterIndex, page)
+    const charColor = character.getPixel(<u8>this.dot % 8, <u8>this.line % 8)
+
+    const attributeIndex = Math.floor(this.line / 32) * 8 + Math.floor(this.dot / 32)
+    const attributeAddress = 0x3c0 + attributeIndex
+    const attribute = this.bus.vram[<i32>attributeAddress]
+
+    const quadrant = Math.floor((this.line % 32) / 16) * 2 + Math.floor((this.dot % 32) / 16)
+    const paletteIndex = (attribute >> (<u8>quadrant * 2)) & 0b11
+    const color = this.bus.palette[paletteIndex * 4 + charColor]
+
+    this.setDotColor(color)
+  }
+
+  @inline
+  setDotColor(color: u8): void {
     const index = (<i32>this.line * 256 + this.dot) * 4
-    this.frameBuffer[index] = <u8>Math.floor(Math.random() * 0xff)
-    this.frameBuffer[index + 1] = <u8>Math.floor(Math.random() * 0xff)
-    this.frameBuffer[index + 2] = <u8>Math.floor(Math.random() * 0xff)
+    this.frameBuffer[index] = this.systemPalette[color][0]
+    this.frameBuffer[index + 1] = this.systemPalette[color][1]
+    this.frameBuffer[index + 2] = this.systemPalette[color][2]
   }
 
   @inline
@@ -77,7 +98,7 @@ class Ppu {
 
       if (this.line == 262) {
         this.line = 0
-        this.frameCount++
+        this.oddFrame = !this.oddFrame
       }
     }
   }
@@ -131,6 +152,11 @@ class Ppu {
     this.scroll.resetLatch()
     this.address.resetLatch()
     return value
+  }
+
+  @inline
+  renderingEnabled(): bool {
+    return this.mask.get(Mask.ShowBackground) || this.mask.get(Mask.ShowSprites)
   }
 }
 
