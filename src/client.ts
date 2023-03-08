@@ -23,22 +23,24 @@ enum DisplayMode {
 
 const WIDTH = 256
 const HEIGHT = 240
+const FRAME_TIME = 1000 / 60
 
 class Client {
   private module: CoreModule
   readonly instance: CoreInstance
 
-  private readonly timePerFrame = 1000 / 60
+  private readonly speed = 1
+  private readonly smoothingEnabled = true
   private readonly displayMode = DisplayMode.Original
   private readonly frameBuffer: Uint8ClampedArray
   private readonly frameImageData: ImageData
-  private readonly canvas: HTMLCanvasElement
-  private readonly canvasContext: CanvasRenderingContext2D
+  private readonly canvasElement: HTMLCanvasElement
+  private readonly canvas: CanvasRenderingContext2D
   private _stop?: () => void
 
   private _status = Status.Ready
   private _volume = 50
-  private _screenScale = 3
+  private _screenScale = 4
 
   constructor(module: CoreModule) {
     this.module = module
@@ -48,14 +50,18 @@ class Client {
     const frameBufferPointer = module.getFrameBufferPointer(this.instance)
     this.frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, WIDTH * HEIGHT * 4)
     this.frameImageData = new ImageData(this.frameBuffer, WIDTH, HEIGHT)
-    this.canvas = document.createElement('canvas')
-    this.canvasContext = this.canvas.getContext('2d')!
+    this.canvasElement = document.createElement('canvas')
+    this.canvas = this.canvasElement.getContext('2d')!
     this.screenScale = this._screenScale
     this.volume = this._volume
     this.bindKeys()
 
     window.addEventListener('blur', this.stop)
     window.addEventListener('focus', this.start)
+  }
+
+  get timePerFrame() {
+    return FRAME_TIME / this.speed
   }
 
   get status() {
@@ -67,12 +73,13 @@ class Client {
   }
 
   set screenScale(scale: number) {
+    const scaledWidth = Math.round(WIDTH * this.displayMode * scale)
     this._screenScale = scale
-    this.canvas.width = WIDTH * this.displayMode * scale * window.devicePixelRatio
-    this.canvas.height = HEIGHT * scale * window.devicePixelRatio
-    this.canvas.style.width = `${WIDTH * this.displayMode * scale}px`
-    this.canvas.style.height = `${HEIGHT * scale}px`
-    this.canvasContext.imageSmoothingEnabled = false
+    this.canvasElement.width = scaledWidth * window.devicePixelRatio
+    this.canvasElement.height = HEIGHT * scale * window.devicePixelRatio
+    this.canvasElement.style.width = `${scaledWidth}px`
+    this.canvasElement.style.height = `${HEIGHT * scale}px`
+    this.canvas.imageSmoothingEnabled = false
   }
 
   get volume() {
@@ -102,19 +109,7 @@ class Client {
       }
 
       if (frameReady) {
-        const { width, height } = this.canvas
-        this.canvasContext.putImageData(this.frameImageData, 0, 0)
-        this.canvasContext.imageSmoothingEnabled = false
-
-        if (this.displayMode === DisplayMode.PixelPerfect) {
-          this.canvasContext.drawImage(this.canvas, 0, 0, WIDTH, HEIGHT, 0, 0, width, height)
-        } else {
-          const scaledWidth = WIDTH * this._screenScale * window.devicePixelRatio
-          this.canvasContext.drawImage(this.canvas, 0, 0, WIDTH, HEIGHT, 0, 0, scaledWidth, height)
-          this.canvasContext.imageSmoothingEnabled = true
-          this.canvasContext.drawImage(this.canvas, 0, 0, scaledWidth, height, 0, 0, width, height)
-        }
-
+        this.drawFrame()
         frameReady = false
       }
 
@@ -130,12 +125,27 @@ class Client {
     this._status = Status.Running
   }
 
+  drawFrame() {
+    const { width, height } = this.canvasElement
+    this.canvas.putImageData(this.frameImageData, 0, 0)
+    this.canvas.imageSmoothingEnabled = false
+
+    if (this.displayMode === DisplayMode.PixelPerfect) {
+      this.canvas.drawImage(this.canvasElement, 0, 0, WIDTH, HEIGHT, 0, 0, width, height)
+    } else {
+      const scaledWidth = WIDTH * this._screenScale * window.devicePixelRatio
+      this.canvas.drawImage(this.canvasElement, 0, 0, WIDTH, HEIGHT, 0, 0, scaledWidth, height)
+      this.canvas.imageSmoothingEnabled = this.smoothingEnabled
+      this.canvas.drawImage(this.canvasElement, 0, 0, scaledWidth, height, 0, 0, width, height)
+    }
+  }
+
   stop = () => {
     this._stop?.()
   }
 
   appendCanvasTo(target: HTMLElement) {
-    target.appendChild(this.canvas)
+    target.appendChild(this.canvasElement)
   }
 
   dispose() {
