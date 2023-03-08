@@ -26,7 +26,7 @@ class Bus {
       case between(address, 0x3f20, 0x3fff):
         return this.load(address & 0x3f1f)
       default:
-        throw new Error(`Cannot read from address 0x${address.toString(16)}`)
+        throw new Error(`Cannot read from PPU bus address 0x${address.toString(16)}`)
     }
   }
 
@@ -44,7 +44,7 @@ class Bus {
       case between(address, 0x3f20, 0x3fff):
         return this.store(address & 0x3f1f, value)
       default:
-        throw new Error(`Cannot write to address 0x${address.toString(16)}`)
+        throw new Error(`Cannot write to PPU bus address 0x${address.toString(16)}`)
     }
   }
 
@@ -80,7 +80,7 @@ class Bus {
   }
 
   @inline
-  loadCharacter(index: u16, page: u8): Character {
+  loadCharacter(index: u8, page: u8): Character {
     return this.drive.loadCharacter(index + page * <u16>0x100)
   }
 

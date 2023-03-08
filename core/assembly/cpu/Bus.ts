@@ -16,7 +16,7 @@ class Bus {
       case PpuRegister.Status:
         return this.ppu.readStatus()
       case PpuRegister.OamData:
-        return this.ppu.loadFromOam()
+        return this.ppu.oam.load()
       case PpuRegister.Data:
         return this.ppu.loadFromAddress()
       case between(address, 0x2008, 0x3fff):
@@ -28,7 +28,7 @@ class Bus {
       case between(address, 0x8000, 0xffff):
         return this.loadPrgRom(address)
       default:
-        throw new Error(`Cannot read from address 0x${address.toString(16)}`)
+        throw new Error(`Cannot read from CPU bus address 0x${address.toString(16)}`)
     }
   }
 
@@ -41,9 +41,9 @@ class Bus {
       case PpuRegister.Mask:
         return this.ppu.mask.setValue(value)
       case PpuRegister.OamAddress:
-        return this.ppu.setOamAddress(value)
+        return this.ppu.oam.setAddress(value)
       case PpuRegister.OamData:
-        return this.ppu.storeToOam(value)
+        return this.ppu.oam.store(value)
       case PpuRegister.Scroll:
         return this.ppu.scroll.update(value)
       case PpuRegister.Address:
@@ -59,7 +59,7 @@ class Bus {
       case between(address, 0x4000, 0x4017):
         return // TODO - APU
       default:
-        throw new Error(`Cannot write to address 0x${address.toString(16)}`)
+        throw new Error(`Cannot write to CPU bus address 0x${address.toString(16)}`)
     }
   }
 
@@ -97,9 +97,9 @@ class Bus {
 
   @inline
   oamDmaTransfer(highByte: u8): void {
-    const startAddress: u16 = highByte << 8
+    const startAddress = (<u16>highByte) << 8
     for (let i: u16 = 0; i < 0x100; i++) {
-      this.ppu.storeToOam(this.load(startAddress + i))
+      this.ppu.oam.store(this.load(startAddress + i))
     }
   }
 }

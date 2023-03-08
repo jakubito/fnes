@@ -1,19 +1,19 @@
 import { Interrupts, Register } from '../main'
 import { Interrupt } from '../main/enums'
-import Address from './Address'
-import Scroll from './Scroll'
-import Bus from './Bus'
 import { Control, Mask, Status } from './enums'
 import systemPalette from './palette'
+import Address from './Address'
+import Scroll from './Scroll'
+import Oam from './Oam'
+import Bus from './Bus'
 
 class Ppu {
   systemPalette: StaticArray<StaticArray<u8>> = systemPalette
   frameBuffer: Uint8Array = new Uint8Array(256 * 240 * 4)
-  oddFrame: bool
-  oam: Uint8Array = new Uint8Array(0x100)
-  oamAddress: u8
+  oam: Oam = new Oam()
   line: u16
   dot: u16
+  oddFrame: bool
 
   control: Register<Control> = new Register<Control>()
   mask: Register<Mask> = new Register<Mask>()
@@ -27,7 +27,6 @@ class Ppu {
 
   reset(): void {
     this.oddFrame = false
-    this.oamAddress = 0
     this.line = 0
     this.dot = 0
     this.control.reset()
@@ -35,8 +34,8 @@ class Ppu {
     this.status.reset()
     this.address.reset()
     this.scroll.reset()
-    this.oam.fill(0)
     this.frameBuffer.fill(0)
+    this.oam.reset()
     for (let i = 3; i < this.frameBuffer.length; i += 4) this.frameBuffer[i] = 0xff
   }
 
@@ -49,11 +48,16 @@ class Ppu {
   step(): void {
     if (this.line < 240 && this.dot < 256) {
       this.renderDot()
+    } else if (this.line < 240 && this.dot == 320) {
+      this.oam.resetLine()
+      const spriteOverflow = this.oam.loadLine(this.line)
+      this.status.set(Status.SpriteOverflow, spriteOverflow)
     } else if (this.line == 241 && this.dot == 1) {
       this.status.set(Status.VerticalBlank, true)
       if (this.control.get(Control.GenerateNmi)) this.interrupts.trigger(Interrupt.Nmi)
     } else if (this.line == 261 && this.dot == 1) {
       this.status.reset()
+      this.oam.resetLine()
     } else if (this.oddFrame && this.renderingEnabled() && this.line == 261 && this.dot == 339) {
       this.dot++
     }
@@ -75,9 +79,32 @@ class Ppu {
 
     const quadrant = Math.floor((this.line % 32) / 16) * 2 + Math.floor((this.dot % 32) / 16)
     const paletteIndex = (attribute >> (<u8>quadrant * 2)) & 0b11
-    const color = this.bus.palette[paletteIndex * 4 + charColor]
+    let dotColor = this.bus.palette[paletteIndex * 4 + charColor]
 
-    this.setDotColor(color)
+    const spritePage = <u8>this.control.get(Control.SpritePattern)
+    this.oam.initializeDot(this.dot)
+    let sprite = this.oam.getNextDotSprite()
+
+    while (sprite != null) {
+      let spritePixelX = <u8>(this.dot - sprite.x)
+      let spritePixelY = <u8>(this.line - 1 - sprite.y)
+      if (sprite.flipHorizontal) spritePixelX = 7 - spritePixelX
+      if (sprite.flipVertical) spritePixelY = 7 - spritePixelY
+
+      const spriteCharacter = this.bus.loadCharacter(sprite.characterIndex, spritePage)
+      const spriteCharColor = spriteCharacter.getPixel(spritePixelX, spritePixelY)
+
+      if (spriteCharColor != 0) {
+        if (sprite.spriteIndex == 0 && charColor != 0) this.status.set(Status.SpriteZeroHit, true)
+        if (sprite.priority == 1) break
+        dotColor = this.bus.palette[16 + sprite.palette * 4 + spriteCharColor]
+        break
+      }
+
+      sprite = this.oam.getNextDotSprite()
+    }
+
+    this.setDotColor(dotColor)
   }
 
   @inline
@@ -128,21 +155,6 @@ class Ppu {
   storeToAddress(value: u8): void {
     this.bus.store(this.address.value, value)
     this.address.increment()
-  }
-
-  @inline
-  setOamAddress(value: u8): void {
-    this.oamAddress = value
-  }
-
-  loadFromOam(): u8 {
-    return this.bus.load(this.oamAddress)
-  }
-
-  @inline
-  storeToOam(value: u8): void {
-    this.oam[this.oamAddress] = value
-    this.oamAddress++
   }
 
   @inline
