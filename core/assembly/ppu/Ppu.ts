@@ -72,18 +72,20 @@ class Ppu {
     const page = <u8>this.control.get(Control.BackgroundPattern)
     const character = this.bus.loadCharacter(characterIndex, page)
     const charColor = character.getPixel(<u8>this.dot % 8, <u8>this.line % 8)
+    let dotColor: u8 = this.bus.palette[0]
 
-    const attributeIndex = Math.floor(this.line / 32) * 8 + Math.floor(this.dot / 32)
-    const attributeAddress = 0x3c0 + attributeIndex
-    const attribute = this.bus.vram[<u16>attributeAddress]
-
-    const quadrant = Math.floor((this.line % 32) / 16) * 2 + Math.floor((this.dot % 32) / 16)
-    const paletteIndex = (attribute >> (<u8>quadrant * 2)) & 0b11
-    let dotColor = this.bus.palette[paletteIndex * 4 + charColor]
+    if (charColor != 0) {
+      const attributeIndex = Math.floor(this.line / 32) * 8 + Math.floor(this.dot / 32)
+      const attributeAddress = 0x3c0 + attributeIndex
+      const attribute = this.bus.vram[<u16>attributeAddress]
+      const quadrant = Math.floor((this.line % 32) / 16) * 2 + Math.floor((this.dot % 32) / 16)
+      const palette = (attribute >> (<u8>quadrant * 2)) & 0b11
+      dotColor = this.bus.palette[palette * 4 + charColor]
+    }
 
     const spritePage = <u8>this.control.get(Control.SpritePattern)
-    this.oam.initializeDot(this.dot)
-    let sprite = this.oam.getNextDotSprite()
+    this.oam.setDot(this.dot)
+    let sprite = this.oam.nextDotSprite()
 
     while (sprite != null) {
       let spritePixelX = <u8>(this.dot - sprite.x)
@@ -96,12 +98,12 @@ class Ppu {
 
       if (spriteCharColor != 0) {
         if (sprite.spriteIndex == 0 && charColor != 0) this.status.set(Status.SpriteZeroHit, true)
-        if (sprite.priority == 1) break
+        if (sprite.priority == 1 && charColor != 0) break
         dotColor = this.bus.palette[16 + sprite.palette * 4 + spriteCharColor]
         break
       }
 
-      sprite = this.oam.getNextDotSprite()
+      sprite = this.oam.nextDotSprite()
     }
 
     this.setDotColor(dotColor)

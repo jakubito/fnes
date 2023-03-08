@@ -49,13 +49,13 @@ class Oam {
   }
 
   @inline
-  initializeDot(dot: u16): void {
+  setDot(dot: u16): void {
     this.dot = dot
     this.dotSpriteIndex = 0
   }
 
   @inline
-  getNextDotSprite(): Sprite | null {
+  nextDotSprite(): Sprite | null {
     while (this.dotSpriteIndex < 8) {
       const sprite = this.lineSprites[this.dotSpriteIndex]
       this.dotSpriteIndex++
