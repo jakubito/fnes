@@ -25,15 +25,14 @@ class Oam {
   @inline
   store(value: u8): void {
     this.data[this.address] = value
-    this.updateSprites()
+    if (this.address % 4 == 3) this.updateSprite()
     this.address++
   }
 
   @inline
-  updateSprites(): void {
-    if (this.address % 4 != 3) return
+  updateSprite(): void {
     const spriteIndex = <u8>(this.address / 4)
-    this.sprites[spriteIndex] = new Sprite(this.data, spriteIndex)
+    this.sprites[spriteIndex].update(this.data, spriteIndex)
   }
 
   @inline
@@ -75,9 +74,7 @@ class Oam {
   @inline
   resetSprites(): void {
     this.data.fill(0)
-    for (let spriteIndex: u8 = 0; spriteIndex < 64; spriteIndex++) {
-      this.sprites[spriteIndex] = new Sprite(this.data, spriteIndex)
-    }
+    for (let i: u8 = 0; i < 64; i++) this.sprites[i] = new Sprite()
   }
 
   reset(): void {

@@ -8,7 +8,7 @@ class Sprite {
   x: u8
   y: u8
 
-  constructor(oam: Uint8Array, spriteIndex: u8) {
+  update(oam: Uint8Array, spriteIndex: u8): void {
     const address = spriteIndex * 4
     const attributes = oam[address + 2]
     this.spriteIndex = spriteIndex
