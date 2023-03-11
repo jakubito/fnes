@@ -58,14 +58,14 @@ class Bus {
   @inline
   loadVram(address: u16): u8 {
     const value = this.readBuffer
-    const index = this.getVramIndex(address)
+    const index = this.vramIndex(address)
     this.readBuffer = this.vram[index]
     return value
   }
 
   @inline
   storeVram(address: u16, value: u8): void {
-    const index = this.getVramIndex(address)
+    const index = this.vramIndex(address)
     this.vram[index] = value
   }
 
@@ -84,9 +84,9 @@ class Bus {
     return this.drive.loadCharacter(index + page * <u16>0x100)
   }
 
-  getVramIndex(address: u16): u16 {
-    const index = (address & 0x2fff) - 0x2000
-    const nametable = index / 0x400
+  vramIndex(address: u16): u16 {
+    const index = (address % 0x3000) - 0x2000
+    const nametable = <u8>(index / 0x400)
     const mirroring = this.drive.getMirroring()
     switch (nametable) {
       case 1:

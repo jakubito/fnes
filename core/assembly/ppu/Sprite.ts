@@ -1,5 +1,5 @@
 class Sprite {
-  spriteIndex: u8
+  index: u8
   characterIndex: u8
   palette: u8
   priority: u8
@@ -8,10 +8,10 @@ class Sprite {
   x: u8
   y: u8
 
-  update(oam: Uint8Array, spriteIndex: u8): void {
-    const address = spriteIndex * 4
+  update(oam: Uint8Array, index: u8): void {
+    const address = index * 4
     const attributes = oam[address + 2]
-    this.spriteIndex = spriteIndex
+    this.index = index
     this.palette = attributes & 0b11
     this.priority = (attributes >> 5) & 1
     this.flipHorizontal = <bool>((attributes >> 6) & 1)

@@ -31,8 +31,7 @@ class Client {
 
   private readonly speed = 1
   private readonly smoothingEnabled = true
-  private readonly displayMode = DisplayMode.Original
-  private readonly frameBuffer: Uint8ClampedArray
+  private readonly displayMode = DisplayMode.PixelPerfect
   private readonly frameImageData: ImageData
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
@@ -48,8 +47,8 @@ class Client {
     // @ts-ignore
     const { buffer } = <WebAssembly.Memory>module.memory
     const frameBufferPointer = module.getFrameBufferPointer(this.instance)
-    this.frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, WIDTH * HEIGHT * 4)
-    this.frameImageData = new ImageData(this.frameBuffer, WIDTH, HEIGHT)
+    const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, WIDTH * HEIGHT * 4)
+    this.frameImageData = new ImageData(frameBuffer, WIDTH, HEIGHT)
     this.canvasElement = document.createElement('canvas')
     this.canvas = this.canvasElement.getContext('2d')!
     this.screenScale = this._screenScale
@@ -57,7 +56,6 @@ class Client {
     this.bindKeys()
 
     window.addEventListener('blur', this.stop)
-    window.addEventListener('focus', this.start)
   }
 
   get timePerFrame() {
@@ -99,7 +97,7 @@ class Client {
     let frameReady = false
 
     const clientFrame = (time: DOMHighResTimeStamp) => {
-      timeAvailable += Math.min(time - previousTime, 100)
+      timeAvailable += Math.min(time - previousTime, 250)
       previousTime = time
 
       while (timeAvailable >= this.timePerFrame) {

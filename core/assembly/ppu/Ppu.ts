@@ -4,6 +4,7 @@ import { Control, Mask, Status } from './enums'
 import systemPalette from './palette'
 import Address from './Address'
 import Scroll from './Scroll'
+import Sprite from './Sprite'
 import Oam from './Oam'
 import Bus from './Bus'
 
@@ -85,9 +86,9 @@ class Ppu {
 
     const spritePage = <u8>this.control.get(Control.SpritePattern)
     this.oam.setDot(this.dot)
-    let sprite = this.oam.nextDotSprite()
+    let sprite: Sprite | null
 
-    while (sprite != null) {
+    while ((sprite = this.oam.nextDotSprite())) {
       let spritePixelX = <u8>(this.dot - sprite.x)
       let spritePixelY = <u8>(this.line - 1 - sprite.y)
       if (sprite.flipHorizontal) spritePixelX = 7 - spritePixelX
@@ -96,14 +97,12 @@ class Ppu {
       const spriteCharacter = this.bus.loadCharacter(sprite.characterIndex, spritePage)
       const spriteCharColor = spriteCharacter.getPixel(spritePixelX, spritePixelY)
 
-      if (spriteCharColor != 0) {
-        if (sprite.spriteIndex == 0 && charColor != 0) this.status.set(Status.SpriteZeroHit, true)
-        if (sprite.priority == 1 && charColor != 0) break
-        dotColor = this.bus.palette[16 + sprite.palette * 4 + spriteCharColor]
-        break
-      }
+      if (spriteCharColor == 0) continue
+      if (charColor != 0 && sprite.index == 0) this.status.set(Status.SpriteZeroHit, true)
+      if (charColor != 0 && sprite.priority == 1) break
 
-      sprite = this.oam.nextDotSprite()
+      dotColor = this.bus.palette[16 + sprite.palette * 4 + spriteCharColor]
+      break
     }
 
     this.setDotColor(dotColor)
