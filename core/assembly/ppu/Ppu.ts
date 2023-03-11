@@ -14,6 +14,8 @@ class Ppu {
   oam: Oam = new Oam()
   line: u16
   dot: u16
+  dotColor: u8
+  bgChar: u8
   oddFrame: bool
 
   control: Register<Control> = new Register<Control>()
@@ -30,6 +32,8 @@ class Ppu {
     this.oddFrame = false
     this.line = 0
     this.dot = 0
+    this.dotColor = 0
+    this.bgChar = 0
     this.control.reset()
     this.mask.reset()
     this.status.reset()
@@ -67,22 +71,40 @@ class Ppu {
 
   @inline
   renderDot(): void {
+    this.dotColor = 0xf
+    this.bgChar = 0
+    this.renderBackground()
+    this.renderSprites()
+    this.paintDot(this.dotColor)
+  }
+
+  @inline
+  renderBackground(): void {
+    if (!this.mask.get(Mask.ShowBackground)) return
+    if (!this.mask.get(Mask.ShowLeftBackground) && this.dot < 8) return
+
     const nametableIndex = Math.floor(this.line / 8) * 32 + Math.floor(this.dot / 8)
     const characterIndex = this.bus.vram[<u16>nametableIndex]
 
     const page = <u8>this.control.get(Control.BackgroundPattern)
     const character = this.bus.loadCharacter(characterIndex, page)
-    const charColor = character.getPixel(<u8>this.dot % 8, <u8>this.line % 8)
-    let dotColor: u8 = this.bus.palette[0]
+    this.bgChar = character.getPixel(<u8>this.dot % 8, <u8>this.line % 8)
+    this.dotColor = this.bus.palette[0]
 
-    if (charColor != 0) {
+    if (this.bgChar != 0) {
       const attributeIndex = Math.floor(this.line / 32) * 8 + Math.floor(this.dot / 32)
       const attributeAddress = 0x3c0 + attributeIndex
       const attribute = this.bus.vram[<u16>attributeAddress]
       const quadrant = Math.floor((this.line % 32) / 16) * 2 + Math.floor((this.dot % 32) / 16)
       const palette = (attribute >> (<u8>quadrant * 2)) & 0b11
-      dotColor = this.bus.palette[palette * 4 + charColor]
+      this.dotColor = this.bus.palette[palette * 4 + this.bgChar]
     }
+  }
+
+  @inline
+  renderSprites(): void {
+    if (!this.mask.get(Mask.ShowSprites)) return
+    if (!this.mask.get(Mask.ShowLeftSprites) && this.dot < 8) return
 
     const spritePage = <u8>this.control.get(Control.SpritePattern)
     this.oam.setDot(this.dot)
@@ -98,18 +120,16 @@ class Ppu {
       const spriteCharColor = spriteCharacter.getPixel(spritePixelX, spritePixelY)
 
       if (spriteCharColor == 0) continue
-      if (charColor != 0 && sprite.index == 0) this.status.set(Status.SpriteZeroHit, true)
-      if (charColor != 0 && sprite.priority == 1) break
+      if (this.bgChar != 0 && sprite.index == 0) this.status.set(Status.SpriteZeroHit, true)
+      if (this.bgChar != 0 && sprite.priority == 1) break
 
-      dotColor = this.bus.palette[16 + sprite.palette * 4 + spriteCharColor]
+      this.dotColor = this.bus.palette[16 + sprite.palette * 4 + spriteCharColor]
       break
     }
-
-    this.setDotColor(dotColor)
   }
 
   @inline
-  setDotColor(color: u8): void {
+  paintDot(color: u8): void {
     const index = (<i32>this.line * 256 + this.dot) * 4
     this.frameBuffer[index] = this.systemPalette[color][0]
     this.frameBuffer[index + 1] = this.systemPalette[color][1]
