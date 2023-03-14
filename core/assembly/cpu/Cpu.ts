@@ -20,7 +20,7 @@ class Cpu {
   y: u8
 
   constructor(private bus: Bus, private interrupts: Interrupts) {
-    for (let i = 0; i < bindings.length; i += 1) bindings.at(i)(this)
+    for (let i = 0; i < bindings.length; i++) bindings.at(i)(this)
     this.reset()
   }
 
@@ -82,7 +82,7 @@ class Cpu {
   @inline
   readByte(): u8 {
     const byte = this.load(this.pc)
-    this.pc += 1
+    this.pc++
     return byte
   }
 
@@ -114,7 +114,7 @@ class Cpu {
 
   @inline
   pullFromStack(): u8 {
-    this.sp += 1
+    this.sp++
     return this.load(0x100 + this.sp)
   }
 

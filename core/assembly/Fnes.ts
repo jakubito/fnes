@@ -42,6 +42,10 @@ class Fnes {
       this.cpu.totalCycles,
       this.ppu.line,
       this.ppu.dot,
+      this.ppu.v,
+      this.ppu.t,
+      this.ppu.x,
+      <usize>this.ppu.w,
     ]
   }
 }

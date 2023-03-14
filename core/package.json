@@ -8,7 +8,8 @@
   "scripts": {
     "build:debug": "asc assembly/index.ts --target debug",
     "build:release": "asc assembly/index.ts --target release",
-    "nestest": "ts-node tests/nestest/nestest.ts"
+    "nestest": "ts-node tests/nestest/nestest.ts",
+    "pputest": "ts-node tests/ppu/pputest.ts"
   },
   "devDependencies": {
     "@types/node": "^17.0.39",

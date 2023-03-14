@@ -27,7 +27,7 @@ export enum Status {
 }
 
 export enum Mirroring {
-  Vertical,
   Horizontal,
+  Vertical,
   FourScreen,
 }

@@ -28,7 +28,7 @@ class Bus {
       case between(address, 0x8000, 0xffff):
         return this.loadPrgRom(address)
       default:
-        throw new Error(`Cannot read from CPU bus address 0x${address.toString(16)}`)
+        return 0
     }
   }
 
@@ -45,9 +45,9 @@ class Bus {
       case PpuRegister.OamData:
         return this.ppu.oam.store(value)
       case PpuRegister.Scroll:
-        return this.ppu.scroll.update(value)
+        return this.ppu.setScroll(value)
       case PpuRegister.Address:
-        return this.ppu.address.update(value)
+        return this.ppu.setAddress(value)
       case PpuRegister.Data:
         return this.ppu.storeToAddress(value)
       case between(address, 0x2008, 0x3fff):

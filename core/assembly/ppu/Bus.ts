@@ -14,8 +14,10 @@ class Bus {
     switch (address) {
       case between(address, 0, 0x1fff):
         return this.loadChrRom(address)
-      case between(address, 0x2000, 0x3eff):
-        return this.loadVram(address)
+      case between(address, 0x2000, 0x2fff):
+        return this.loadVram(address - 0x2000)
+      case between(address, 0x3000, 0x3eff):
+        return this.loadVram(address - 0x3000)
       case 0x3f10:
       case 0x3f14:
       case 0x3f18:
@@ -32,8 +34,10 @@ class Bus {
 
   store(address: u16, value: u8): void {
     switch (address) {
-      case between(address, 0x2000, 0x3eff):
-        return this.storeVram(address, value)
+      case between(address, 0x2000, 0x2fff):
+        return this.storeVram(address - 0x2000, value)
+      case between(address, 0x3000, 0x3eff):
+        return this.storeVram(address - 0x3000, value)
       case 0x3f10:
       case 0x3f14:
       case 0x3f18:
@@ -58,14 +62,14 @@ class Bus {
   @inline
   loadVram(address: u16): u8 {
     const value = this.readBuffer
-    const index = this.vramIndex(address)
+    const index = this.mirrorVram(address)
     this.readBuffer = this.vram[index]
     return value
   }
 
   @inline
   storeVram(address: u16, value: u8): void {
-    const index = this.vramIndex(address)
+    const index = this.mirrorVram(address)
     this.vram[index] = value
   }
 
@@ -84,19 +88,18 @@ class Bus {
     return this.drive.loadCharacter(index + page * <u16>0x100)
   }
 
-  vramIndex(address: u16): u16 {
-    const index = (address % 0x3000) - 0x2000
-    const nametable = <u8>(index / 0x400)
+  mirrorVram(address: u16): u16 {
+    const nametable = (address >> 10) & 0b11
     const mirroring = this.drive.getMirroring()
     switch (nametable) {
       case 1:
-        return index - (mirroring == Mirroring.Horizontal ? 0x400 : 0)
+        return address - (mirroring == Mirroring.Horizontal ? 0x400 : 0)
       case 2:
-        return index - (mirroring == Mirroring.Vertical ? 0x800 : 0x400)
+        return address - (mirroring == Mirroring.Vertical ? 0x800 : 0x400)
       case 3:
-        return index - 0x800
+        return address - 0x800
       default:
-        return index
+        return address
     }
   }
 }

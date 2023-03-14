@@ -2,8 +2,6 @@ import { Interrupts, Register } from '../main'
 import { Interrupt } from '../main/enums'
 import { Control, Mask, Status } from './enums'
 import systemPalette from './palette'
-import Address from './Address'
-import Scroll from './Scroll'
 import Sprite from './Sprite'
 import Oam from './Oam'
 import Bus from './Bus'
@@ -18,11 +16,14 @@ class Ppu {
   bgChar: u8
   oddFrame: bool
 
+  v: u16
+  t: u16
+  x: u8
+  w: bool
+
   control: Register<Control> = new Register<Control>()
   mask: Register<Mask> = new Register<Mask>()
   status: Register<Status> = new Register<Status>()
-  address: Address = new Address(this.control)
-  scroll: Scroll = new Scroll()
 
   constructor(private bus: Bus, private interrupts: Interrupts) {
     this.reset()
@@ -34,11 +35,13 @@ class Ppu {
     this.dot = 0
     this.dotColor = 0
     this.bgChar = 0
+    this.v = 0
+    this.t = 0
+    this.x = 0
+    this.w = false
     this.control.reset()
     this.mask.reset()
     this.status.reset()
-    this.address.reset()
-    this.scroll.reset()
     this.frameBuffer.fill(0)
     this.oam.reset()
     for (let i = 3; i < this.frameBuffer.length; i += 4) this.frameBuffer[i] = 0xff
@@ -53,7 +56,11 @@ class Ppu {
   step(): void {
     if (this.line < 240 && this.dot < 256) {
       this.renderDot()
-    } else if (this.line < 240 && this.dot == 320) {
+      if (this.renderingEnabled() && (this.dot + this.x) % 8 == 7) this.incrementCoarseX()
+    } else if (this.renderingEnabled() && this.line < 240 && this.dot == 257) {
+      this.incrementFineY()
+      this.v = (this.v & 0b1_111_10_11111_00000) | (this.t & ~0b1_111_10_11111_00000)
+    } else if (this.renderingEnabled() && this.line < 240 && this.dot == 320) {
       this.oam.resetLine()
       const spriteOverflow = this.oam.loadLine(this.line)
       this.status.set(Status.SpriteOverflow, spriteOverflow)
@@ -63,6 +70,8 @@ class Ppu {
     } else if (this.line == 261 && this.dot == 1) {
       this.status.reset()
       this.oam.resetLine()
+    } else if (this.renderingEnabled() && this.line == 261 && this.dot == 304) {
+      this.v = (this.v & 0b1_000_01_00000_11111) | (this.t & ~0b1_000_01_00000_11111)
     } else if (this.oddFrame && this.renderingEnabled() && this.line == 261 && this.dot == 339) {
       this.dot++
     }
@@ -83,22 +92,21 @@ class Ppu {
     if (!this.mask.get(Mask.ShowBackground)) return
     if (!this.mask.get(Mask.ShowLeftBackground) && this.dot < 8) return
 
-    const nametableIndex = Math.floor(this.line / 8) * 32 + Math.floor(this.dot / 8)
-    const characterIndex = this.bus.vram[<u16>nametableIndex]
-
+    const characterIndex = this.bus.vram[this.bus.mirrorVram(this.v & 0xfff)]
     const page = <u8>this.control.get(Control.BackgroundPattern)
     const character = this.bus.loadCharacter(characterIndex, page)
-    this.bgChar = character.getPixel(<u8>this.dot % 8, <u8>this.line % 8)
+    this.bgChar = character.getPixel(<u8>((this.dot + this.x) % 8), this.getFineY())
     this.dotColor = this.bus.palette[0]
 
-    if (this.bgChar != 0) {
-      const attributeIndex = Math.floor(this.line / 32) * 8 + Math.floor(this.dot / 32)
-      const attributeAddress = 0x3c0 + attributeIndex
-      const attribute = this.bus.vram[<u16>attributeAddress]
-      const quadrant = Math.floor((this.line % 32) / 16) * 2 + Math.floor((this.dot % 32) / 16)
-      const palette = (attribute >> (<u8>quadrant * 2)) & 0b11
-      this.dotColor = this.bus.palette[palette * 4 + this.bgChar]
-    }
+    if (this.bgChar == 0) return
+
+    const attributeAddress =
+      0x3c0 | (this.v & 0b11_00000_00000) | ((this.v >> 4) & 0b111000) | ((this.v >> 2) & 0b111)
+    const attribute = this.bus.vram[this.bus.mirrorVram(<u16>attributeAddress)]
+    const quadrant = ((this.v >> 5) & 0b10) | ((this.v >> 1) & 0b1)
+    const palette = (attribute >> (<u8>quadrant * 2)) & 0b11
+
+    this.dotColor = this.bus.palette[palette * 4 + this.bgChar]
   }
 
   @inline
@@ -152,9 +160,48 @@ class Ppu {
   }
 
   @inline
+  incrementCoarseX(): void {
+    if ((this.v & 0b11111) < 31) {
+      this.v++
+    } else {
+      this.v &= ~0b11111
+      this.v ^= 0b1_00000_00000
+    }
+  }
+
+  @inline
+  incrementFineY(): void {
+    if (this.getFineY() < 7) {
+      this.v += 0b1_00_00000_00000
+    } else {
+      this.v &= 0b1_000_11_11111_11111
+      const coarseY = <u8>((this.v >> 5) & 0b11111)
+      if (coarseY == 29) {
+        this.setCoarseY(0)
+        this.v ^= 0b10_00000_00000
+      } else if (coarseY == 31) {
+        this.setCoarseY(0)
+      } else {
+        this.setCoarseY(coarseY + 1)
+      }
+    }
+  }
+
+  @inline
+  getFineY(): u8 {
+    return <u8>((this.v >> 12) & 0b111)
+  }
+
+  @inline
+  setCoarseY(value: u8): void {
+    this.v = (this.v & ~0b11111_00000) | ((<u16>value) << 5)
+  }
+
+  @inline
   setControl(value: u8): void {
     const previousGenerateNmi = this.control.get(Control.GenerateNmi)
     this.control.setValue(value)
+    this.t = (this.t & ~(0b11 << 10)) | ((<u16>(value & 0b11)) << 10)
     this.handleControlNmiChange(previousGenerateNmi)
   }
 
@@ -166,24 +213,53 @@ class Ppu {
     this.interrupts.trigger(Interrupt.Nmi)
   }
 
+  @inline
+  setScroll(value: u8): void {
+    if (this.w) {
+      this.t &= 0b1_000_11_00000_11111
+      this.t |= (<u16>(value & 0b111)) << 12
+      this.t |= (<u16>(value & ~0b111)) << 2
+    } else {
+      this.t = (this.t & ~0b11111) | (value >> 3)
+      this.x = value & 0b111
+    }
+    this.w = !this.w
+  }
+
+  @inline
+  setAddress(value: u8): void {
+    if (this.w) {
+      this.t = (this.t & ~0xff) | value
+      this.v = this.t
+    } else {
+      this.t = (this.t & 0xff) | ((<u16>(value & 0b111111)) << 8)
+    }
+    this.w = !this.w
+  }
+
+  @inline
   loadFromAddress(): u8 {
-    const address = this.address.value
-    this.address.increment()
-    return this.bus.load(address)
+    const address = this.v
+    this.incrementV()
+    return this.bus.load(address & 0x3fff)
   }
 
   @inline
   storeToAddress(value: u8): void {
-    this.bus.store(this.address.value, value)
-    this.address.increment()
+    this.bus.store(this.v & 0x3fff, value)
+    this.incrementV()
+  }
+
+  @inline
+  incrementV(): void {
+    this.v += this.control.get(Control.VramIncrement) ? 32 : 1
   }
 
   @inline
   readStatus(): u8 {
     const value = this.status.value
     this.status.set(Status.VerticalBlank, false)
-    this.scroll.resetLatch()
-    this.address.resetLatch()
+    this.w = false
     return value
   }
 

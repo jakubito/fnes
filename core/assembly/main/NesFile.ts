@@ -32,7 +32,7 @@ class NesFile {
 }
 
 function validateFormat(header: Uint8Array): void {
-  for (let i = 0; i < 4; i += 1) assert(header[i] == NesFile.TAG[i], 'Unknown rom format')
+  for (let i = 0; i < 4; i++) assert(header[i] == NesFile.TAG[i], 'Unknown rom format')
 }
 
 function validateVersion(header: Uint8Array): void {
