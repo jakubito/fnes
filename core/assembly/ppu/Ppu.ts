@@ -1,10 +1,17 @@
 import { Interrupts, Register } from '../main'
 import { Interrupt } from '../main/enums'
-import { Control, Mask, Status } from './enums'
+import { Control, Mask, PpuMask, Status } from './enums'
 import systemPalette from './palette'
 import Sprite from './Sprite'
 import Oam from './Oam'
 import Bus from './Bus'
+
+const y = <u16>PpuMask.y
+const NN = <u16>PpuMask.NN
+const N = <u16>PpuMask.N
+const n = <u16>PpuMask.n
+const Y = <u16>PpuMask.Y
+const X = <u16>PpuMask.X
 
 class Ppu {
   systemPalette: StaticArray<StaticArray<u8>> = systemPalette
@@ -59,7 +66,7 @@ class Ppu {
       if (this.renderingEnabled() && (this.dot + this.x) % 8 == 7) this.incrementCoarseX()
     } else if (this.renderingEnabled() && this.line < 240 && this.dot == 257) {
       this.incrementFineY()
-      this.v = (this.v & 0b1_111_10_11111_00000) | (this.t & ~0b1_111_10_11111_00000)
+      this.v = (this.v & ~(n | X)) | (this.t & (n | X))
     } else if (this.renderingEnabled() && this.line < 240 && this.dot == 320) {
       this.oam.resetLine()
       const spriteOverflow = this.oam.loadLine(this.line)
@@ -71,7 +78,7 @@ class Ppu {
       this.status.reset()
       this.oam.resetLine()
     } else if (this.renderingEnabled() && this.line == 261 && this.dot == 304) {
-      this.v = (this.v & 0b1_000_01_00000_11111) | (this.t & ~0b1_000_01_00000_11111)
+      this.v = (this.v & ~(y | N | Y)) | (this.t & (y | N | Y))
     } else if (this.oddFrame && this.renderingEnabled() && this.line == 261 && this.dot == 339) {
       this.dot++
     }
@@ -100,9 +107,8 @@ class Ppu {
 
     if (this.bgChar == 0) return
 
-    const attributeAddress =
-      0x3c0 | (this.v & 0b11_00000_00000) | ((this.v >> 4) & 0b111000) | ((this.v >> 2) & 0b111)
-    const attribute = this.bus.vram[this.bus.mirrorVram(<u16>attributeAddress)]
+    const attrAddress = 0x3c0 | (this.v & NN) | ((this.v >> 4) & 0b111000) | ((this.v >> 2) & 0b111)
+    const attribute = this.bus.vram[this.bus.mirrorVram(<u16>attrAddress)]
     const quadrant = ((this.v >> 5) & 0b10) | ((this.v >> 1) & 0b1)
     const palette = (attribute >> (<u8>quadrant * 2)) & 0b11
 
@@ -161,24 +167,24 @@ class Ppu {
 
   @inline
   incrementCoarseX(): void {
-    if ((this.v & 0b11111) < 31) {
+    if ((this.v & X) < 31) {
       this.v++
     } else {
-      this.v &= ~0b11111
-      this.v ^= 0b1_00000_00000
+      this.v &= ~X
+      this.v ^= n
     }
   }
 
   @inline
   incrementFineY(): void {
     if (this.getFineY() < 7) {
-      this.v += 0b1_00_00000_00000
+      this.v += 1 << 12
     } else {
-      this.v &= 0b1_000_11_11111_11111
-      const coarseY = <u8>((this.v >> 5) & 0b11111)
+      this.v &= ~y
+      const coarseY = <u8>((this.v & Y) >> 5)
       if (coarseY == 29) {
         this.setCoarseY(0)
-        this.v ^= 0b10_00000_00000
+        this.v ^= N
       } else if (coarseY == 31) {
         this.setCoarseY(0)
       } else {
@@ -189,12 +195,12 @@ class Ppu {
 
   @inline
   getFineY(): u8 {
-    return <u8>((this.v >> 12) & 0b111)
+    return <u8>((this.v & y) >> 12)
   }
 
   @inline
   setCoarseY(value: u8): void {
-    this.v = (this.v & ~0b11111_00000) | ((<u16>value) << 5)
+    this.v = (this.v & ~Y) | ((<u16>value) << 5)
   }
 
   @inline
@@ -216,11 +222,11 @@ class Ppu {
   @inline
   setScroll(value: u8): void {
     if (this.w) {
-      this.t &= 0b1_000_11_00000_11111
+      this.t &= ~(y | Y)
       this.t |= (<u16>(value & 0b111)) << 12
       this.t |= (<u16>(value & ~0b111)) << 2
     } else {
-      this.t = (this.t & ~0b11111) | (value >> 3)
+      this.t = (this.t & ~X) | (value >> 3)
       this.x = value & 0b111
     }
     this.w = !this.w
