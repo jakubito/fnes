@@ -68,7 +68,7 @@ class Ppu {
     // Render screen
     if (this.line < 240 && this.dot < 256) {
       this.renderDot()
-      if (this.renderingEnabled() && (this.dot + this.x) % 8 == 7) this.incrementCoarseX()
+      if (this.renderingEnabled() && ((this.dot + this.x) & 0b111) == 7) this.incrementCoarseX()
     }
     // Increment fine Y; reset X scroll
     else if (this.renderingEnabled() && this.line < 240 && this.dot == 257) {
@@ -119,7 +119,7 @@ class Ppu {
     const characterIndex = this.bus.vram[this.bus.mirrorVram(this.v & 0xfff)]
     const page = <u8>this.control.get(Control.BackgroundPattern)
     const character = this.bus.loadCharacter(characterIndex, page)
-    this.bgChar = character.getPixel(<u8>((this.dot + this.x) % 8), this.getFineY())
+    this.bgChar = character.getPixel(<u8>((this.dot + this.x) & 0b111), this.getFineY())
     this.dotColor = this.bus.palette[0]
 
     if (this.bgChar == 0) return

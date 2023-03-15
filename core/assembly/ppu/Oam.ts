@@ -25,7 +25,7 @@ class Oam {
   @inline
   store(value: u8): void {
     this.data[this.address] = value
-    if (this.address % 4 == 3) this.updateSprite()
+    if ((this.address & 0b11) == 3) this.updateSprite()
     this.address++
   }
 

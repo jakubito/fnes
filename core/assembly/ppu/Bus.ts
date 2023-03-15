@@ -28,7 +28,7 @@ class Bus {
       case between(address, 0x3f20, 0x3fff):
         return this.load(address & 0x3f1f)
       default:
-        throw new Error(`Cannot read from PPU bus address 0x${address.toString(16)}`)
+        return 0
     }
   }
 
@@ -47,8 +47,6 @@ class Bus {
         return this.storePalette(address, value)
       case between(address, 0x3f20, 0x3fff):
         return this.store(address & 0x3f1f, value)
-      default:
-        throw new Error(`Cannot write to PPU bus address 0x${address.toString(16)}`)
     }
   }
 

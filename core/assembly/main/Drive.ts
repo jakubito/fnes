@@ -6,6 +6,7 @@ class Drive {
   file: NesFile | null
 
   loadFile(buffer: ArrayBuffer): void {
+    if (this.file) heap.free(changetype<usize>(this.file))
     this.file = new NesFile(buffer)
   }
 

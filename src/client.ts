@@ -10,10 +10,14 @@ enum Status {
 }
 
 enum Keymap {
-  ArrowUp = 0x77,
-  ArrowDown = 0x73,
-  ArrowLeft = 0x61,
-  ArrowRight = 0x64,
+  KeyF,
+  KeyD,
+  KeyS,
+  Enter,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
 }
 
 enum DisplayMode {
@@ -32,29 +36,26 @@ class Client {
   private readonly speed = 1
   private readonly smoothingEnabled = true
   private readonly displayMode = DisplayMode.PixelPerfect
-  private readonly frameImageData: ImageData
+  private frameImageData!: ImageData
+  private playerOneButtons!: Uint8Array
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
   private _stop?: () => void
 
   private _status = Status.Ready
   private _volume = 50
-  private _screenScale = 4
+  private _screenScale = 3
 
   constructor(module: CoreModule) {
     this.module = module
     this.instance = module.createInstance()
-    // @ts-ignore
-    const { buffer } = <WebAssembly.Memory>module.memory
-    const frameBufferPointer = module.getFrameBufferPointer(this.instance)
-    const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, WIDTH * HEIGHT * 4)
-    this.frameImageData = new ImageData(frameBuffer, WIDTH, HEIGHT)
     this.canvasElement = document.createElement('canvas')
     this.canvas = this.canvasElement.getContext('2d')!
     this.screenScale = this._screenScale
     this.volume = this._volume
-    this.bindKeys()
-
+    this.bindBuffers()
+    document.addEventListener('keydown', this.onKeyDown)
+    document.addEventListener('keyup', this.onKeyUp)
     window.addEventListener('blur', this.stop)
   }
 
@@ -86,6 +87,16 @@ class Client {
 
   set volume(value: number) {
     this._volume = value
+  }
+
+  bindBuffers() {
+    // @ts-ignore
+    const { buffer } = <WebAssembly.Memory>this.module.memory
+    const frameBufferPointer = this.module.getFrameBufferPointer(this.instance)
+    const playerOneBufferPointer = this.module.getPlayerOneBufferPointer(this.instance)
+    const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, WIDTH * HEIGHT * 4)
+    this.frameImageData = new ImageData(frameBuffer, WIDTH, HEIGHT)
+    this.playerOneButtons = new Uint8Array(buffer, playerOneBufferPointer, 8)
   }
 
   start = () => {
@@ -148,27 +159,27 @@ class Client {
 
   dispose() {
     this.stop()
-    this.unbindKeys()
+    document.removeEventListener('keydown', this.onKeyDown)
+    document.removeEventListener('keyup', this.onKeyUp)
+    window.removeEventListener('blur', this.stop)
   }
 
   loadFile(buffer: ArrayBuffer) {
     this.module.loadFile(this.instance, buffer)
+    this.bindBuffers()
   }
 
-  private onKeyDown = (event: KeyboardEvent) => {
+  onKeyDown = (event: KeyboardEvent) => {
     if (!Keymap.hasOwnProperty(event.code)) return
     if (event.repeat) return
-
-    // const keyValue = Keymap[<keyof typeof Keymap>event.code]
-    // TODO
+    const index = Keymap[<keyof typeof Keymap>event.code]
+    this.playerOneButtons[index] = 1
   }
 
-  private bindKeys() {
-    document.addEventListener('keydown', this.onKeyDown)
-  }
-
-  private unbindKeys() {
-    document.removeEventListener('keydown', this.onKeyDown)
+  onKeyUp = (event: KeyboardEvent) => {
+    if (!Keymap.hasOwnProperty(event.code)) return
+    const index = Keymap[<keyof typeof Keymap>event.code]
+    this.playerOneButtons[index] = 0
   }
 }
 

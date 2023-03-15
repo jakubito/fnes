@@ -77,9 +77,7 @@ class Cpu {
   @inline
   runNextInstruction(): void {
     const opcode = this.readByte()
-    const instruction = unchecked(this.instructions[opcode])
-    assert(instruction, `Unknown opcode 0x${opcode.toString(16)}`)
-    instruction!.run()
+    unchecked(this.instructions[opcode]!).run()
   }
 
   @inline

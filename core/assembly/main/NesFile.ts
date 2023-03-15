@@ -2,6 +2,7 @@ import Character from '../ppu/Character'
 import { Mirroring } from '../ppu/enums'
 import { bit } from './helpers'
 
+@unmanaged
 class NesFile {
   static TAG: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
   static PRG_ROM_PAGE_SIZE: u16 = 0x4000

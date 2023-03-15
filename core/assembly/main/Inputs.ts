@@ -7,11 +7,8 @@ class Inputs {
 
   setStrobe(value: u8): void {
     const strobe = <bool>(value & 1)
-    if (this.strobe && !strobe) {
-      this.playerOne.takeSnapshot()
-      this.playerTwo.takeSnapshot()
-    }
-    this.strobe = strobe
+    this.playerOne.setStrobe(strobe)
+    this.playerTwo.setStrobe(strobe)
   }
 }
 

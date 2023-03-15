@@ -56,10 +56,6 @@ class Bus {
         return this.oamDmaTransfer(value)
       case ControllerAddress.PlayerOne:
         return this.inputs.setStrobe(value)
-      case between(address, 0x4000, 0x4017):
-        return // TODO - APU
-      default:
-        throw new Error(`Cannot write to CPU bus address 0x${address.toString(16)}`)
     }
   }
 
