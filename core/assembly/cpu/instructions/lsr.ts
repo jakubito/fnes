@@ -17,10 +17,12 @@ export function lsrAc(cpu: Cpu, param: u16, mode: Mode): void {
 }
 
 export function lsr(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.sr.set(Status.Carry, cpu.load(param) & 1)
-  cpu.store(param, cpu.load(param) >> 1)
-  cpu.sr.set(Status.Zero, cpu.load(param) == 0)
-  cpu.sr.set(Status.Negative, cpu.load(param) >> 7)
+  const value = cpu.load(param)
+  const newValue = value >> 1
+  cpu.store(param, newValue)
+  cpu.sr.set(Status.Carry, value & 1)
+  cpu.sr.set(Status.Zero, newValue == 0)
+  cpu.sr.set(Status.Negative, newValue >> 7)
 }
 
 export default bind

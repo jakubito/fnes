@@ -19,10 +19,12 @@ function rolAc(cpu: Cpu, param: u16, mode: Mode): void {
 
 export function rol(cpu: Cpu, param: u16, mode: Mode): void {
   const oldCarry = <u8>cpu.sr.get(Status.Carry)
-  cpu.sr.set(Status.Carry, cpu.load(param) >> 7)
-  cpu.store(param, (cpu.load(param) << 1) | oldCarry)
-  cpu.sr.set(Status.Zero, cpu.load(param) == 0)
-  cpu.sr.set(Status.Negative, cpu.load(param) >> 7)
+  const value = cpu.load(param)
+  const newValue = (value << 1) | oldCarry
+  cpu.store(param, newValue)
+  cpu.sr.set(Status.Carry, value >> 7)
+  cpu.sr.set(Status.Zero, newValue == 0)
+  cpu.sr.set(Status.Negative, newValue >> 7)
 }
 
 export default bind

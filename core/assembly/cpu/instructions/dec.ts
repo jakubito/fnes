@@ -9,9 +9,10 @@ function bind(cpu: Cpu): void {
 }
 
 export function dec(cpu: Cpu, param: u16, mode: Mode): void {
-  cpu.store(param, cpu.load(param) - 1)
-  cpu.sr.set(Status.Zero, cpu.load(param) == 0)
-  cpu.sr.set(Status.Negative, cpu.load(param) >> 7)
+  const value = cpu.load(param) - 1
+  cpu.store(param, value)
+  cpu.sr.set(Status.Zero, value == 0)
+  cpu.sr.set(Status.Negative, value >> 7)
 }
 
 export default bind
