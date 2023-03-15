@@ -9,7 +9,7 @@ class Oam {
   address: u8
 
   constructor() {
-    this.resetSprites()
+    for (let i: u8 = 0; i < 64; i++) this.sprites[i] = new Sprite()
   }
 
   @inline
@@ -74,7 +74,7 @@ class Oam {
   @inline
   resetSprites(): void {
     this.data.fill(0)
-    for (let i: u8 = 0; i < 64; i++) this.sprites[i] = new Sprite()
+    for (let i: u8 = 0; i < 64; i++) this.sprites[i].reset()
   }
 
   reset(): void {

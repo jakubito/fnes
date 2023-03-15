@@ -23,14 +23,14 @@ class Ppu {
   bgChar: u8
   oddFrame: bool
 
+  control: Register<Control> = new Register<Control>()
+  mask: Register<Mask> = new Register<Mask>()
+  status: Register<Status> = new Register<Status>()
+
   v: u16
   t: u16
   x: u8
   w: bool
-
-  control: Register<Control> = new Register<Control>()
-  mask: Register<Mask> = new Register<Mask>()
-  status: Register<Status> = new Register<Status>()
 
   constructor(private bus: Bus, private interrupts: Interrupts) {
     this.reset()
@@ -51,7 +51,11 @@ class Ppu {
     this.status.reset()
     this.frameBuffer.fill(0)
     this.oam.reset()
-    for (let i = 3; i < this.frameBuffer.length; i += 4) this.frameBuffer[i] = 0xff
+
+    // Set alpha channel to 0xff
+    for (let i = 3; i < this.frameBuffer.length; i += 4) {
+      this.frameBuffer[i] = 0xff
+    }
   }
 
   @inline
@@ -61,25 +65,38 @@ class Ppu {
 
   @inline
   step(): void {
+    // Render screen
     if (this.line < 240 && this.dot < 256) {
       this.renderDot()
       if (this.renderingEnabled() && (this.dot + this.x) % 8 == 7) this.incrementCoarseX()
-    } else if (this.renderingEnabled() && this.line < 240 && this.dot == 257) {
+    }
+    // Increment fine Y; reset X scroll
+    else if (this.renderingEnabled() && this.line < 240 && this.dot == 257) {
       this.incrementFineY()
       this.v = (this.v & ~(n | X)) | (this.t & (n | X))
-    } else if (this.renderingEnabled() && this.line < 240 && this.dot == 320) {
+    }
+    // Load sprites for the next scanline
+    else if (this.renderingEnabled() && this.line < 240 && this.dot == 320) {
       this.oam.resetLine()
       const spriteOverflow = this.oam.loadLine(this.line)
       this.status.set(Status.SpriteOverflow, spriteOverflow)
-    } else if (this.line == 241 && this.dot == 1) {
+    }
+    // Enter vertical blank
+    else if (this.line == 241 && this.dot == 1) {
       this.status.set(Status.VerticalBlank, true)
       if (this.control.get(Control.GenerateNmi)) this.interrupts.trigger(Interrupt.Nmi)
-    } else if (this.line == 261 && this.dot == 1) {
+    }
+    // Exit vertical blank; reset sprites
+    else if (this.line == 261 && this.dot == 1) {
       this.status.reset()
       this.oam.resetLine()
-    } else if (this.renderingEnabled() && this.line == 261 && this.dot == 304) {
+    }
+    // Reset Y scroll
+    else if (this.renderingEnabled() && this.line == 261 && this.dot == 304) {
       this.v = (this.v & ~(y | N | Y)) | (this.t & (y | N | Y))
-    } else if (this.oddFrame && this.renderingEnabled() && this.line == 261 && this.dot == 339) {
+    }
+    // Skip cycle on odd frames
+    else if (this.oddFrame && this.renderingEnabled() && this.line == 261 && this.dot == 339) {
       this.dot++
     }
     this.advanceDot()

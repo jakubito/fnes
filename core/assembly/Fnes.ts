@@ -23,7 +23,6 @@ class Fnes {
     this.cpu.reset()
     this.ppu.reset()
     this.interrupts.reset()
-    this.interrupts.trigger(Interrupt.Reset)
     this.cpu.step()
   }
 

@@ -8,6 +8,17 @@ class Sprite {
   x: u8
   y: u8
 
+  reset(): void {
+    this.index = 0
+    this.characterIndex = 0
+    this.palette = 0
+    this.priority = 0
+    this.flipHorizontal = false
+    this.flipVertical = false
+    this.x = 0
+    this.y = 0
+  }
+
   update(oam: Uint8Array, index: u8): void {
     const address = index * 4
     const attributes = oam[address + 2]

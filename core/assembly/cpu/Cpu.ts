@@ -9,6 +9,7 @@ import { InstructionHandler } from './types'
 
 class Cpu {
   instructions: StaticArray<Instruction | null> = new StaticArray(0x100)
+  pendingInterrupt: Interrupt
   totalCycles: usize
   cycles: usize
 
@@ -25,6 +26,7 @@ class Cpu {
   }
 
   reset(): void {
+    this.pendingInterrupt = Interrupt.Reset
     this.totalCycles = 0
     this.cycles = 0
     this.sr.setValue(0b0010_0000)
@@ -46,13 +48,14 @@ class Cpu {
   }
 
   step(): Interrupt {
-    const interrupt = this.pollInterrupt()
+    const interrupt = this.pendingInterrupt
+    this.pendingInterrupt = this.pollInterrupt()
     if (<i8>interrupt == -1) this.runNextInstruction()
     else this.handleInterrupt(interrupt)
     this.bus.tick(this.cycles)
     this.totalCycles += this.cycles
     this.cycles = 0
-    return interrupt
+    return this.pendingInterrupt
   }
 
   @inline
@@ -74,7 +77,7 @@ class Cpu {
   @inline
   runNextInstruction(): void {
     const opcode = this.readByte()
-    const instruction = this.instructions[opcode]
+    const instruction = unchecked(this.instructions[opcode])
     assert(instruction, `Unknown opcode 0x${opcode.toString(16)}`)
     instruction!.run()
   }
@@ -121,7 +124,7 @@ class Cpu {
   @inline
   pushToStack(value: u8): void {
     this.store(0x100 + this.sp, value)
-    this.sp -= 1
+    this.sp--
   }
 
   @inline

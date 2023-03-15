@@ -9,6 +9,8 @@
     "release": {
       "outFile": "build/core.wasm",
       "sourceMap": false,
+      "debug": false,
+      "runtime": "minimal",
       "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": false,
