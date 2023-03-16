@@ -76,9 +76,8 @@ class Client {
     this._screenScale = scale
     this.canvasElement.width = scaledWidth * window.devicePixelRatio
     this.canvasElement.height = HEIGHT * scale * window.devicePixelRatio
-    this.canvasElement.style.width = `${scaledWidth}px`
-    this.canvasElement.style.height = `${HEIGHT * scale}px`
-    this.canvas.imageSmoothingEnabled = false
+    this.canvasElement.style.width = scaledWidth + 'px'
+    this.canvasElement.style.height = HEIGHT * scale + 'px'
   }
 
   get volume() {
@@ -110,6 +109,7 @@ class Client {
     const clientFrame = (time: DOMHighResTimeStamp) => {
       timeAvailable += Math.min(time - previousTime, 250)
       previousTime = time
+      this.pollGamepads()
 
       while (timeAvailable >= this.timePerFrame) {
         this.module.renderFrame(this.instance)
@@ -180,6 +180,24 @@ class Client {
     if (!Keymap.hasOwnProperty(event.code)) return
     const index = Keymap[<keyof typeof Keymap>event.code]
     this.playerOneButtons[index] = 0
+  }
+
+  pollGamepads() {
+    const gamepads = navigator.getGamepads().filter((gamepad) => gamepad?.connected)
+    if (gamepads[0]?.mapping == 'standard')
+      this.pollStandardGamepad(gamepads[0], this.playerOneButtons)
+  }
+
+  pollStandardGamepad(gamepad: Gamepad, buffer: Uint8Array) {
+    const { buttons } = gamepad
+    buffer[0] = +buttons[1].pressed
+    buffer[1] = +buttons[0].pressed | +buttons[2].pressed | +buttons[3].pressed
+    buffer[2] = +buttons[8].pressed
+    buffer[3] = +buttons[9].pressed
+    buffer[4] = +buttons[12].pressed
+    buffer[5] = +buttons[13].pressed
+    buffer[6] = +buttons[14].pressed
+    buffer[7] = +buttons[15].pressed
   }
 }
 
