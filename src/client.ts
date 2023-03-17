@@ -35,7 +35,7 @@ class Client {
 
   private readonly speed = 1
   private readonly smoothingEnabled = true
-  private readonly displayMode = DisplayMode.PixelPerfect
+  private readonly displayMode = DisplayMode.Original
   private frameImageData!: ImageData
   private playerOneButtons!: Uint8Array
   private readonly canvasElement: HTMLCanvasElement
@@ -59,7 +59,7 @@ class Client {
     window.addEventListener('blur', this.stop)
   }
 
-  get timePerFrame() {
+  get frameTime() {
     return FRAME_TIME / this.speed
   }
 
@@ -107,13 +107,13 @@ class Client {
     let frameReady = false
 
     const clientFrame = (time: DOMHighResTimeStamp) => {
-      timeAvailable += Math.min(time - previousTime, 250)
+      timeAvailable += Math.min(time - previousTime, 35)
       previousTime = time
       this.pollGamepads()
 
-      while (timeAvailable >= this.timePerFrame) {
+      while (timeAvailable >= this.frameTime) {
         this.module.renderFrame(this.instance)
-        timeAvailable -= this.timePerFrame
+        timeAvailable -= this.frameTime
         frameReady = true
       }
 
@@ -134,6 +134,14 @@ class Client {
     this._status = Status.Running
   }
 
+  stop = () => {
+    this._stop?.()
+  }
+
+  appendCanvasTo(target: HTMLElement) {
+    target.appendChild(this.canvasElement)
+  }
+
   drawFrame() {
     const { width, height } = this.canvasElement
     this.canvas.putImageData(this.frameImageData, 0, 0)
@@ -147,14 +155,6 @@ class Client {
       this.canvas.imageSmoothingEnabled = this.smoothingEnabled
       this.canvas.drawImage(this.canvasElement, 0, 0, scaledWidth, height, 0, 0, width, height)
     }
-  }
-
-  stop = () => {
-    this._stop?.()
-  }
-
-  appendCanvasTo(target: HTMLElement) {
-    target.appendChild(this.canvasElement)
   }
 
   dispose() {
@@ -189,6 +189,7 @@ class Client {
   }
 
   pollStandardGamepad(gamepad: Gamepad, buffer: Uint8Array) {
+    // https://www.w3.org/TR/gamepad/#dfn-standard-gamepad
     const { buttons } = gamepad
     buffer[0] = +buttons[1].pressed
     buffer[1] = +buttons[0].pressed | +buttons[2].pressed | +buttons[3].pressed

@@ -1,3 +1,5 @@
+import { Register } from '../main'
+import { Control } from './enums'
 import Sprite from './Sprite'
 
 class Oam {
@@ -8,7 +10,7 @@ class Oam {
   data: Uint8Array = new Uint8Array(0x100)
   address: u8
 
-  constructor() {
+  constructor(private control: Register<Control>) {
     for (let i: u8 = 0; i < 64; i++) this.sprites[i] = new Sprite()
   }
 
@@ -37,9 +39,10 @@ class Oam {
 
   @inline
   loadLine(line: u16): bool {
+    const spriteHeight = <u8>this.control.get(Control.SpriteSize) * 8 + 8
     let count: u8 = 0
     for (let spriteIndex: u8 = 0; spriteIndex < 64; spriteIndex++) {
-      if (line - this.sprites[spriteIndex].y >= 8) continue
+      if (line - this.sprites[spriteIndex].y >= spriteHeight) continue
       if (count == 8) return true
       this.lineSprites[count] = this.sprites[spriteIndex]
       count++

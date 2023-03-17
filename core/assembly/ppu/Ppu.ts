@@ -16,7 +16,6 @@ const X = <u16>PpuMask.X
 class Ppu {
   systemPalette: StaticArray<StaticArray<u8>> = systemPalette
   frameBuffer: Uint8Array = new Uint8Array(256 * 240 * 4)
-  oam: Oam = new Oam()
   line: u16
   dot: u16
   dotColor: u8
@@ -26,6 +25,7 @@ class Ppu {
   control: Register<Control> = new Register<Control>()
   mask: Register<Mask> = new Register<Mask>()
   status: Register<Status> = new Register<Status>()
+  oam: Oam = new Oam(this.control)
 
   v: u16
   t: u16
@@ -137,26 +137,38 @@ class Ppu {
     if (!this.mask.get(Mask.ShowSprites)) return
     if (!this.mask.get(Mask.ShowLeftSprites) && this.dot < 8) return
 
-    const spritePage = <u8>this.control.get(Control.SpritePattern)
     this.oam.setDot(this.dot)
     let sprite: Sprite | null
 
     while ((sprite = this.oam.nextDotSprite())) {
-      let spritePixelX = <u8>(this.dot - sprite.x)
-      let spritePixelY = <u8>(this.line - 1 - sprite.y)
-      if (sprite.flipHorizontal) spritePixelX = 7 - spritePixelX
-      if (sprite.flipVertical) spritePixelY = 7 - spritePixelY
+      const charColor = this.getSpriteCharacterColor(sprite)
 
-      const spriteCharacter = this.bus.loadCharacter(sprite.characterIndex, spritePage)
-      const spriteCharColor = spriteCharacter.getPixel(spritePixelX, spritePixelY)
-
-      if (spriteCharColor == 0) continue
+      if (charColor == 0) continue
       if (this.bgChar != 0 && sprite.index == 0) this.status.set(Status.SpriteZeroHit, true)
       if (this.bgChar != 0 && sprite.priority == 1) break
 
-      this.dotColor = this.bus.palette[16 + sprite.palette * 4 + spriteCharColor]
+      this.dotColor = this.bus.palette[16 + sprite.palette * 4 + charColor]
       break
     }
+  }
+
+  @inline
+  getSpriteCharacterColor(sprite: Sprite): u8 {
+    const size = this.control.get(Control.SpriteSize)
+    const page = size ? sprite.characterIndex & 1 : <u8>this.control.get(Control.SpritePattern)
+    let charIndex = sprite.characterIndex & ~(<u8>size)
+    let x = <u8>(this.dot - sprite.x)
+    let y = <u8>(this.line - 1 - sprite.y)
+
+    if (sprite.flipHorizontal) x = 7 - x
+    if (sprite.flipVertical) y = <u8>size * 8 + 7 - y
+    if (y > 7) {
+      y -= 8
+      charIndex++
+    }
+
+    const character = this.bus.loadCharacter(charIndex, page)
+    return character.getPixel(x, y)
   }
 
   @inline
