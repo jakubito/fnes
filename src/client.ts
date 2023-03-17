@@ -33,11 +33,9 @@ class Client {
   private module: CoreModule
   readonly instance: CoreInstance
 
-  private readonly speed = 1
-  private readonly smoothingEnabled = true
-  private readonly displayMode = DisplayMode.Original
   private frameImageData!: ImageData
   private playerOneButtons!: Uint8Array
+  private playerTwoButtons!: Uint8Array
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
   private _stop?: () => void
@@ -45,15 +43,18 @@ class Client {
   private _status = Status.Ready
   private _volume = 50
   private _screenScale = 3
+  private _speed = 1
+  private smoothingEnabled = true
+  private _displayMode = DisplayMode.Original
 
   constructor(module: CoreModule) {
     this.module = module
     this.instance = module.createInstance()
+    this.bindBuffers()
     this.canvasElement = document.createElement('canvas')
     this.canvas = this.canvasElement.getContext('2d')!
     this.screenScale = this._screenScale
     this.volume = this._volume
-    this.bindBuffers()
     document.addEventListener('keydown', this.onKeyDown)
     document.addEventListener('keyup', this.onKeyUp)
     window.addEventListener('blur', this.stop)
@@ -78,6 +79,7 @@ class Client {
     this.canvasElement.height = HEIGHT * scale * window.devicePixelRatio
     this.canvasElement.style.width = scaledWidth + 'px'
     this.canvasElement.style.height = HEIGHT * scale + 'px'
+    this.drawFrame()
   }
 
   get volume() {
@@ -88,14 +90,33 @@ class Client {
     this._volume = value
   }
 
+  get speed() {
+    return this._speed
+  }
+
+  set speed(value: number) {
+    this._speed = Math.min(Math.max(value, 0.1), 5)
+  }
+
+  get displayMode() {
+    return this._displayMode
+  }
+
+  set displayMode(value: DisplayMode) {
+    this._displayMode = value
+    this.screenScale = this._screenScale
+  }
+
   bindBuffers() {
     // @ts-ignore
     const { buffer } = <WebAssembly.Memory>this.module.memory
     const frameBufferPointer = this.module.getFrameBufferPointer(this.instance)
     const playerOneBufferPointer = this.module.getPlayerOneBufferPointer(this.instance)
+    const playerTwoBufferPointer = this.module.getPlayerTwoBufferPointer(this.instance)
     const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, WIDTH * HEIGHT * 4)
     this.frameImageData = new ImageData(frameBuffer, WIDTH, HEIGHT)
     this.playerOneButtons = new Uint8Array(buffer, playerOneBufferPointer, 8)
+    this.playerTwoButtons = new Uint8Array(buffer, playerTwoBufferPointer, 8)
   }
 
   start = () => {
@@ -183,9 +204,13 @@ class Client {
   }
 
   pollGamepads() {
-    const gamepads = navigator.getGamepads().filter((gamepad) => gamepad?.connected)
-    if (gamepads[0]?.mapping == 'standard')
-      this.pollStandardGamepad(gamepads[0], this.playerOneButtons)
+    const gamepads = <Gamepad[]>navigator.getGamepads().filter((gamepad) => {
+      if (!gamepad?.connected) return false
+      if (gamepad.mapping != 'standard') return false
+      return true
+    })
+    if (gamepads[0]) this.pollStandardGamepad(gamepads[0], this.playerOneButtons)
+    if (gamepads[1]) this.pollStandardGamepad(gamepads[1], this.playerTwoButtons)
   }
 
   pollStandardGamepad(gamepad: Gamepad, buffer: Uint8Array) {
