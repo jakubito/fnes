@@ -44,7 +44,7 @@ class Client {
   private _volume = 50
   private _screenScale = 3
   private _speed = 1
-  private smoothingEnabled = true
+  private _smoothingEnabled = true
   private _displayMode = DisplayMode.Original
 
   constructor(module: CoreModule) {
@@ -96,6 +96,15 @@ class Client {
 
   set speed(value: number) {
     this._speed = Math.min(Math.max(value, 0.1), 5)
+  }
+
+  get smoothingEnabled() {
+    return this._smoothingEnabled
+  }
+
+  set smoothingEnabled(value: boolean) {
+    this._smoothingEnabled = value
+    this.drawFrame()
   }
 
   get displayMode() {
