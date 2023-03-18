@@ -9,7 +9,8 @@
     "build:debug": "asc assembly/index.ts --target debug",
     "build:release": "asc assembly/index.ts --target release",
     "nestest": "ts-node tests/nestest/nestest.ts",
-    "pputest": "ts-node tests/ppu/pputest.ts"
+    "pputest": "ts-node tests/ppu/pputest.ts",
+    "perftest": "ts-node tests/performance/perftest.ts"
   },
   "devDependencies": {
     "@types/node": "^17.0.39",
