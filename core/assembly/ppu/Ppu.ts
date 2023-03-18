@@ -16,21 +16,21 @@ const X = <u16>PpuMask.X
 class Ppu {
   systemPalette: StaticArray<StaticArray<u8>> = systemPalette
   frameBuffer: Uint8Array = new Uint8Array(256 * 240 * 4)
-  line: u16
-  dot: u16
-  dotColor: u8
-  bgChar: u8
-  oddFrame: bool
+  line: u16 = 0
+  dot: u16 = 0
+  dotColor: u8 = 0
+  bgChar: u8 = 0
+  oddFrame: bool = false
 
   control: Register<Control> = new Register<Control>()
   mask: Register<Mask> = new Register<Mask>()
   status: Register<Status> = new Register<Status>()
   oam: Oam = new Oam(this.control)
 
-  v: u16
-  t: u16
-  x: u8
-  w: bool
+  v: u16 = 0
+  t: u16 = 0
+  x: u8 = 0
+  w: bool = false
 
   constructor(private bus: Bus, private interrupts: Interrupts) {
     this.reset()
@@ -173,10 +173,44 @@ class Ppu {
 
   @inline
   paintDot(color: u8): void {
+    let r = this.systemPalette[color][0]
+    let g = this.systemPalette[color][1]
+    let b = this.systemPalette[color][2]
+
     const index = (<i32>this.line * 256 + this.dot) * 4
-    this.frameBuffer[index] = this.systemPalette[color][0]
-    this.frameBuffer[index + 1] = this.systemPalette[color][1]
-    this.frameBuffer[index + 2] = this.systemPalette[color][2]
+    const emphasizeRed = <u8>this.mask.get(Mask.EmphasizeRed)
+    const emphasizeGreen = <u8>this.mask.get(Mask.EmphasizeGreen)
+    const emphasizeBlue = <u8>this.mask.get(Mask.EmphasizeBlue)
+
+    if (emphasizeRed | emphasizeGreen | emphasizeBlue) {
+      const all = emphasizeRed & emphasizeGreen & emphasizeBlue
+      r = this.emphasizeColor(r, emphasizeRed, all)
+      g = this.emphasizeColor(g, emphasizeGreen, all)
+      b = this.emphasizeColor(b, emphasizeBlue, all)
+    }
+
+    if (this.mask.get(Mask.Grayscale)) {
+      r = this.convertToGrayscale(r, g, b)
+      g = r
+      b = r
+    }
+
+    this.frameBuffer[index] = r
+    this.frameBuffer[index + 1] = g
+    this.frameBuffer[index + 2] = b
+  }
+
+  @inline
+  emphasizeColor(value: u8, emphasize: u8, emphasizeAll: u8): u8 {
+    return <u8>Math.round(<f32>value * (0.75 + (emphasize & (~emphasizeAll & 1)) * 0.25))
+  }
+
+  @inline
+  convertToGrayscale(red: u8, green: u8, blue: u8): u8 {
+    const r = <f32>red / 255
+    const g = <f32>green / 255
+    const b = <f32>blue / 255
+    return <u8>Math.round((r * 0.299 + g * 0.587 + b * 0.114) * 255)
   }
 
   @inline

@@ -1,12 +1,12 @@
 class Sprite {
-  index: u8
-  characterIndex: u8
-  palette: u8
-  priority: u8
-  flipHorizontal: bool
-  flipVertical: bool
-  x: u8
-  y: u8
+  index: u8 = 0
+  characterIndex: u8 = 0
+  palette: u8 = 0
+  priority: u8 = 0
+  flipHorizontal: bool = false
+  flipVertical: bool = false
+  x: u8 = 0
+  y: u8 = 0
 
   reset(): void {
     this.index = 0

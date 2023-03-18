@@ -3,7 +3,7 @@ import { Mirroring } from '../ppu/enums'
 import NesFile from './NesFile'
 
 class Drive {
-  file: NesFile | null
+  file: NesFile | null = null
 
   loadFile(buffer: ArrayBuffer): void {
     if (this.file) heap.free(changetype<usize>(this.file))

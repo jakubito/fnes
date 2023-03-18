@@ -6,7 +6,7 @@ import Character from './Character'
 class Bus {
   vram: Uint8Array = new Uint8Array(0x800)
   palette: Uint8Array = new Uint8Array(0x20)
-  readBuffer: u8
+  readBuffer: u8 = 0
 
   constructor(private drive: Drive) {}
 

@@ -1,8 +1,8 @@
 class Controller {
   buttons: Uint8Array = new Uint8Array(8)
   snapshot: Uint8Array = new Uint8Array(8)
-  strobe: bool
-  index: u8
+  strobe: bool = false
+  index: u8 = 0
 
   read(): u8 {
     if (this.strobe) return this.buttons[0]

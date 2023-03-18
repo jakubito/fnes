@@ -9,16 +9,16 @@ import { InstructionHandler } from './types'
 
 class Cpu {
   instructions: StaticArray<Instruction | null> = new StaticArray(0x100)
-  pendingInterrupt: Interrupt
-  totalCycles: usize
-  cycles: usize
+  pendingInterrupt: Interrupt = -1
+  totalCycles: usize = 0
+  cycles: usize = 0
 
   sr: Register<Status> = new Register<Status>()
-  pc: u16
-  sp: u8
-  ac: u8
-  x: u8
-  y: u8
+  pc: u16 = 0
+  sp: u8 = 0
+  ac: u8 = 0
+  x: u8 = 0
+  y: u8 = 0
 
   constructor(private bus: Bus, private interrupts: Interrupts) {
     for (let i = 0; i < bindings.length; i++) bindings.at(i)(this)

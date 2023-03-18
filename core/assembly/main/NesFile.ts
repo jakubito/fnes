@@ -23,12 +23,14 @@ class NesFile {
     const prgSize = header[4] * NesFile.PRG_ROM_PAGE_SIZE
     const chrSize = header[5] * NesFile.CHR_ROM_PAGE_SIZE
     const start = bit(header[6], 2) * 512 + 16
+    const prgRom = Uint8Array.wrap(buffer, start, prgSize)
+    const chrRom = Uint8Array.wrap(buffer, start + prgSize, chrSize)
 
-    this.prgRom = Uint8Array.wrap(buffer, start, prgSize)
-    this.chrRom = Uint8Array.wrap(buffer, start + prgSize, chrSize)
+    this.prgRom = prgRom
+    this.chrRom = chrRom
     this.mapper = getMapper(header)
     this.mirroring = getMirroring(header)
-    this.characters = buildCharacters(this.chrRom)
+    this.characters = buildCharacters(chrRom)
   }
 }
 
