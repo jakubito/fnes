@@ -61,24 +61,24 @@ class Bus {
   loadVram(address: u16): u8 {
     const value = this.readBuffer
     const index = this.mirrorVram(address)
-    this.readBuffer = this.vram[index]
+    this.readBuffer = unchecked(this.vram[index])
     return value
   }
 
   @inline
   storeVram(address: u16, value: u8): void {
     const index = this.mirrorVram(address)
-    this.vram[index] = value
+    unchecked((this.vram[index] = value))
   }
 
   @inline
   loadPalette(address: u16): u8 {
-    return this.palette[address - 0x3f00]
+    return unchecked(this.palette[address - 0x3f00])
   }
 
   @inline
   storePalette(address: u16, value: u8): void {
-    this.palette[address - 0x3f00] = value
+    unchecked((this.palette[address - 0x3f00] = value))
   }
 
   @inline

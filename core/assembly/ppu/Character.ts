@@ -11,13 +11,13 @@ class Character {
       for (let x: u8 = 0; x < 8; x++) {
         const lowBit = bit(lowByte, 7 - x)
         const highBit = bit(highByte, 7 - x) << 1
-        this.data[y * 8 + x] = lowBit | highBit
+        unchecked((this.data[y * 8 + x] = lowBit | highBit))
       }
     }
   }
 
   getPixel(x: u8, y: u8): u8 {
-    return this.data[y * 8 + x]
+    return unchecked(this.data[y * 8 + x])
   }
 }
 

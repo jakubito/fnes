@@ -19,14 +19,14 @@ class Controller {
 
   @inline
   takeSnapshot(): void {
-    this.snapshot[0] = this.buttons[0]
-    this.snapshot[1] = this.buttons[1]
-    this.snapshot[2] = this.buttons[2]
-    this.snapshot[3] = this.buttons[3]
-    this.snapshot[4] = this.buttons[4]
-    this.snapshot[5] = this.buttons[5]
-    this.snapshot[6] = this.buttons[6]
-    this.snapshot[7] = this.buttons[7]
+    unchecked((this.snapshot[0] = unchecked(this.buttons[0])))
+    unchecked((this.snapshot[1] = unchecked(this.buttons[1])))
+    unchecked((this.snapshot[2] = unchecked(this.buttons[2])))
+    unchecked((this.snapshot[3] = unchecked(this.buttons[3])))
+    unchecked((this.snapshot[4] = unchecked(this.buttons[4])))
+    unchecked((this.snapshot[5] = unchecked(this.buttons[5])))
+    unchecked((this.snapshot[6] = unchecked(this.buttons[6])))
+    unchecked((this.snapshot[7] = unchecked(this.buttons[7])))
     this.index = 0
   }
 }

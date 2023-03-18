@@ -4,17 +4,26 @@ class Interrupts {
   value: StaticArray<bool> = new StaticArray(3)
 
   poll(): Interrupt {
-    for (let i: i32 = 0; i < this.value.length; i++) {
-      if (!this.value[i]) continue
-      this.value[i] = false
-      return i
+    if (this.value[Interrupt.Nmi]) {
+      unchecked((this.value[Interrupt.Nmi] = false))
+      return Interrupt.Nmi
+    }
+
+    if (this.value[Interrupt.Reset]) {
+      unchecked((this.value[Interrupt.Reset] = false))
+      return Interrupt.Reset
+    }
+
+    if (this.value[Interrupt.Irq]) {
+      unchecked((this.value[Interrupt.Irq] = false))
+      return Interrupt.Irq
     }
 
     return -1
   }
 
   trigger(interrupt: Interrupt): void {
-    this.value[interrupt] = true
+    unchecked((this.value[interrupt] = true))
   }
 
   reset(): void {

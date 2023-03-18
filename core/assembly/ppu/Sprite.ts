@@ -21,15 +21,15 @@ class Sprite {
 
   update(oam: Uint8Array, index: u8): void {
     const address = index * 4
-    const attributes = oam[address + 2]
+    const attributes = unchecked(oam[address + 2])
     this.index = index
     this.palette = attributes & 0b11
     this.priority = (attributes >> 5) & 1
     this.flipHorizontal = <bool>((attributes >> 6) & 1)
     this.flipVertical = <bool>((attributes >> 7) & 1)
-    this.characterIndex = oam[address + 1]
-    this.x = oam[address + 3]
-    this.y = oam[address]
+    this.characterIndex = unchecked(oam[address + 1])
+    this.x = unchecked(oam[address + 3])
+    this.y = unchecked(oam[address])
   }
 }
 

@@ -13,18 +13,18 @@ class Drive {
   @inline
   loadPrgRom(address: u16): u8 {
     const prgRomSize = <u16>this.file!.prgRom.length
-    if (address >= prgRomSize) return this.file!.prgRom[address & 0x3fff]
-    return this.file!.prgRom[address]
+    if (address >= prgRomSize) return unchecked(this.file!.prgRom[address & 0x3fff])
+    return unchecked(this.file!.prgRom[address])
   }
 
   @inline
   loadChrRom(address: u16): u8 {
-    return this.file!.chrRom[address]
+    return unchecked(this.file!.chrRom[address])
   }
 
   @inline
   loadCharacter(index: u16): Character {
-    return this.file!.characters[index]
+    return unchecked(this.file!.characters[index])
   }
 
   @inline

@@ -54,7 +54,7 @@ class Ppu {
 
     // Set alpha channel to 0xff
     for (let i = 3; i < this.frameBuffer.length; i += 4) {
-      this.frameBuffer[i] = 0xff
+      unchecked((this.frameBuffer[i] = 0xff))
     }
   }
 
@@ -116,20 +116,20 @@ class Ppu {
     if (!this.mask.get(Mask.ShowBackground)) return
     if (!this.mask.get(Mask.ShowLeftBackground) && this.dot < 8) return
 
-    const characterIndex = this.bus.vram[this.bus.mirrorVram(this.v & 0xfff)]
+    const characterIndex = unchecked(this.bus.vram[this.bus.mirrorVram(this.v & 0xfff)])
     const page = <u8>this.control.get(Control.BackgroundPattern)
     const character = this.bus.loadCharacter(characterIndex, page)
     this.bgChar = character.getPixel(<u8>((this.dot + this.x) & 0b111), this.getFineY())
-    this.dotColor = this.bus.palette[0]
+    this.dotColor = unchecked(this.bus.palette[0])
 
     if (this.bgChar == 0) return
 
     const attrAddress = 0x3c0 | (this.v & NN) | ((this.v >> 4) & 0b111000) | ((this.v >> 2) & 0b111)
-    const attribute = this.bus.vram[this.bus.mirrorVram(<u16>attrAddress)]
+    const attribute = unchecked(this.bus.vram[this.bus.mirrorVram(<u16>attrAddress)])
     const quadrant = ((this.v >> 5) & 0b10) | ((this.v >> 1) & 0b1)
     const palette = (attribute >> (<u8>quadrant * 2)) & 0b11
 
-    this.dotColor = this.bus.palette[palette * 4 + this.bgChar]
+    this.dotColor = unchecked(this.bus.palette[palette * 4 + this.bgChar])
   }
 
   @inline
@@ -147,7 +147,7 @@ class Ppu {
       if (this.bgChar != 0 && sprite.index == 0) this.status.set(Status.SpriteZeroHit, true)
       if (this.bgChar != 0 && sprite.priority == 1) break
 
-      this.dotColor = this.bus.palette[16 + sprite.palette * 4 + charColor]
+      this.dotColor = unchecked(this.bus.palette[16 + sprite.palette * 4 + charColor])
       break
     }
   }
@@ -173,9 +173,9 @@ class Ppu {
 
   @inline
   paintDot(color: u8): void {
-    let r = this.systemPalette[color][0]
-    let g = this.systemPalette[color][1]
-    let b = this.systemPalette[color][2]
+    let r = unchecked(unchecked(this.systemPalette[color])[0])
+    let g = unchecked(unchecked(this.systemPalette[color])[1])
+    let b = unchecked(unchecked(this.systemPalette[color])[2])
 
     const index = (<i32>this.line * 256 + this.dot) * 4
     const emphasizeRed = <u8>this.mask.get(Mask.EmphasizeRed)
@@ -195,9 +195,9 @@ class Ppu {
       b = r
     }
 
-    this.frameBuffer[index] = r
-    this.frameBuffer[index + 1] = g
-    this.frameBuffer[index + 2] = b
+    unchecked((this.frameBuffer[index] = r))
+    unchecked((this.frameBuffer[index + 1] = g))
+    unchecked((this.frameBuffer[index + 2] = b))
   }
 
   @inline

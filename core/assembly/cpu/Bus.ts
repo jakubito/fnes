@@ -78,12 +78,12 @@ class Bus {
 
   @inline
   loadWram(address: u16): u8 {
-    return this.wram[address & 0x7ff]
+    return unchecked(this.wram[address & 0x7ff])
   }
 
   @inline
   storeWram(address: u16, value: u8): void {
-    this.wram[address & 0x7ff] = value
+    unchecked((this.wram[address & 0x7ff] = value))
   }
 
   @inline

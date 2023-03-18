@@ -70,7 +70,7 @@ class Cpu {
     this.pushWordToStack(this.pc)
     this.pushToStack(this.sr.value | 0b0010_0000)
     this.sr.set(Status.IrqDisable, true)
-    this.pc = this.loadWord(InterruptVector[interrupt])
+    this.pc = this.loadWord(unchecked(InterruptVector[interrupt]))
     this.cycles += 7
   }
 
