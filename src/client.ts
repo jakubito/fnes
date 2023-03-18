@@ -20,7 +20,7 @@ enum Keymap {
   ArrowRight,
 }
 
-enum DisplayMode {
+export enum DisplayMode {
   PixelPerfect = 1,
   Original = 8 / 7,
 }
@@ -129,6 +129,7 @@ class Client {
   }
 
   start = () => {
+    if (!this.module.fileLoaded(this.instance)) return
     if (this._status === Status.Running) return
 
     const id = { value: 0 }

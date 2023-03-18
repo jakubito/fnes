@@ -34,6 +34,10 @@ export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {
   instance.loadFile(buffer)
 }
 
+export function fileLoaded(instance: Fnes): bool {
+  return instance.drive.file != null
+}
+
 export function setProgramCounter(instance: Fnes, value: u16): void {
   instance.cpu.pc = value
 }
