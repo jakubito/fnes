@@ -13,10 +13,10 @@
     "perftest": "ts-node tests/performance/perftest.ts"
   },
   "devDependencies": {
-    "@types/node": "^17.0.39",
+    "@types/node": "^18.15.5",
     "assemblyscript": "^0.27.1",
-    "ts-node": "^10.8.1",
-    "typescript": "^4.7.3"
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.2"
   },
   "type": "module",
   "exports": {
