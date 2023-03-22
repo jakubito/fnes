@@ -35,7 +35,7 @@ export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {
 }
 
 export function fileLoaded(instance: Fnes): bool {
-  return instance.drive.file != null
+  return instance.drive.mapper != null
 }
 
 export function setProgramCounter(instance: Fnes, value: u16): void {

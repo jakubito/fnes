@@ -13,7 +13,7 @@ class Bus {
   load(address: u16): u8 {
     switch (address) {
       case between(address, 0, 0x1fff):
-        return this.loadChrRom(address)
+        return this.loadChr(address)
       case between(address, 0x2000, 0x2fff):
         return this.loadVram(address - 0x2000)
       case between(address, 0x3000, 0x3eff):
@@ -51,9 +51,9 @@ class Bus {
   }
 
   @inline
-  loadChrRom(address: u16): u8 {
+  loadChr(address: u16): u8 {
     const value = this.readBuffer
-    this.readBuffer = this.drive.loadChrRom(address)
+    this.readBuffer = this.drive.loadChr(address)
     return value
   }
 

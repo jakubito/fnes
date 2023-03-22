@@ -1,35 +1,45 @@
+import createMapper from '../mappers'
+import Mapper from '../mappers/Mapper'
 import Character from '../ppu/Character'
 import { Mirroring } from '../ppu/enums'
 import NesFile from './NesFile'
 
 class Drive {
-  file: NesFile | null = null
+  mapper: Mapper | null = null
 
   loadFile(buffer: ArrayBuffer): void {
-    if (this.file) heap.free(changetype<usize>(this.file))
-    this.file = new NesFile(buffer)
+    if (this.mapper) heap.free(changetype<usize>(this.mapper))
+    this.mapper = createMapper(new NesFile(buffer))
   }
 
   @inline
-  loadPrgRom(address: u16): u8 {
-    const prgRomSize = <u16>this.file!.prgRom.length
-    if (address >= prgRomSize) return unchecked(this.file!.prgRom[address & 0x3fff])
-    return unchecked(this.file!.prgRom[address])
+  loadPrg(address: u16): u8 {
+    return this.mapper!.loadPrg(address)
   }
 
   @inline
-  loadChrRom(address: u16): u8 {
-    return unchecked(this.file!.chrRom[address])
+  loadChr(address: u16): u8 {
+    return this.mapper!.loadChr(address)
+  }
+
+  @inline
+  storePrg(address: u16, value: u8): void {
+    this.mapper!.storePrg(address, value)
+  }
+
+  @inline
+  storeChr(address: u16, value: u8): void {
+    this.mapper!.storePrg(address, value)
   }
 
   @inline
   loadCharacter(index: u16): Character {
-    return unchecked(this.file!.characters[index])
+    return unchecked(this.mapper!.file.characters[index])
   }
 
   @inline
   getMirroring(): Mirroring {
-    return this.file!.mirroring
+    return this.mapper!.file.mirroring
   }
 }
 

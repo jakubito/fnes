@@ -20,8 +20,9 @@ class NesFile {
     validateFormat(header)
     validateVersion(header)
 
-    const prgSize = header[4] * NesFile.PRG_ROM_PAGE_SIZE
-    const chrSize = header[5] * NesFile.CHR_ROM_PAGE_SIZE
+    const prgSize = <u32>header[4] * NesFile.PRG_ROM_PAGE_SIZE
+    const chrSize = <u32>header[5] * NesFile.CHR_ROM_PAGE_SIZE
+
     const start = bit(header[6], 2) * 512 + 16
     const prgRom = Uint8Array.wrap(buffer, start, prgSize)
     const chrRom = Uint8Array.wrap(buffer, start + prgSize, chrSize)
@@ -35,12 +36,14 @@ class NesFile {
 }
 
 function validateFormat(header: Uint8Array): void {
-  for (let i = 0; i < 4; i++) assert(header[i] == NesFile.TAG[i], 'Unknown rom format')
+  for (let i = 0; i < 4; i++) {
+    if (header[i] != NesFile.TAG[i]) throw new Error('Unknown rom format')
+  }
 }
 
 function validateVersion(header: Uint8Array): void {
   const version = (header[7] >> 2) & 0b11
-  assert(version == 0, 'Unsupported version')
+  if (version != 0) throw new Error('Unsupported rom version')
 }
 
 function getMapper(header: Uint8Array): u8 {

@@ -26,7 +26,7 @@ class Bus {
       case ControllerAddress.PlayerTwo:
         return this.inputs.playerTwo.read()
       case between(address, 0x8000, 0xffff):
-        return this.loadPrgRom(address)
+        return this.drive.loadPrg(address)
       default:
         return 0
     }
@@ -56,6 +56,8 @@ class Bus {
         return this.oamDmaTransfer(value)
       case ControllerAddress.PlayerOne:
         return this.inputs.setStrobe(value)
+      case between(address, 0x8000, 0xffff):
+        return this.drive.storePrg(address, value)
     }
   }
 
@@ -84,11 +86,6 @@ class Bus {
   @inline
   storeWram(address: u16, value: u8): void {
     unchecked((this.wram[address & 0x7ff] = value))
-  }
-
-  @inline
-  loadPrgRom(address: u16): u8 {
-    return this.drive.loadPrgRom(address & 0x7fff)
   }
 
   @inline
