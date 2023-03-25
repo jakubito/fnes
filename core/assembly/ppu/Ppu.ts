@@ -1,5 +1,6 @@
 import { Interrupts, Register } from '../main'
-import { Interrupt } from '../main/enums'
+import { bit } from '../main/helpers'
+import { Interrupt } from '../cpu/enums'
 import { Control, Mask, PpuMask, Status } from './enums'
 import systemPalette from './palette'
 import Sprite from './Sprite'
@@ -118,8 +119,10 @@ class Ppu {
 
     const characterIndex = unchecked(this.bus.vram[this.bus.mirrorVram(this.v & 0xfff)])
     const page = <u8>this.control.get(Control.BackgroundPattern)
-    const character = this.bus.loadCharacter(characterIndex, page)
-    this.bgChar = character.getPixel(<u8>((this.dot + this.x) & 0b111), this.getFineY())
+    const x = <u8>((this.dot + this.x) & 0b111)
+    const y = this.getFineY()
+
+    this.bgChar = this.getCharacterPixel(characterIndex, page, x, y)
     this.dotColor = unchecked(this.bus.palette[0])
 
     if (this.bgChar == 0) return
@@ -167,8 +170,17 @@ class Ppu {
       charIndex++
     }
 
-    const character = this.bus.loadCharacter(charIndex, page)
-    return character.getPixel(x, y)
+    return this.getCharacterPixel(charIndex, page, x, y)
+  }
+
+  @inline
+  getCharacterPixel(index: u8, page: u8, x: u8, y: u8): u8 {
+    const address = <u16>page * 0x1000 + <u16>index * 16 + y
+    const lowByte = this.bus.drive.loadChr(address)
+    const highByte = this.bus.drive.loadChr(address + 8)
+    const lowBit = bit(lowByte, 7 - x)
+    const highBit = bit(highByte, 7 - x) << 1
+    return lowBit | highBit
   }
 
   @inline

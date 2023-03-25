@@ -1,4 +1,4 @@
-import { Interrupt } from './enums'
+import { Interrupt } from '../cpu/enums'
 
 class Interrupts {
   value: StaticArray<bool> = new StaticArray(3)

@@ -1,8 +1,11 @@
 import NesFile from '../main/NesFile'
 
-@unmanaged
 abstract class Mapper {
-  constructor(public file: NesFile) {}
+  id: u8
+
+  constructor(public file: NesFile) {
+    this.id = file.mapper
+  }
 
   abstract loadPrg(address: u16): u8
   abstract loadChr(address: u16): u8

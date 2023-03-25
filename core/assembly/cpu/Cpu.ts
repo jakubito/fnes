@@ -1,10 +1,9 @@
 import { Register, Interrupts } from '../main'
-import { Interrupt, InterruptVector } from '../main/enums'
 import Bus from './Bus'
 import Instruction from './Instruction'
 import bindings from './instructions'
 import { word } from './helpers'
-import { Mode, PpuRegister, Status } from './enums'
+import { Interrupt, InterruptVector, Mode, PpuRegister, Status } from './enums'
 import { InstructionHandler } from './types'
 
 class Cpu {

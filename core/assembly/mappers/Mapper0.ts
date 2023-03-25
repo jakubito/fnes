@@ -1,7 +1,6 @@
 import NesFile from '../main/NesFile'
 import Mapper from './Mapper'
 
-@unmanaged
 class Mapper0 extends Mapper {
   prgMax: u16
 

@@ -17,17 +17,15 @@ export function getState(instance: Fnes): StaticArray<usize> {
 }
 
 export function getFrameBufferPointer(instance: Fnes): usize {
-  return changetype<usize>(instance.ppu.frameBuffer.buffer) + instance.ppu.frameBuffer.byteOffset
+  return instance.ppu.frameBuffer.dataStart
 }
 
 export function getPlayerOneBufferPointer(instance: Fnes): usize {
-  const buttons = instance.inputs.playerOne.buttons
-  return changetype<usize>(buttons.buffer) + buttons.byteOffset
+  return instance.inputs.playerOne.buttons.dataStart
 }
 
 export function getPlayerTwoBufferPointer(instance: Fnes): usize {
-  const buttons = instance.inputs.playerTwo.buttons
-  return changetype<usize>(buttons.buffer) + buttons.byteOffset
+  return instance.inputs.playerTwo.buttons.dataStart
 }
 
 export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {
@@ -35,7 +33,7 @@ export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {
 }
 
 export function fileLoaded(instance: Fnes): bool {
-  return instance.drive.mapper != null
+  return instance.drive.cartridge != null
 }
 
 export function setProgramCounter(instance: Fnes, value: u16): void {

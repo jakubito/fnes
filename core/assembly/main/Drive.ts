@@ -1,45 +1,36 @@
-import createMapper from '../mappers'
-import Mapper from '../mappers/Mapper'
-import Character from '../ppu/Character'
 import { Mirroring } from '../ppu/enums'
-import NesFile from './NesFile'
+import Cartridge from './Cartridge'
 
 class Drive {
-  mapper: Mapper | null = null
+  cartridge: Cartridge | null = null
 
   loadFile(buffer: ArrayBuffer): void {
-    if (this.mapper) heap.free(changetype<usize>(this.mapper))
-    this.mapper = createMapper(new NesFile(buffer))
+    this.cartridge = new Cartridge(buffer)
   }
 
   @inline
   loadPrg(address: u16): u8 {
-    return this.mapper!.loadPrg(address)
+    return this.cartridge!.loadPrg(address)
   }
 
   @inline
   loadChr(address: u16): u8 {
-    return this.mapper!.loadChr(address)
+    return this.cartridge!.loadChr(address)
   }
 
   @inline
   storePrg(address: u16, value: u8): void {
-    this.mapper!.storePrg(address, value)
+    this.cartridge!.storePrg(address, value)
   }
 
   @inline
   storeChr(address: u16, value: u8): void {
-    this.mapper!.storePrg(address, value)
-  }
-
-  @inline
-  loadCharacter(index: u16): Character {
-    return unchecked(this.mapper!.file.characters[index])
+    this.cartridge!.storeChr(address, value)
   }
 
   @inline
   getMirroring(): Mirroring {
-    return this.mapper!.file.mirroring
+    return this.cartridge!.getMirroring()
   }
 }
 

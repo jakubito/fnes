@@ -1,7 +1,7 @@
 import { Drive, Inputs, Interrupts } from './main'
-import { Interrupt } from './main/enums'
 import { Ppu, Bus as PpuBus } from './ppu'
 import { Cpu, Bus as CpuBus } from './cpu'
+import { Interrupt } from './cpu/enums'
 
 class Fnes {
   drive: Drive = new Drive()

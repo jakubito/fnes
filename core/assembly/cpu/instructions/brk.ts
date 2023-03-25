@@ -1,6 +1,5 @@
-import { Interrupt, InterruptVector } from '../../main/enums'
 import Cpu from '../Cpu'
-import { Mode } from '../enums'
+import { Interrupt, InterruptVector, Mode } from '../enums'
 
 function bind(cpu: Cpu): void {
   cpu.bind(0x00, brk, Mode.Implied, 7)

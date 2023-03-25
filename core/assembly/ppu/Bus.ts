@@ -1,14 +1,13 @@
 import { Drive } from '../main'
 import { between } from '../main/helpers'
 import { Mirroring } from './enums'
-import Character from './Character'
 
 class Bus {
   vram: Uint8Array = new Uint8Array(0x800)
   palette: Uint8Array = new Uint8Array(0x20)
   readBuffer: u8 = 0
 
-  constructor(private drive: Drive) {}
+  constructor(public drive: Drive) {}
 
   load(address: u16): u8 {
     switch (address) {
@@ -34,6 +33,8 @@ class Bus {
 
   store(address: u16, value: u8): void {
     switch (address) {
+      case between(address, 0, 0x1fff):
+        return this.drive.storeChr(address, value)
       case between(address, 0x2000, 0x2fff):
         return this.storeVram(address - 0x2000, value)
       case between(address, 0x3000, 0x3eff):
@@ -79,11 +80,6 @@ class Bus {
   @inline
   storePalette(address: u16, value: u8): void {
     unchecked((this.palette[address - 0x3f00] = value))
-  }
-
-  @inline
-  loadCharacter(index: u8, page: u8): Character {
-    return this.drive.loadCharacter(index + page * <u16>0x100)
   }
 
   mirrorVram(address: u16): u16 {

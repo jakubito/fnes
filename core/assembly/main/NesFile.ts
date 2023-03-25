@@ -1,8 +1,6 @@
-import Character from '../ppu/Character'
 import { Mirroring } from '../ppu/enums'
 import { bit } from './helpers'
 
-@unmanaged
 class NesFile {
   static TAG: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
   static PRG_ROM_PAGE_SIZE: u16 = 0x4000
@@ -10,9 +8,9 @@ class NesFile {
 
   prgRom: Uint8Array
   chrRom: Uint8Array
+  usesChrRam: bool
   mapper: u8
   mirroring: Mirroring
-  characters: StaticArray<Character>
 
   constructor(public buffer: ArrayBuffer) {
     const header = Uint8Array.wrap(buffer, 0, 16)
@@ -29,9 +27,9 @@ class NesFile {
 
     this.prgRom = prgRom
     this.chrRom = chrRom
-    this.mapper = getMapper(header)
-    this.mirroring = getMirroring(header)
-    this.characters = buildCharacters(chrRom)
+    this.usesChrRam = chrSize == 0
+    this.mapper = parseMapper(header)
+    this.mirroring = parseMirroring(header)
   }
 }
 
@@ -46,20 +44,13 @@ function validateVersion(header: Uint8Array): void {
   if (version != 0) throw new Error('Unsupported rom version')
 }
 
-function getMapper(header: Uint8Array): u8 {
+function parseMapper(header: Uint8Array): u8 {
   return (header[7] & 0xf0) | (header[6] >> 4)
 }
 
-function getMirroring(header: Uint8Array): Mirroring {
+function parseMirroring(header: Uint8Array): Mirroring {
   if (bit(header[6], 3)) return Mirroring.FourScreen
   return bit(header[6], 0) ? Mirroring.Vertical : Mirroring.Horizontal
-}
-
-function buildCharacters(chrRom: Uint8Array): StaticArray<Character> {
-  const count = chrRom.length / 16
-  const characters = new StaticArray<Character>(count)
-  for (let i = 0; i < count; i++) characters[i] = new Character(chrRom, <u16>i * 16)
-  return characters
 }
 
 export default NesFile

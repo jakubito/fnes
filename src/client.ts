@@ -1,6 +1,6 @@
 import { __AdaptedExports } from '../core/build/core'
 
-type CoreModule = typeof __AdaptedExports
+type CoreModule = typeof __AdaptedExports & { __collect: () => void }
 type CoreInstance = ReturnType<typeof __AdaptedExports.createInstance>
 
 enum Status {
@@ -117,8 +117,7 @@ class Client {
   }
 
   bindBuffers() {
-    // @ts-ignore
-    const { buffer } = <WebAssembly.Memory>this.module.memory
+    const { buffer } = this.module.memory
     const frameBufferPointer = this.module.getFrameBufferPointer(this.instance)
     const playerOneBufferPointer = this.module.getPlayerOneBufferPointer(this.instance)
     const playerTwoBufferPointer = this.module.getPlayerTwoBufferPointer(this.instance)
@@ -196,6 +195,7 @@ class Client {
   }
 
   loadFile(buffer: ArrayBuffer) {
+    this.module.__collect() // perform garbage collection before loading a new file
     this.module.loadFile(this.instance, buffer)
     this.bindBuffers()
   }
