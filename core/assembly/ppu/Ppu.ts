@@ -117,7 +117,7 @@ class Ppu {
     if (!this.mask.get(Mask.ShowBackground)) return
     if (!this.mask.get(Mask.ShowLeftBackground) && this.dot < 8) return
 
-    const characterIndex = unchecked(this.bus.vram[this.bus.mirrorVram(this.v & 0xfff)])
+    const characterIndex = this.bus.loadVramImmediate(this.v & 0xfff)
     const page = <u8>this.control.get(Control.BackgroundPattern)
     const x = <u8>((this.dot + this.x) & 0b111)
     const y = this.getFineY()
@@ -128,7 +128,7 @@ class Ppu {
     if (this.bgChar == 0) return
 
     const attrAddress = 0x3c0 | (this.v & NN) | ((this.v >> 4) & 0b111000) | ((this.v >> 2) & 0b111)
-    const attribute = unchecked(this.bus.vram[this.bus.mirrorVram(<u16>attrAddress)])
+    const attribute = this.bus.loadVramImmediate(<u16>attrAddress)
     const quadrant = ((this.v >> 5) & 0b10) | ((this.v >> 1) & 0b1)
     const palette = (attribute >> (<u8>quadrant * 2)) & 0b11
 

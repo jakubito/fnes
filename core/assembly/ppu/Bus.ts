@@ -61,14 +61,19 @@ class Bus {
   @inline
   loadVram(address: u16): u8 {
     const value = this.readBuffer
-    const index = this.mirrorVram(address)
-    this.readBuffer = unchecked(this.vram[index])
+    this.readBuffer = this.loadVramImmediate(address)
     return value
   }
 
   @inline
+  loadVramImmediate(address: u16): u8 {
+    const index = this.vramIndex(address)
+    return unchecked(this.vram[index])
+  }
+
+  @inline
   storeVram(address: u16, value: u8): void {
-    const index = this.mirrorVram(address)
+    const index = this.vramIndex(address)
     unchecked((this.vram[index] = value))
   }
 
@@ -82,7 +87,7 @@ class Bus {
     unchecked((this.palette[address - 0x3f00] = value))
   }
 
-  mirrorVram(address: u16): u16 {
+  vramIndex(address: u16): u16 {
     const nametable = (address >> 10) & 0b11
     const mirroring = this.drive.getMirroring()
     switch (nametable) {
