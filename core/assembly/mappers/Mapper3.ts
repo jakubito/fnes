@@ -1,7 +1,8 @@
 import NesFile from '../main/NesFile'
 import Mapper from './Mapper'
 
-class Mapper0 extends Mapper {
+class Mapper3 extends Mapper {
+  bank: u8 = 0
   prgMax: u16 = 0
 
   constructor(file: NesFile) {
@@ -13,9 +14,14 @@ class Mapper0 extends Mapper {
     return unchecked(this.file.prgRom[address & this.prgMax])
   }
 
+  storePrg(address: u16, value: u8): void {
+    this.bank = value & 0b11
+  }
+
   loadChr(address: u16): u8 {
-    return unchecked(this.file.chrRom[address])
+    const index = <u32>address + <u32>this.bank * NesFile.CHR_ROM_PAGE_SIZE
+    return unchecked(this.file.chrRom[index])
   }
 }
 
-export default Mapper0
+export default Mapper3
