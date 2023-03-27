@@ -19,7 +19,7 @@ class Mapper3 extends Mapper {
   }
 
   loadChr(address: u16): u8 {
-    const index = <u32>address + <u32>this.bank * NesFile.CHR_ROM_PAGE_SIZE
+    const index = <u32>address + <u32>this.bank * NesFile.CHR_PAGE_SIZE
     return unchecked(this.file.chrRom[index])
   }
 }

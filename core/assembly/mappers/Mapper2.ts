@@ -8,17 +8,17 @@ class Mapper2 extends Mapper {
 
   constructor(file: NesFile) {
     super(file)
-    this.lastBank = <u8>(file.prgRom.length / NesFile.PRG_ROM_PAGE_SIZE) - 1
+    this.lastBank = <u8>(file.prgRom.length / NesFile.PRG_PAGE_SIZE) - 1
   }
 
   loadPrg(address: u16): u8 {
     let index = (<u32>address) & 0x7fff
 
-    if (index < NesFile.PRG_ROM_PAGE_SIZE) {
-      index += <u32>this.bank * NesFile.PRG_ROM_PAGE_SIZE
+    if (index < NesFile.PRG_PAGE_SIZE) {
+      index += <u32>this.bank * NesFile.PRG_PAGE_SIZE
     } else {
-      index -= NesFile.PRG_ROM_PAGE_SIZE
-      index += <u32>this.lastBank * NesFile.PRG_ROM_PAGE_SIZE
+      index -= NesFile.PRG_PAGE_SIZE
+      index += <u32>this.lastBank * NesFile.PRG_PAGE_SIZE
     }
 
     return unchecked(this.file.prgRom[index])

@@ -3,8 +3,8 @@ import { bit } from './helpers'
 
 class NesFile {
   static TAG: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
-  static PRG_ROM_PAGE_SIZE: u16 = 0x4000
-  static CHR_ROM_PAGE_SIZE: u16 = 0x2000
+  static PRG_PAGE_SIZE: u16 = 0x4000
+  static CHR_PAGE_SIZE: u16 = 0x2000
 
   prgRom: Uint8Array
   chrRom: Uint8Array
@@ -17,15 +17,12 @@ class NesFile {
     validateFormat(header)
     validateVersion(header)
 
-    const prgSize = <u32>header[4] * NesFile.PRG_ROM_PAGE_SIZE
-    const chrSize = <u32>header[5] * NesFile.CHR_ROM_PAGE_SIZE
-
+    const prgSize = <u32>header[4] * NesFile.PRG_PAGE_SIZE
+    const chrSize = <u32>header[5] * NesFile.CHR_PAGE_SIZE
     const start = bit(header[6], 2) * 512 + 16
-    const prgRom = Uint8Array.wrap(buffer, start, prgSize)
-    const chrRom = Uint8Array.wrap(buffer, start + prgSize, chrSize)
 
-    this.prgRom = prgRom
-    this.chrRom = chrRom
+    this.prgRom = Uint8Array.wrap(buffer, start, prgSize)
+    this.chrRom = Uint8Array.wrap(buffer, start + prgSize, chrSize)
     this.mapper = parseMapper(header)
     this.mirroring = parseMirroring(header)
   }
