@@ -8,7 +8,6 @@ class NesFile {
 
   prgRom: Uint8Array
   chrRom: Uint8Array
-  usesChrRam: bool
   mapper: u8
   mirroring: Mirroring
 
@@ -27,7 +26,6 @@ class NesFile {
 
     this.prgRom = prgRom
     this.chrRom = chrRom
-    this.usesChrRam = chrSize == 0
     this.mapper = parseMapper(header)
     this.mirroring = parseMirroring(header)
   }

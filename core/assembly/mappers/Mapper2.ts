@@ -29,12 +29,11 @@ class Mapper2 extends Mapper {
   }
 
   loadChr(address: u16): u8 {
-    if (this.file.usesChrRam) return unchecked(this.chrRam[address])
-    return unchecked(this.file.chrRom[address])
+    return unchecked(this.chrRam[address])
   }
 
   storeChr(address: u16, value: u8): void {
-    if (this.file.usesChrRam) unchecked((this.chrRam[address] = value))
+    unchecked((this.chrRam[address] = value))
   }
 }
 

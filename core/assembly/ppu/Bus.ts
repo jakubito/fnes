@@ -1,6 +1,5 @@
 import { Drive } from '../main'
 import { between } from '../main/helpers'
-import { Mirroring } from './enums'
 
 class Bus {
   vram: Uint8Array = new Uint8Array(0x800)
@@ -67,13 +66,13 @@ class Bus {
 
   @inline
   loadVramImmediate(address: u16): u8 {
-    const index = this.vramIndex(address)
+    const index = this.drive.vramIndex(address)
     return unchecked(this.vram[index])
   }
 
   @inline
   storeVram(address: u16, value: u8): void {
-    const index = this.vramIndex(address)
+    const index = this.drive.vramIndex(address)
     unchecked((this.vram[index] = value))
   }
 
@@ -85,21 +84,6 @@ class Bus {
   @inline
   storePalette(address: u16, value: u8): void {
     unchecked((this.palette[address - 0x3f00] = value))
-  }
-
-  vramIndex(address: u16): u16 {
-    const nametable = (address >> 10) & 0b11
-    const mirroring = this.drive.getMirroring()
-    switch (nametable) {
-      case 1:
-        return address - (mirroring == Mirroring.Horizontal ? 0x400 : 0)
-      case 2:
-        return address - (mirroring == Mirroring.Vertical ? 0x800 : 0x400)
-      case 3:
-        return address - 0x800
-      default:
-        return address
-    }
   }
 }
 

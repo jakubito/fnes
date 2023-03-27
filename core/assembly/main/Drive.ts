@@ -1,4 +1,3 @@
-import { Mirroring } from '../ppu/enums'
 import Cartridge from './Cartridge'
 
 class Drive {
@@ -29,8 +28,8 @@ class Drive {
   }
 
   @inline
-  getMirroring(): Mirroring {
-    return this.cartridge!.getMirroring()
+  vramIndex(address: u16): u16 {
+    return this.cartridge!.vramIndex(address)
   }
 }
 
