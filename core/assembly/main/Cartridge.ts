@@ -1,9 +1,4 @@
-import Mapper from '../mappers/Mapper'
-import Mapper0 from '../mappers/Mapper0'
-import Mapper1 from '../mappers/Mapper1'
-import Mapper2 from '../mappers/Mapper2'
-import Mapper3 from '../mappers/Mapper3'
-import Mapper7 from '../mappers/Mapper7'
+import { Mapper, Mapper0, Mapper1, Mapper2, Mapper3, Mapper7 } from '../mappers'
 import NesFile from './NesFile'
 
 class Cartridge {
