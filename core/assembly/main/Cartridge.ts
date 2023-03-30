@@ -1,5 +1,6 @@
 import Mapper from '../mappers/Mapper'
 import Mapper0 from '../mappers/Mapper0'
+import Mapper1 from '../mappers/Mapper1'
 import Mapper2 from '../mappers/Mapper2'
 import Mapper3 from '../mappers/Mapper3'
 import Mapper7 from '../mappers/Mapper7'
@@ -13,10 +14,21 @@ class Cartridge {
     this.mapper = createMapper(file)
   }
 
+  loadPrgRam(address: u16): u8 {
+    switch (this.mapper.id) {
+      case 1:
+        return changetype<Mapper1>(this.mapper).loadPrgRam(address)
+      default:
+        return 0
+    }
+  }
+
   loadPrg(address: u16): u8 {
     switch (this.mapper.id) {
       case 0:
         return changetype<Mapper0>(this.mapper).loadPrg(address)
+      case 1:
+        return changetype<Mapper1>(this.mapper).loadPrg(address)
       case 2:
         return changetype<Mapper2>(this.mapper).loadPrg(address)
       case 3:
@@ -32,6 +44,8 @@ class Cartridge {
     switch (this.mapper.id) {
       case 0:
         return changetype<Mapper0>(this.mapper).loadChr(address)
+      case 1:
+        return changetype<Mapper1>(this.mapper).loadChr(address)
       case 2:
         return changetype<Mapper2>(this.mapper).loadChr(address)
       case 3:
@@ -43,10 +57,18 @@ class Cartridge {
     }
   }
 
+  storePrgRam(address: u16, value: u8): void {
+    switch (this.mapper.id) {
+      case 1:
+        changetype<Mapper1>(this.mapper).storePrgRam(address, value)
+        break
+    }
+  }
+
   storePrg(address: u16, value: u8): void {
     switch (this.mapper.id) {
-      case 0:
-        changetype<Mapper0>(this.mapper).storePrg(address, value)
+      case 1:
+        changetype<Mapper1>(this.mapper).storePrg(address, value)
         break
       case 2:
         changetype<Mapper2>(this.mapper).storePrg(address, value)
@@ -62,14 +84,11 @@ class Cartridge {
 
   storeChr(address: u16, value: u8): void {
     switch (this.mapper.id) {
-      case 0:
-        changetype<Mapper0>(this.mapper).storeChr(address, value)
+      case 1:
+        changetype<Mapper1>(this.mapper).storeChr(address, value)
         break
       case 2:
         changetype<Mapper2>(this.mapper).storeChr(address, value)
-        break
-      case 3:
-        changetype<Mapper3>(this.mapper).storeChr(address, value)
         break
       case 7:
         changetype<Mapper7>(this.mapper).storeChr(address, value)
@@ -79,16 +98,12 @@ class Cartridge {
 
   vramIndex(address: u16): u16 {
     switch (this.mapper.id) {
-      case 0:
-        return changetype<Mapper0>(this.mapper).vramIndex(address)
-      case 2:
-        return changetype<Mapper2>(this.mapper).vramIndex(address)
-      case 3:
-        return changetype<Mapper3>(this.mapper).vramIndex(address)
+      case 1:
+        return changetype<Mapper1>(this.mapper).vramIndex(address)
       case 7:
         return changetype<Mapper7>(this.mapper).vramIndex(address)
       default:
-        return 0
+        return this.mapper.vramIndex(address)
     }
   }
 }
@@ -97,6 +112,8 @@ function createMapper(file: NesFile): Mapper {
   switch (file.mapper) {
     case 0:
       return new Mapper0(file)
+    case 1:
+      return new Mapper1(file)
     case 2:
       return new Mapper2(file)
     case 3:

@@ -1,3 +1,4 @@
+import { mirrorSingleScreen } from '../ppu/helpers'
 import Mapper from './Mapper'
 
 class Mapper7 extends Mapper {
@@ -24,7 +25,7 @@ class Mapper7 extends Mapper {
   }
 
   vramIndex(address: u16): u16 {
-    return (address & 0x3ff) + <u16>this.vramPage * 0x400
+    return mirrorSingleScreen(address, this.vramPage)
   }
 }
 

@@ -25,6 +25,8 @@ class Bus {
         return this.inputs.playerOne.read()
       case ControllerAddress.PlayerTwo:
         return this.inputs.playerTwo.read()
+      case between(address, 0x6000, 0x7fff):
+        return this.drive.loadPrgRam(address)
       case between(address, 0x8000, 0xffff):
         return this.drive.loadPrg(address)
       default:
@@ -56,6 +58,8 @@ class Bus {
         return this.oamDmaTransfer(value)
       case ControllerAddress.PlayerOne:
         return this.inputs.setStrobe(value)
+      case between(address, 0x6000, 0x7fff):
+        return this.drive.storePrgRam(address, value)
       case between(address, 0x8000, 0xffff):
         return this.drive.storePrg(address, value)
     }
