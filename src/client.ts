@@ -1,7 +1,4 @@
-import { __AdaptedExports } from '../core/build/core'
-
-type CoreModule = typeof __AdaptedExports & { __collect: () => void }
-type CoreInstance = ReturnType<typeof __AdaptedExports.createInstance>
+import { CoreInstance, CoreModule } from './types'
 
 enum Status {
   Ready,

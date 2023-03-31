@@ -1,10 +1,12 @@
 import moduleUrl from '../core/build/core.wasm?url'
 import { instantiate } from '../core/build/core'
-import './style.css'
 import Client, { DisplayMode } from './client'
+import { CoreModule } from './types'
+import './style.css'
+
 const compiledModule = await WebAssembly.compileStreaming(fetch(moduleUrl))
 const module = await instantiate(compiledModule, { env: {} })
-const client = new Client(module)
+const client = new Client(module as CoreModule)
 const root = document.querySelector<HTMLElement>('#root')!
 
 client.appendCanvasTo(root)
