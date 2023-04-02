@@ -2,6 +2,7 @@
   "name": "fnes-core",
   "private": true,
   "version": "0.0.1",
+  "type": "module",
   "description": "FNES core",
   "author": "Jakub Dobes <dobes.jakub@gmail.com>",
   "license": "ISC",
