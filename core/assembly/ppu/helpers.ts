@@ -1,4 +1,4 @@
-// @ts-expect-error
+// @ts-expect-error "decorators are not valid here"
 @inline
 export function mirrorHorizontal(address: u16): u16 {
   const nametable = (<u8>(address >> 10)) & 0b11

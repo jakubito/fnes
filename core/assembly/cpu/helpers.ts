@@ -1,4 +1,4 @@
-// @ts-expect-error
+// @ts-expect-error "decorators are not valid here"
 @inline
 export function word(lowByte: u8, highByte: u8): u16 {
   return ((<u16>highByte) << 8) | lowByte
