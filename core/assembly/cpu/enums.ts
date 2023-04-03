@@ -1,4 +1,5 @@
 export enum Interrupt {
+  Null = -1,
   Nmi,
   Reset,
   Irq,

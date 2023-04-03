@@ -8,7 +8,7 @@ import { InstructionHandler } from './types'
 
 class Cpu {
   instructions: StaticArray<Instruction | null> = new StaticArray(0x100)
-  pendingInterrupt: Interrupt = -1
+  pendingInterrupt: Interrupt = Interrupt.Null
   totalCycles: usize = 0
   cycles: usize = 0
 
@@ -49,8 +49,8 @@ class Cpu {
   step(): Interrupt {
     const interrupt = this.pendingInterrupt
     this.pendingInterrupt = this.pollInterrupt()
-    if (<i8>interrupt == -1) this.runNextInstruction()
-    else this.handleInterrupt(interrupt)
+    if (interrupt != Interrupt.Null) this.handleInterrupt(interrupt)
+    else this.runNextInstruction()
     this.bus.tick(this.cycles)
     this.totalCycles += this.cycles
     this.cycles = 0
@@ -60,7 +60,7 @@ class Cpu {
   @inline
   pollInterrupt(): Interrupt {
     const interrupt = this.interrupts.poll()
-    if (interrupt == Interrupt.Irq && this.sr.get(Status.IrqDisable)) return -1
+    if (interrupt == Interrupt.Irq && this.sr.get(Status.IrqDisable)) return Interrupt.Null
     return interrupt
   }
 

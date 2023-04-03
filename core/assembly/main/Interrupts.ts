@@ -19,7 +19,7 @@ class Interrupts {
       return Interrupt.Irq
     }
 
-    return -1
+    return Interrupt.Null
   }
 
   trigger(interrupt: Interrupt): void {
