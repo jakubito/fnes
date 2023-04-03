@@ -3,6 +3,7 @@ import { Interrupt } from '../cpu/enums'
 class Interrupts {
   value: StaticArray<bool> = new StaticArray(3)
 
+  @inline
   poll(): Interrupt {
     if (this.value[Interrupt.Nmi]) {
       unchecked((this.value[Interrupt.Nmi] = false))
@@ -22,10 +23,12 @@ class Interrupts {
     return Interrupt.Null
   }
 
+  @inline
   trigger(interrupt: Interrupt): void {
     unchecked((this.value[interrupt] = true))
   }
 
+  @inline
   reset(): void {
     this.value.fill(false)
   }

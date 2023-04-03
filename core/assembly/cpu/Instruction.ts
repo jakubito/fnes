@@ -12,11 +12,13 @@ class Instruction {
     public pageCheck: bool
   ) {}
 
+  @inline
   run(): void {
     this.handler(this.cpu, this.getParam(), this.mode)
     this.cpu.cycles += this.cycles
   }
 
+  @inline
   getParam(): u16 {
     switch (this.mode) {
       case Mode.Immediate:
