@@ -4,18 +4,6 @@ export function createInstance(): Fnes {
   return new Fnes()
 }
 
-export function renderFrame(instance: Fnes): void {
-  instance.renderFrame()
-}
-
-export function step(instance: Fnes): void {
-  instance.cpu.step()
-}
-
-export function getState(instance: Fnes): StaticArray<usize> {
-  return instance.getState()
-}
-
 export function getFrameBufferPointer(instance: Fnes): usize {
   return instance.ppu.frameBuffer.dataStart
 }
@@ -34,6 +22,20 @@ export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {
 
 export function fileLoaded(instance: Fnes): bool {
   return instance.drive.cartridge != null
+}
+
+export function renderFrame(instance: Fnes): void {
+  instance.renderFrame()
+}
+
+/****** Testing helpers ******/
+
+export function step(instance: Fnes): void {
+  instance.cpu.step()
+}
+
+export function getState(instance: Fnes): StaticArray<usize> {
+  return instance.getState()
 }
 
 export function setProgramCounter(instance: Fnes, value: u16): void {

@@ -1,6 +1,8 @@
 {
   "extends": "assemblyscript/std/assembly.json",
-  "include": [
-    "./**/*.ts"
-  ]
+  "include": ["./**/*.ts"],
+  "compilerOptions": {
+    // https://github.com/AssemblyScript/assemblyscript/issues/2646
+    "strictBindCallApply": false
+  }
 }
