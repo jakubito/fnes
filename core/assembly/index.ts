@@ -20,12 +20,12 @@ export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {
   instance.loadFile(buffer)
 }
 
-export function fileLoaded(instance: Fnes): bool {
-  return instance.drive.cartridge != null
-}
-
 export function renderFrame(instance: Fnes): void {
   instance.renderFrame()
+}
+
+export function reset(instance: Fnes): void {
+  instance.reset()
 }
 
 /****** Testing helpers ******/

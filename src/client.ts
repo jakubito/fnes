@@ -1,6 +1,6 @@
 import { CoreInstance, CoreModule } from './types'
 
-enum Status {
+export enum Status {
   Ready,
   Stopped,
   Running,
@@ -18,30 +18,34 @@ enum Keymap {
 }
 
 export enum DisplayMode {
-  PixelPerfect = 1,
-  Original = 8 / 7,
+  PixelPerfect,
+  Original,
 }
 
-const WIDTH = 256
-const HEIGHT = 240
-const FRAME_TIME = 1000 / 60
+const aspectRatio: Readonly<Record<DisplayMode, number>> = {
+  [DisplayMode.PixelPerfect]: 1,
+  [DisplayMode.Original]: 8 / 7,
+}
 
-class Client {
-  private module: CoreModule
-  readonly instance: CoreInstance
+export class Client {
+  onStatusChange?: (status: Status) => void
 
+  private readonly module: CoreModule
+  private readonly instance: CoreInstance
+
+  private fileLoaded = false
   private frameImageData!: ImageData
   private playerOneButtons!: Uint8Array
   private playerTwoButtons!: Uint8Array
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
-  private _stop?: () => void
 
+  private _stop?: () => void
   private _status = Status.Ready
   private _volume = 50
   private _screenScale = 3
   private _speed = 1
-  private _smoothingEnabled = true
+  private _imageSmoothing = true
   private _displayMode = DisplayMode.Original
 
   constructor(module: CoreModule) {
@@ -54,11 +58,6 @@ class Client {
     this.volume = this._volume
     document.addEventListener('keydown', this.onKeyDown)
     document.addEventListener('keyup', this.onKeyUp)
-    window.addEventListener('blur', this.stop)
-  }
-
-  get frameTime() {
-    return FRAME_TIME / this.speed
   }
 
   get status() {
@@ -69,14 +68,10 @@ class Client {
     return this._screenScale
   }
 
-  set screenScale(scale: number) {
-    const scaledWidth = Math.round(WIDTH * this.displayMode * scale)
-    this._screenScale = scale
-    this.canvasElement.width = scaledWidth * window.devicePixelRatio
-    this.canvasElement.height = HEIGHT * scale * window.devicePixelRatio
-    this.canvasElement.style.width = scaledWidth + 'px'
-    this.canvasElement.style.height = HEIGHT * scale + 'px'
-    this.drawFrame()
+  set screenScale(value: number) {
+    const width = Math.round(256 * aspectRatio[this.displayMode] * value)
+    this._screenScale = value
+    this.resizeCanvas(width, 240 * value)
   }
 
   get volume() {
@@ -92,15 +87,15 @@ class Client {
   }
 
   set speed(value: number) {
-    this._speed = Math.min(Math.max(value, 0.1), 5)
+    this._speed = value
   }
 
-  get smoothingEnabled() {
-    return this._smoothingEnabled
+  get imageSmoothing() {
+    return this._imageSmoothing
   }
 
-  set smoothingEnabled(value: boolean) {
-    this._smoothingEnabled = value
+  set imageSmoothing(value: boolean) {
+    this._imageSmoothing = value
     this.drawFrame()
   }
 
@@ -113,19 +108,33 @@ class Client {
     this.screenScale = this._screenScale
   }
 
-  bindBuffers() {
-    const { buffer } = this.module.memory
-    const frameBufferPointer = this.module.getFrameBufferPointer(this.instance)
-    const playerOneBufferPointer = this.module.getPlayerOneBufferPointer(this.instance)
-    const playerTwoBufferPointer = this.module.getPlayerTwoBufferPointer(this.instance)
-    const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, WIDTH * HEIGHT * 4)
-    this.frameImageData = new ImageData(frameBuffer, WIDTH, HEIGHT)
-    this.playerOneButtons = new Uint8Array(buffer, playerOneBufferPointer, 8)
-    this.playerTwoButtons = new Uint8Array(buffer, playerTwoBufferPointer, 8)
+  private get frameTime() {
+    return 1000 / 60 / this.speed
   }
 
-  start = () => {
-    if (!this.module.fileLoaded(this.instance)) return
+  appendCanvasTo(target: HTMLElement) {
+    target.appendChild(this.canvasElement)
+  }
+
+  resizeCanvasByWidth(width: number) {
+    const height = Math.round(width / ((256 / 240) * aspectRatio[this.displayMode]))
+    this.resizeCanvas(width, height)
+  }
+
+  resizeCanvasByHeight(height: number) {
+    const width = Math.round(height * (256 / 240) * aspectRatio[this.displayMode])
+    this.resizeCanvas(width, height)
+  }
+
+  loadFile(buffer: ArrayBuffer) {
+    this.module.__collect() // perform garbage collection before loading a new file
+    this.module.loadFile(this.instance, buffer)
+    this.bindBuffers()
+    this.fileLoaded = true
+  }
+
+  start() {
+    if (!this.fileLoaded) return
     if (this._status === Status.Running) return
 
     const id = { value: 0 }
@@ -155,62 +164,79 @@ class Client {
     this._stop = () => {
       cancelAnimationFrame(id.value)
       this._status = Status.Stopped
+      this.onStatusChange?.(this.status)
     }
 
     id.value = requestAnimationFrame(clientFrame)
     this._status = Status.Running
+    this.onStatusChange?.(this.status)
   }
 
-  stop = () => {
+  stop() {
     this._stop?.()
   }
 
-  appendCanvasTo(target: HTMLElement) {
-    target.appendChild(this.canvasElement)
-  }
-
-  drawFrame() {
-    const { width, height } = this.canvasElement
-    this.canvas.putImageData(this.frameImageData, 0, 0)
-    this.canvas.imageSmoothingEnabled = false
-
-    if (this.displayMode === DisplayMode.PixelPerfect) {
-      this.canvas.drawImage(this.canvasElement, 0, 0, WIDTH, HEIGHT, 0, 0, width, height)
-    } else {
-      const scaledWidth = WIDTH * this._screenScale * window.devicePixelRatio
-      this.canvas.drawImage(this.canvasElement, 0, 0, WIDTH, HEIGHT, 0, 0, scaledWidth, height)
-      this.canvas.imageSmoothingEnabled = this.smoothingEnabled
-      this.canvas.drawImage(this.canvasElement, 0, 0, scaledWidth, height, 0, 0, width, height)
-    }
+  reset() {
+    if (!this.fileLoaded) return
+    this.stop()
+    this.module.reset(this.instance)
+    this.start()
   }
 
   dispose() {
     this.stop()
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('keyup', this.onKeyUp)
-    window.removeEventListener('blur', this.stop)
   }
 
-  loadFile(buffer: ArrayBuffer) {
-    this.module.__collect() // perform garbage collection before loading a new file
-    this.module.loadFile(this.instance, buffer)
-    this.bindBuffers()
+  private bindBuffers() {
+    const { buffer } = this.module.memory
+    const frameBufferPointer = this.module.getFrameBufferPointer(this.instance)
+    const playerOneBufferPointer = this.module.getPlayerOneBufferPointer(this.instance)
+    const playerTwoBufferPointer = this.module.getPlayerTwoBufferPointer(this.instance)
+    const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, 256 * 240 * 4)
+    this.frameImageData = new ImageData(frameBuffer, 256, 240)
+    this.playerOneButtons = new Uint8Array(buffer, playerOneBufferPointer, 8)
+    this.playerTwoButtons = new Uint8Array(buffer, playerTwoBufferPointer, 8)
   }
 
-  onKeyDown = (event: KeyboardEvent) => {
+  private resizeCanvas(width: number, height: number) {
+    this.canvasElement.width = width * window.devicePixelRatio
+    this.canvasElement.height = height * window.devicePixelRatio
+    this.canvasElement.style.width = width + 'px'
+    this.canvasElement.style.height = height + 'px'
+    this.drawFrame()
+  }
+
+  private drawFrame() {
+    const { width, height } = this.canvasElement
+    this.canvas.putImageData(this.frameImageData, 0, 0)
+    this.canvas.imageSmoothingEnabled = false
+
+    if (this.displayMode === DisplayMode.PixelPerfect) {
+      this.canvas.drawImage(this.canvasElement, 0, 0, 256, 240, 0, 0, width, height)
+    } else {
+      const scaledWidth = 256 * this._screenScale * window.devicePixelRatio
+      this.canvas.drawImage(this.canvasElement, 0, 0, 256, 240, 0, 0, scaledWidth, height)
+      this.canvas.imageSmoothingEnabled = this.imageSmoothing
+      this.canvas.drawImage(this.canvasElement, 0, 0, scaledWidth, height, 0, 0, width, height)
+    }
+  }
+
+  private onKeyDown = (event: KeyboardEvent) => {
     if (!Keymap.hasOwnProperty(event.code)) return
     if (event.repeat) return
     const index = Keymap[<keyof typeof Keymap>event.code]
     this.playerOneButtons[index] = 1
   }
 
-  onKeyUp = (event: KeyboardEvent) => {
+  private onKeyUp = (event: KeyboardEvent) => {
     if (!Keymap.hasOwnProperty(event.code)) return
     const index = Keymap[<keyof typeof Keymap>event.code]
     this.playerOneButtons[index] = 0
   }
 
-  pollGamepads() {
+  private pollGamepads() {
     const gamepads = <Gamepad[]>navigator.getGamepads().filter((gamepad) => {
       if (!gamepad?.connected) return false
       if (gamepad.mapping != 'standard') return false
@@ -220,7 +246,7 @@ class Client {
     if (gamepads[1]) this.pollStandardGamepad(gamepads[1], this.playerTwoButtons)
   }
 
-  pollStandardGamepad(gamepad: Gamepad, buffer: Uint8Array) {
+  private pollStandardGamepad(gamepad: Gamepad, buffer: Uint8Array) {
     // https://www.w3.org/TR/gamepad/#dfn-standard-gamepad
     const { buttons } = gamepad
     buffer[0] = +buttons[1].pressed
@@ -233,5 +259,3 @@ class Client {
     buffer[7] = +buttons[15].pressed
   }
 }
-
-export default Client
