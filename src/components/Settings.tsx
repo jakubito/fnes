@@ -62,10 +62,14 @@ export function Settings() {
         <input
           type="checkbox"
           id="imageSmoothing"
+          className="peer"
           defaultChecked={imageSmoothing}
+          disabled={displayMode === DisplayMode.PixelPerfect}
           onChange={(event) => setImageSmoothing(event.currentTarget.checked)}
         />
-        <label htmlFor="imageSmoothing">Enable image smoothing</label>
+        <label htmlFor="imageSmoothing" className="peer-disabled:text-gray-700">
+          Enable image smoothing
+        </label>
       </div>
       <div className="flex items-center gap-3">
         <Button onClick={() => screenElement?.requestFullscreen({ navigationUI: 'hide' })}>
