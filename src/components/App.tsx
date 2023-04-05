@@ -8,7 +8,7 @@ export function App() {
   return (
     <div className="flex flex-row min-h-screen">
       <div className="w-96 shrink-0 p-6">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <Title />
           <Controls />
           <hr className="my-1" />

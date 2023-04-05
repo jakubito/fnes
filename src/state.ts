@@ -1,4 +1,5 @@
 import { atom, createStore, useAtomValue } from 'jotai'
+import { atomWithReset } from 'jotai/utils'
 import { Client, DisplayMode, Status } from './client'
 import { ButtonMap, defaultButtonMap } from './input'
 import * as storage from './storage'
@@ -16,7 +17,7 @@ export const imageSmoothingAtom = persistedAtom('imageSmoothing', true)
 export const buttonMapAtom = persistedAtom<ButtonMap>('buttonMap', defaultButtonMap)
 
 function persistedAtom<T>(key: string, value: T) {
-  const newAtom = atom(value)
+  const newAtom = atomWithReset(value)
   const persistedValue = storage.get<T>(key)
   if (persistedValue !== null) store.set(newAtom, persistedValue)
   store.sub(newAtom, () => storage.set(key, store.get(newAtom)))

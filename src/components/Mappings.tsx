@@ -1,20 +1,26 @@
-import { Button } from '../input'
+import { useResetAtom } from 'jotai/utils'
+import { Button as InputButton } from '../input'
+import { buttonMapAtom } from '../state'
+import { Button } from './Button'
 import { Mapping } from './Mapping'
 
 export function Mappings() {
+  const reset = useResetAtom(buttonMapAtom)
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-5 mb-1">
         <div className="text-lg font-medium">Button mappings</div>
+        <Button onClick={() => reset()}>Revert to defaults</Button>
       </div>
-      <Mapping button={Button.Right} />
-      <Mapping button={Button.Left} />
-      <Mapping button={Button.Down} />
-      <Mapping button={Button.Up} />
-      <Mapping button={Button.Start} />
-      <Mapping button={Button.Select} />
-      <Mapping button={Button.B} />
-      <Mapping button={Button.A} />
+      <Mapping button={InputButton.Right} />
+      <Mapping button={InputButton.Left} />
+      <Mapping button={InputButton.Down} />
+      <Mapping button={InputButton.Up} />
+      <Mapping button={InputButton.Start} />
+      <Mapping button={InputButton.Select} />
+      <Mapping button={InputButton.B} />
+      <Mapping button={InputButton.A} />
     </div>
   )
 }

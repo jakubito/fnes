@@ -40,16 +40,17 @@ export function Mapping(props: Props) {
     const onClick = () => setEditing(false)
     const onKeyDown = (event: KeyboardEvent) => {
       event.preventDefault()
-      setButtonMap({ ...buttonMap, [button]: event.key })
+      event.stopPropagation()
+      if (event.code !== 'Escape') setButtonMap({ ...buttonMap, [button]: event.key })
       setEditing(false)
     }
 
     window.addEventListener('click', onClick)
-    window.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keydown', onKeyDown)
 
     return () => {
       window.removeEventListener('click', onClick)
-      window.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('keydown', onKeyDown)
     }
   }, [editing])
 
@@ -71,7 +72,7 @@ export function Mapping(props: Props) {
         secondary
         className={cx(
           'px-2 rounded-md border border-b-2 border-gray-400 hover:border-gray-500',
-          editing ? 'bg-green-100' : 'capitalize bg-white hover:bg-gray-100',
+          editing ? '!bg-indigo-50 font-medium' : 'capitalize bg-white hover:bg-gray-100',
           !editing && hasConflict && '!bg-red-50 border-red-500'
         )}
         title="Click to change"
