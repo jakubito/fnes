@@ -1,5 +1,6 @@
 import { render } from 'preact'
 import { Provider } from 'jotai'
+import { Toaster, toast } from 'react-hot-toast'
 import moduleUrl from '../core/build/core.wasm?url'
 import { instantiate } from '../core/build/core'
 import type { CoreModule } from './types'
@@ -22,8 +23,12 @@ window.addEventListener('drop', async (event) => {
   event.preventDefault()
   const file = event.dataTransfer?.files[0]
   if (!file) return
-  client.loadFile(await file.arrayBuffer())
-  client.start()
+  try {
+    client.loadFile(await file.arrayBuffer())
+    client.start()
+  } catch (error) {
+    if (error instanceof Error) toast.error(error.message)
+  }
 })
 
 window.addEventListener('blur', () => {
@@ -36,6 +41,7 @@ window.addEventListener('click', (event) => {
 
 render(
   <Provider store={store}>
+    <Toaster />
     <App />
   </Provider>,
   document.querySelector('#root')!

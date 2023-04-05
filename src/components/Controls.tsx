@@ -1,4 +1,5 @@
 import type { JSXInternal } from 'preact/src/jsx'
+import { toast } from 'react-hot-toast'
 import { useClient } from '../state'
 import { Status } from '../client'
 import { Button } from './Button'
@@ -15,8 +16,12 @@ export function Controls() {
   const onFileInput = async (event: JSXInternal.TargetedEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0]
     if (!file) return
-    client.loadFile(await file.arrayBuffer())
-    client.start()
+    try {
+      client.loadFile(await file.arrayBuffer())
+      client.start()
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message)
+    }
   }
 
   return (

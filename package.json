@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "jotai": "^2.0.3",
-    "preact": "^10.13.2"
+    "preact": "^10.13.2",
+    "react-hot-toast": "^2.4.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",

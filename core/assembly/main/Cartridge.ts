@@ -116,7 +116,7 @@ function createMapper(file: NesFile): Mapper {
     case 7:
       return new Mapper7(file)
     default:
-      throw new Error('Unsupported mapper: ' + file.mapper.toString())
+      throw new Error('Unsupported mapper: #' + file.mapper.toString())
   }
 }
 
