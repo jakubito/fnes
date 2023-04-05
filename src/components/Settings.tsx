@@ -37,7 +37,7 @@ export function Settings() {
       </div>
       <div className="flex items-center gap-3">
         <div className="w-28">Aspect ratio</div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <input
             type="radio"
             id="displayMode1"
@@ -45,9 +45,11 @@ export function Settings() {
             defaultChecked={displayMode === DisplayMode.Original}
             onChange={() => setDisplayMode(DisplayMode.Original)}
           />
-          <label htmlFor="displayMode1">Original</label>
+          <label htmlFor="displayMode1" className="pl-2">
+            Original
+          </label>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <input
             type="radio"
             id="displayMode0"
@@ -55,10 +57,12 @@ export function Settings() {
             defaultChecked={displayMode === DisplayMode.PixelPerfect}
             onChange={() => setDisplayMode(DisplayMode.PixelPerfect)}
           />
-          <label htmlFor="displayMode0">Pixel perfect</label>
+          <label htmlFor="displayMode0" className="pl-2">
+            Pixel perfect
+          </label>
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center">
         <input
           type="checkbox"
           id="imageSmoothing"
@@ -67,7 +71,7 @@ export function Settings() {
           disabled={displayMode === DisplayMode.PixelPerfect}
           onChange={(event) => setImageSmoothing(event.currentTarget.checked)}
         />
-        <label htmlFor="imageSmoothing" className="peer-disabled:text-gray-700">
+        <label htmlFor="imageSmoothing" className="peer-disabled:text-neutral-500 pl-2">
           Enable image smoothing
         </label>
       </div>
