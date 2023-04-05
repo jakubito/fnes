@@ -1,20 +1,10 @@
 import { CoreInstance, CoreModule } from './types'
+import { Input } from './input'
 
 export enum Status {
   Ready,
   Stopped,
   Running,
-}
-
-enum Keymap {
-  KeyF,
-  KeyD,
-  KeyS,
-  Enter,
-  ArrowUp,
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
 }
 
 export enum DisplayMode {
@@ -29,21 +19,20 @@ const aspectRatio: Readonly<Record<DisplayMode, number>> = {
 
 export class Client {
   onStatusChange?: (status: Status) => void
+  readonly input = new Input()
 
   private readonly module: CoreModule
   private readonly instance: CoreInstance
 
   private fileLoaded = false
   private frameImageData!: ImageData
-  private playerOneButtons!: Uint8Array
-  private playerTwoButtons!: Uint8Array
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
 
   private _stop?: () => void
   private _status = Status.Ready
   private _volume = 50
-  private _screenScale = 3
+  private _screenScale = 2
   private _speed = 1
   private _imageSmoothing = true
   private _displayMode = DisplayMode.Original
@@ -56,8 +45,6 @@ export class Client {
     this.canvas = this.canvasElement.getContext('2d')!
     this.screenScale = this._screenScale
     this.volume = this._volume
-    document.addEventListener('keydown', this.onKeyDown)
-    document.addEventListener('keyup', this.onKeyUp)
   }
 
   get status() {
@@ -145,7 +132,7 @@ export class Client {
     const clientFrame = (time: DOMHighResTimeStamp) => {
       timeAvailable += Math.min(time - previousTime, 35)
       previousTime = time
-      this.pollGamepads()
+      this.input.pollGamepads()
 
       while (timeAvailable >= this.frameTime) {
         this.module.renderFrame(this.instance)
@@ -185,8 +172,7 @@ export class Client {
 
   dispose() {
     this.stop()
-    document.removeEventListener('keydown', this.onKeyDown)
-    document.removeEventListener('keyup', this.onKeyUp)
+    this.input.dispose()
   }
 
   private bindBuffers() {
@@ -196,8 +182,8 @@ export class Client {
     const playerTwoBufferPointer = this.module.getPlayerTwoBufferPointer(this.instance)
     const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, 256 * 240 * 4)
     this.frameImageData = new ImageData(frameBuffer, 256, 240)
-    this.playerOneButtons = new Uint8Array(buffer, playerOneBufferPointer, 8)
-    this.playerTwoButtons = new Uint8Array(buffer, playerTwoBufferPointer, 8)
+    this.input.playerOneButtons = new Uint8Array(buffer, playerOneBufferPointer, 8)
+    this.input.playerTwoButtons = new Uint8Array(buffer, playerTwoBufferPointer, 8)
   }
 
   private resizeCanvas(width: number, height: number) {
@@ -221,41 +207,5 @@ export class Client {
       this.canvas.imageSmoothingEnabled = this.imageSmoothing
       this.canvas.drawImage(this.canvasElement, 0, 0, scaledWidth, height, 0, 0, width, height)
     }
-  }
-
-  private onKeyDown = (event: KeyboardEvent) => {
-    if (!Keymap.hasOwnProperty(event.code)) return
-    if (event.repeat) return
-    const index = Keymap[<keyof typeof Keymap>event.code]
-    this.playerOneButtons[index] = 1
-  }
-
-  private onKeyUp = (event: KeyboardEvent) => {
-    if (!Keymap.hasOwnProperty(event.code)) return
-    const index = Keymap[<keyof typeof Keymap>event.code]
-    this.playerOneButtons[index] = 0
-  }
-
-  private pollGamepads() {
-    const gamepads = <Gamepad[]>navigator.getGamepads().filter((gamepad) => {
-      if (!gamepad?.connected) return false
-      if (gamepad.mapping != 'standard') return false
-      return true
-    })
-    if (gamepads[0]) this.pollStandardGamepad(gamepads[0], this.playerOneButtons)
-    if (gamepads[1]) this.pollStandardGamepad(gamepads[1], this.playerTwoButtons)
-  }
-
-  private pollStandardGamepad(gamepad: Gamepad, buffer: Uint8Array) {
-    // https://www.w3.org/TR/gamepad/#dfn-standard-gamepad
-    const { buttons } = gamepad
-    buffer[0] = +buttons[1].pressed
-    buffer[1] = +buttons[0].pressed | +buttons[2].pressed | +buttons[3].pressed
-    buffer[2] = +buttons[8].pressed
-    buffer[3] = +buttons[9].pressed
-    buffer[4] = +buttons[12].pressed
-    buffer[5] = +buttons[13].pressed
-    buffer[6] = +buttons[14].pressed
-    buffer[7] = +buttons[15].pressed
   }
 }

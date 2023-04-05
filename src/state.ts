@@ -1,5 +1,6 @@
 import { atom, createStore, useAtomValue } from 'jotai'
 import { Client, DisplayMode, Status } from './client'
+import { ButtonMap, defaultButtonMap } from './input'
 import * as storage from './storage'
 
 export const store = createStore()
@@ -12,6 +13,7 @@ export const screenScaleAtom = persistedAtom('screenScale', 2)
 export const speedAtom = persistedAtom('speed', 1)
 export const displayModeAtom = persistedAtom('displayMode', DisplayMode.Original)
 export const imageSmoothingAtom = persistedAtom('imageSmoothing', true)
+export const buttonMapAtom = persistedAtom<ButtonMap>('buttonMap', defaultButtonMap)
 
 function persistedAtom<T>(key: string, value: T) {
   const newAtom = atom(value)
@@ -37,9 +39,11 @@ export function setClient(client: Client) {
   client.screenScale = store.get(screenScaleAtom)
   client.displayMode = store.get(displayModeAtom)
   client.imageSmoothing = store.get(imageSmoothingAtom)
+  client.input.buttonMap = store.get(buttonMapAtom)
 
   store.sub(speedAtom, () => (client.speed = store.get(speedAtom)))
   store.sub(screenScaleAtom, () => (client.screenScale = store.get(screenScaleAtom)))
   store.sub(displayModeAtom, () => (client.displayMode = store.get(displayModeAtom)))
   store.sub(imageSmoothingAtom, () => (client.imageSmoothing = store.get(imageSmoothingAtom)))
+  store.sub(buttonMapAtom, () => (client.input.buttonMap = store.get(buttonMapAtom)))
 }

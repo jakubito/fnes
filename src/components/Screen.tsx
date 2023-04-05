@@ -13,8 +13,8 @@ export function Screen() {
     const onFullscreenChange = () => setFullscreen(document.fullscreenElement === container.current)
     setScreenElement(container.current!)
     client.appendCanvasTo(container.current!)
-    document.addEventListener('fullscreenchange', onFullscreenChange)
-    return () => document.removeEventListener('fullscreenchange', onFullscreenChange)
+    window.addEventListener('fullscreenchange', onFullscreenChange)
+    return () => window.removeEventListener('fullscreenchange', onFullscreenChange)
   }, [])
 
   return (
