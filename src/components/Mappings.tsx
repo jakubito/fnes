@@ -11,7 +11,7 @@ export function Mappings() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-5 mb-1">
         <div className="text-lg font-medium">Button mappings</div>
-        <Button onClick={() => reset()}>Revert to defaults</Button>
+        <Button onClick={() => reset()}>↺</Button>
       </div>
       <Mapping button={InputButton.Right} />
       <Mapping button={InputButton.Left} />

@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai'
+import { useResetAtom } from 'jotai/utils'
 import {
   displayModeAtom,
   imageSmoothingAtom,
@@ -16,13 +17,27 @@ export function Settings() {
   const [displayMode, setDisplayMode] = useAtom(displayModeAtom)
   const [imageSmoothing, setImageSmoothing] = useAtom(imageSmoothingAtom)
   const screenElement = useAtomValue(screenElementAtom)
+  const resetSpeed = useResetAtom(speedAtom)
+  const resetScreenScale = useResetAtom(screenScaleAtom)
+  const resetDisplayMode = useResetAtom(displayModeAtom)
+  const resetImageSmoothing = useResetAtom(imageSmoothingAtom)
 
   const setClampedSpeed = (value: number) => setSpeed(clamp(value, 0.25, 8))
   const setClampedScreenScale = (value: number) => setScreenScale(clamp(value, 1, 10))
 
+  const reset = () => {
+    resetSpeed()
+    resetScreenScale()
+    resetDisplayMode()
+    resetImageSmoothing()
+  }
+
   return (
     <>
-      <div className="text-lg font-medium">Settings</div>
+      <div className="flex items-center gap-5 mb-1">
+        <div className="text-lg font-medium">Emulation settings</div>
+        <Button onClick={reset}>↺</Button>
+      </div>
       <div className="flex items-center gap-3">
         <div className="w-28">Speed</div>
         <Button onClick={() => setClampedSpeed(speed - 0.25)}>-</Button>
@@ -42,7 +57,7 @@ export function Settings() {
             type="radio"
             id="displayMode1"
             name="displayMode"
-            defaultChecked={displayMode === DisplayMode.Original}
+            checked={displayMode === DisplayMode.Original}
             onChange={() => setDisplayMode(DisplayMode.Original)}
           />
           <label htmlFor="displayMode1" className="pl-2">
@@ -54,7 +69,7 @@ export function Settings() {
             type="radio"
             id="displayMode0"
             name="displayMode"
-            defaultChecked={displayMode === DisplayMode.PixelPerfect}
+            checked={displayMode === DisplayMode.PixelPerfect}
             onChange={() => setDisplayMode(DisplayMode.PixelPerfect)}
           />
           <label htmlFor="displayMode0" className="pl-2">
@@ -67,7 +82,7 @@ export function Settings() {
           type="checkbox"
           id="imageSmoothing"
           className="peer"
-          defaultChecked={imageSmoothing}
+          checked={imageSmoothing}
           disabled={displayMode === DisplayMode.PixelPerfect}
           onChange={(event) => setImageSmoothing(event.currentTarget.checked)}
         />
