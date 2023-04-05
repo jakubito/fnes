@@ -14,8 +14,9 @@ class NesFile {
   constructor(public buffer: ArrayBuffer) {
     const header = Uint8Array.wrap(buffer, 0, 16)
 
-    validateFormat(header)
-    validateVersion(header)
+    for (let i = 0; i < 4; i++) {
+      if (header[i] != NesFile.TAG[i]) throw new Error('Unknown rom format')
+    }
 
     const prgSize = <u32>header[4] * NesFile.PRG_PAGE_SIZE
     const chrSize = <u32>header[5] * NesFile.CHR_PAGE_SIZE
@@ -26,17 +27,6 @@ class NesFile {
     this.mapper = parseMapper(header)
     this.mirroring = parseMirroring(header)
   }
-}
-
-function validateFormat(header: Uint8Array): void {
-  for (let i = 0; i < 4; i++) {
-    if (header[i] != NesFile.TAG[i]) throw new Error('Unknown rom format')
-  }
-}
-
-function validateVersion(header: Uint8Array): void {
-  const version = (header[7] >> 2) & 0b11
-  if (version != 0) throw new Error('Unsupported rom version')
 }
 
 function parseMapper(header: Uint8Array): u8 {
