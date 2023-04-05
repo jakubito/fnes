@@ -72,7 +72,7 @@ export function Mapping(props: Props) {
         secondary
         className={cx(
           'px-2 rounded-md border border-b-2 border-gray-400 hover:border-gray-500',
-          editing ? '!bg-indigo-50 font-medium' : 'capitalize bg-white hover:bg-gray-100',
+          editing ? '!bg-emerald-50 font-medium' : 'capitalize bg-white hover:bg-gray-100',
           !editing && hasConflict && '!bg-red-50 border-red-500'
         )}
         title="Click to change"
