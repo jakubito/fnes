@@ -23,7 +23,7 @@ export function Controls() {
     <>
       <input
         type="file"
-        className="cursor-pointer text-black file:rounded-[4px] file:bg-zinc-200 file:px-2 file:py-px file:mr-2 file:border-0 file:cursor-pointer"
+        className="cursor-pointer text-black file:text-black file:rounded-[4px] file:bg-zinc-200 file:px-2 file:py-px file:mr-2 file:border-0 file:cursor-pointer"
         accept=".nes,.zip"
         onInput={onFileInput}
       />

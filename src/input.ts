@@ -45,7 +45,7 @@ export class Input {
 
     for (const entry of Object.entries(this.buttonMap)) {
       const [button, keyCode] = entry
-      this.invertedButtonMap[keyCode] = +button
+      this.invertedButtonMap[keyCode] = Number(button) as Button
     }
   }
 
