@@ -19,7 +19,7 @@ export function Controls() {
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-5">
       <input
         type="file"
         className="cursor-pointer text-black file:text-black file:rounded-[4px] file:bg-zinc-200 file:px-2 file:py-px file:mr-2 file:border-0 file:cursor-pointer"
@@ -40,6 +40,6 @@ export function Controls() {
           Status: <span className="font-semibold">{statusLabel[status]}</span>
         </div>
       </div>
-    </>
+    </div>
   )
 }
