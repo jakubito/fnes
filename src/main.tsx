@@ -1,6 +1,6 @@
 import { render } from 'preact'
 import { Provider } from 'jotai'
-import { Toaster } from 'react-hot-toast'
+import { Toaster, toast } from 'react-hot-toast'
 import moduleUrl from '../core/build/core.wasm?url'
 import { instantiate } from '../core/build/core'
 import type { CoreModule } from './types'
@@ -32,6 +32,14 @@ window.addEventListener('blur', () => {
 
 window.addEventListener('click', (event) => {
   if (event.target instanceof HTMLElement) event.target.blur()
+})
+
+window.addEventListener('gamepadconnected', () => {
+  toast('Gamepad connected')
+})
+
+window.addEventListener('gamepaddisconnected', () => {
+  toast('Gamepad disconnected')
 })
 
 render(
