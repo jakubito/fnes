@@ -12,8 +12,8 @@ FNES is an [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) em
 
 - Small and efficient webassembly core
 - Lightweight javascript client for browsers
-- Real-time adjustments of emulation settings
-- Custom keyboard mappings and [standard gamepads](https://www.w3.org/TR/gamepad/#dfn-standard-gamepad) support up to two players
+- Custom keyboard mappings
+- [Standard gamepads](https://www.w3.org/TR/gamepad/#dfn-standard-gamepad) support for up to two players
 - ZIP files support
 - Full screen support
 
@@ -35,6 +35,15 @@ Click on the links below to see which games _should_ be currently compatible wit
 - APU (sound)
 
 ## Useful resources
+
+### Homebrew games
+
+- [nesworld.com](https://www.nesworld.com/article.php?system=nes&data=neshomebrew_bestof)
+- [itch.io](https://itch.io/c/632436/nes-homebrew-games)
+- [neshomebrew.ca](https://neshomebrew.ca/)
+- [romhacking.net](https://www.romhacking.net/?page=homebrew&platform=1&category=&perpage=200&title=&author=&search=Go)
+
+### Dev related
 
 - [Nesdev Wiki](https://www.nesdev.org/wiki/NES_reference_guide)
 - [High-level dev guide](https://bugzmanov.github.io/nes_ebook/)
