@@ -13,11 +13,13 @@ FNES is an [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) em
 - Small and efficient webassembly core
 - Lightweight javascript client for browsers
 - Real-time adjustments of emulation settings
-- Custom keyboard mappings and [standard gamepads](https://www.w3.org/TR/gamepad/#dfn-standard-gamepad) support
+- Custom keyboard mappings and [standard gamepads](https://www.w3.org/TR/gamepad/#dfn-standard-gamepad) support up to two players
 - ZIP files support
 - Full screen support
 
 ## Supported mappers
+
+Click on the links below to see which games _should_ be currently compatible with FNES. Please note it is still in development, there may be random glitches and crashes with certain titles.
 
 - [NROM (0)](https://nescartdb.com/search/advanced?ines_op=equal&ines=0)
 - [MMC1 (1)](https://nescartdb.com/search/advanced?ines_op=equal&ines=1)
