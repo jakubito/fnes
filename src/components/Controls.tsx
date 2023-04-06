@@ -1,7 +1,7 @@
 import type { JSXInternal } from 'preact/src/jsx'
-import { toast } from 'react-hot-toast'
 import { useClient } from '../state'
 import { Status } from '../client'
+import { loadFile } from '../helpers'
 import { Button } from './Button'
 
 const statusLabel: Readonly<Record<Status, string>> = {
@@ -15,13 +15,7 @@ export function Controls() {
 
   const onFileInput = async (event: JSXInternal.TargetedEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0]
-    if (!file) return
-    try {
-      client.loadFile(await file.arrayBuffer())
-      client.start()
-    } catch (error) {
-      if (error instanceof Error) toast.error(error.message)
-    }
+    if (file) loadFile(client, file)
   }
 
   return (

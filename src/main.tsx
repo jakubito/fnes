@@ -1,11 +1,12 @@
 import { render } from 'preact'
 import { Provider } from 'jotai'
-import { Toaster, toast } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import moduleUrl from '../core/build/core.wasm?url'
 import { instantiate } from '../core/build/core'
 import type { CoreModule } from './types'
 import { setClient, store } from './state'
 import { Client } from './client'
+import { loadFile } from './helpers'
 import { App } from './components/App'
 import './style.css'
 
@@ -22,13 +23,7 @@ window.addEventListener('dragover', (event) => {
 window.addEventListener('drop', async (event) => {
   event.preventDefault()
   const file = event.dataTransfer?.files[0]
-  if (!file) return
-  try {
-    client.loadFile(await file.arrayBuffer())
-    client.start()
-  } catch (error) {
-    if (error instanceof Error) toast.error(error.message)
-  }
+  if (file) loadFile(client, file)
 })
 
 window.addEventListener('blur', () => {

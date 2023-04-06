@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "fflate": "^0.7.4",
     "jotai": "^2.0.3",
     "preact": "^10.13.2",
     "react-hot-toast": "^2.4.0"
