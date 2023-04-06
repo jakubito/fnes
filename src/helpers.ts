@@ -24,8 +24,9 @@ export async function loadFile(client: Client, file: File) {
 
 async function getRom(file: File) {
   const fileBuffer = await file.arrayBuffer()
+  if (file.name.endsWith('.nes')) return fileBuffer
   if (file.name.endsWith('.zip')) return unzipRom(fileBuffer)
-  return fileBuffer
+  throw new Error('Unsupported file format')
 }
 
 function unzipRom(fileBuffer: ArrayBuffer) {
