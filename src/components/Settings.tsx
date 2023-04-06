@@ -58,7 +58,7 @@ export function Settings() {
             id="displayMode1"
             name="displayMode"
             checked={displayMode === DisplayMode.Original}
-            onChange={() => setDisplayMode(DisplayMode.Original)}
+            onClick={() => setDisplayMode(DisplayMode.Original)}
           />
           <label htmlFor="displayMode1" className="pl-2">
             Original
@@ -70,7 +70,7 @@ export function Settings() {
             id="displayMode0"
             name="displayMode"
             checked={displayMode === DisplayMode.PixelPerfect}
-            onChange={() => setDisplayMode(DisplayMode.PixelPerfect)}
+            onClick={() => setDisplayMode(DisplayMode.PixelPerfect)}
           />
           <label htmlFor="displayMode0" className="pl-2">
             Pixel perfect

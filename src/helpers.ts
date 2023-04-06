@@ -24,14 +24,15 @@ export async function loadFile(client: Client, file: File) {
 
 async function getRom(file: File) {
   const fileBuffer = await file.arrayBuffer()
-  if (file.name.endsWith('.nes')) return fileBuffer
-  if (file.name.endsWith('.zip')) return unzipRom(fileBuffer)
+  const filename = file.name.toLowerCase()
+  if (filename.endsWith('.nes')) return fileBuffer
+  if (filename.endsWith('.zip')) return unzipRom(fileBuffer)
   throw new Error('Unsupported file format')
 }
 
 function unzipRom(fileBuffer: ArrayBuffer) {
   const files = unzipSync(new Uint8Array(fileBuffer), {
-    filter: (entry) => entry.name.endsWith('.nes'),
+    filter: (entry) => entry.name.toLowerCase().endsWith('.nes'),
   })
   const rom = Object.values(files)[0]
   if (!rom) throw new Error('No .nes file found in the archive')
