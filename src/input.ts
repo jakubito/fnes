@@ -9,9 +9,9 @@ export enum Button {
   Right,
 }
 
-export type ButtonMap = Record<Button, string>
+type ButtonMap = Readonly<Record<Button, string>>
 
-export const defaultButtonMap: Readonly<ButtonMap> = {
+export const defaultButtonMap: ButtonMap = {
   [Button.A]: 'f',
   [Button.B]: 'd',
   [Button.Select]: 's',
