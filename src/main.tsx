@@ -14,6 +14,10 @@ const compiledModule = await WebAssembly.compileStreaming(fetch(moduleUrl))
 const module = await instantiate(compiledModule, { env: {} })
 const client = new Client(module as CoreModule)
 
+const introUrl = 'https://raw.githubusercontent.com/jakubito/fnes-intro/master/build/intro.nes'
+const introResponse = await fetch(introUrl)
+client.loadFile(await introResponse.arrayBuffer())
+
 setClient(client)
 
 window.addEventListener('dragover', (event) => {

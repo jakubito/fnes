@@ -1,3 +1,5 @@
+import { useEffect } from 'preact/hooks'
+import { useClient } from '../state'
 import { Title } from './Title'
 import { Controls } from './Controls'
 import { Settings } from './Settings'
@@ -5,6 +7,9 @@ import { Mappings } from './Mappings'
 import { Screen } from './Screen'
 
 export function App() {
+  const { client } = useClient()
+  useEffect(() => client.start(), [])
+
   return (
     <div className="flex flex-row min-h-screen">
       <div className="w-96 shrink-0 p-6">
