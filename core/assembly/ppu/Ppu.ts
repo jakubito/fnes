@@ -105,10 +105,10 @@ class Ppu {
 
   @inline
   renderDot(): void {
-    this.dotColor = 0xf
     this.bgChar = 0
+    this.dotColor = unchecked(this.bus.palette[0])
     this.renderBackground()
-    this.renderSprites()
+    this.renderSprite()
     this.paintDot(this.dotColor)
   }
 
@@ -123,8 +123,6 @@ class Ppu {
     const y = this.getFineY()
 
     this.bgChar = this.getCharacterPixel(characterIndex, page, x, y)
-    this.dotColor = unchecked(this.bus.palette[0])
-
     if (this.bgChar == 0) return
 
     const attrAddress = 0x3c0 | (this.v & NN) | ((this.v >> 4) & 0b111000) | ((this.v >> 2) & 0b111)
@@ -136,7 +134,7 @@ class Ppu {
   }
 
   @inline
-  renderSprites(): void {
+  renderSprite(): void {
     if (!this.mask.get(Mask.ShowSprites)) return
     if (!this.mask.get(Mask.ShowLeftSprites) && this.dot < 8) return
 
