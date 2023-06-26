@@ -17,6 +17,10 @@ FNES is an [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) em
 - ZIP files support
 - Full screen support
 
+## Related projects
+
+- [fnes-intro](https://github.com/jakubito/fnes-intro)
+
 ## Supported mappers
 
 Click on the links below to see which games _should_ be currently compatible with FNES. Please note it is still in development, there may be random glitches and crashes with certain titles.
@@ -51,7 +55,7 @@ Click on the links below to see which games _should_ be currently compatible wit
 
 ## Bug reporting
 
-If you find a bug, please send me an e-mail to dobes.jakub@gmail.com or open an issue here on Github.
+If you find a bug, please send me an e-mail to <dobes.jakub@gmail.com> or open an issue here on Github.
 
 ## License
 
