@@ -8,6 +8,12 @@ class Bus {
 
   constructor(public drive: Drive) {}
 
+  reset(): void {
+    this.vram.fill(0)
+    this.palette.fill(0)
+    this.readBuffer = 0
+  }
+
   load(address: u16): u8 {
     switch (address) {
       case between(address, 0, 0x1fff):

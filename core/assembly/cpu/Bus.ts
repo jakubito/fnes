@@ -9,6 +9,10 @@ class Bus {
 
   constructor(private drive: Drive, private inputs: Inputs, private ppu: Ppu) {}
 
+  reset(): void {
+    this.wram.fill(0)
+  }
+
   load(address: u16): u8 {
     switch (address) {
       case between(address, 0, 0x1fff):

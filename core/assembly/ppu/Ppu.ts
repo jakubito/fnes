@@ -52,6 +52,7 @@ class Ppu {
     this.status.reset()
     this.frameBuffer.fill(0)
     this.oam.reset()
+    this.bus.reset()
 
     // Set alpha channel to 0xff
     for (let i = 3; i < this.frameBuffer.length; i += 4) {

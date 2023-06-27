@@ -34,6 +34,7 @@ class Cpu {
     this.ac = 0
     this.x = 0
     this.y = 0
+    this.bus.reset()
   }
 
   bind(

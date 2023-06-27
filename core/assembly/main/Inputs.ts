@@ -3,7 +3,6 @@ import Controller from './Controller'
 class Inputs {
   playerOne: Controller = new Controller()
   playerTwo: Controller = new Controller()
-  strobe: bool = false
 
   setStrobe(value: u8): void {
     const strobe = <bool>(value & 1)
