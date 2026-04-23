@@ -7,14 +7,18 @@ import { ControllerAddress, PpuRegister } from './enums'
 class Bus {
   wram: Uint8Array = new Uint8Array(0x800)
 
-  constructor(private drive: Drive, private inputs: Inputs, private ppu: Ppu) {}
+  constructor(
+    private drive: Drive,
+    private inputs: Inputs,
+    private ppu: Ppu
+  ) {}
 
   reset(): void {
     this.wram.fill(0)
   }
 
   load(address: u16): u8 {
-    switch (address) {
+    switch (<i32>address) {
       case between(address, 0, 0x1fff):
         return this.loadWram(address)
       case PpuRegister.Status:
@@ -39,7 +43,7 @@ class Bus {
   }
 
   store(address: u16, value: u8): void {
-    switch (address) {
+    switch (<i32>address) {
       case between(address, 0, 0x1fff):
         return this.storeWram(address, value)
       case PpuRegister.Control:

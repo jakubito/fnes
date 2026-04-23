@@ -17,7 +17,7 @@ type StateTuple = [
   ppuV: number,
   ppuT: number,
   ppuX: number,
-  ppuW: number
+  ppuW: number,
 ]
 
 type State = {
@@ -43,7 +43,7 @@ const module = await instantiate(compiledModule, { env: {} })
 const instance = module.createInstance()
 
 function state() {
-  const state = <StateTuple>module.getState(instance)
+  const state = module.getState(instance) as StateTuple
   const [pc, sp, sr, ac, x, y, cycles, ppuLine, ppuDot, ppuV, ppuT, ppuX, ppuW] = state
   return { pc, sp, sr, ac, x, y, cycles, ppuLine, ppuDot, ppuV, ppuT, ppuX, ppuW } as State
 }

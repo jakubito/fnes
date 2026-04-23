@@ -1,4 +1,4 @@
-import { CoreInstance, CoreModule } from './types'
+import type { CoreInstance, CoreModule } from './types'
 import { Input } from './input'
 
 export enum Status {

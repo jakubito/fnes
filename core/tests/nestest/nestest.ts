@@ -1,8 +1,17 @@
 import { dirname, join } from 'path'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
-import { equal } from 'assert'
+import { equal } from 'assert/strict'
 import { instantiate } from '../../build/core.js'
+
+class NestestError extends Error {
+  logLine: number
+
+  constructor(message: string, logLine: number) {
+    super(message)
+    this.logLine = logLine
+  }
+}
 
 type State = [
   pc: number,
@@ -13,7 +22,7 @@ type State = [
   y: number,
   cycles: number,
   ppuLine: number,
-  ppuDot: number
+  ppuDot: number,
 ]
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -25,17 +34,19 @@ const compiledModule = await WebAssembly.compile(moduleBuffer)
 const module = await instantiate(compiledModule, { env: {} })
 const instance = module.createInstance()
 
-module.loadFile(instance, romBuffer)
+module.loadFile(instance, romBuffer.buffer)
 module.setProgramCounter(instance, 0xc000)
 
 for (let i = 0; i < log.length - 1; i += 1) {
-  const state = formatState(<State>module.getState(instance))
+  const state = formatState(module.getState(instance) as State)
   const logState = formatLine(log[i])
   try {
     equal(state, logState)
     module.step(instance)
   } catch (error) {
-    error.logLine = i + 1
+    if (error instanceof Error) {
+      throw new NestestError(error.message, i + 1)
+    }
     throw error
   }
 }

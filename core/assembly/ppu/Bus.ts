@@ -15,7 +15,7 @@ class Bus {
   }
 
   load(address: u16): u8 {
-    switch (address) {
+    switch (<i32>address) {
       case between(address, 0, 0x1fff):
         return this.loadChr(address)
       case between(address, 0x2000, 0x2fff):
@@ -37,7 +37,7 @@ class Bus {
   }
 
   store(address: u16, value: u8): void {
-    switch (address) {
+    switch (<i32>address) {
       case between(address, 0, 0x1fff):
         return this.drive.storeChr(address, value)
       case between(address, 0x2000, 0x2fff):
