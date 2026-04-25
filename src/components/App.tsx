@@ -16,9 +16,9 @@ export function App() {
         <div className="flex flex-col gap-3">
           <Title />
           <Controls />
-          <hr className="my-1" />
+          <hr className="border-neutral-300 my-1" />
           <Settings />
-          <hr className="my-1" />
+          <hr className="border-neutral-300 my-1" />
           <Mappings />
         </div>
       </div>

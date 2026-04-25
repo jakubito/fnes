@@ -5,6 +5,7 @@
   "description": "FNES web client",
   "author": "Jakub Dobes <dobes.jakub@gmail.com>",
   "license": "ISC",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "prebuild": "cd core && npm install && npm run build:release",
