@@ -1,5 +1,6 @@
 import type { CoreInstance, CoreModule } from './types'
 import { Input } from './input'
+import { AudioBuffer } from './audio'
 
 export enum Status {
   Ready,
@@ -21,11 +22,11 @@ export class Client {
   onStatusChange?: (status: Status) => void
   readonly input = new Input()
 
-  private readonly module: CoreModule
   private readonly instance: CoreInstance
 
   private fileLoaded = false
-  private frameImageData!: ImageData
+  private frameImageData: ImageData
+  private audioBuffer: AudioBuffer
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
 
@@ -37,8 +38,11 @@ export class Client {
   private _imageSmoothing = true
   private _displayMode = DisplayMode.Original
 
-  constructor(module: CoreModule) {
-    this.module = module
+  constructor(
+    private readonly module: CoreModule,
+    private readonly audioContext: AudioContext,
+    private readonly audioProcessorNode: AudioWorkletNode
+  ) {
     this.instance = module.createInstance()
     this.bindBuffers()
     this.canvasElement = document.createElement('canvas')
@@ -124,6 +128,8 @@ export class Client {
     if (!this.fileLoaded) return
     if (this._status === Status.Running) return
 
+    this.audioContext.resume()
+
     const id = { value: 0 }
     let previousTime = performance.now()
     let timeAvailable = 0
@@ -143,6 +149,8 @@ export class Client {
       if (frameReady) {
         this.drawFrame()
         frameReady = false
+        const samples = this.audioBuffer.samples()
+        this.audioProcessorNode.port.postMessage(samples)
       }
 
       id.value = requestAnimationFrame(clientFrame)
@@ -177,13 +185,20 @@ export class Client {
 
   private bindBuffers() {
     const { buffer } = this.module.memory
-    const frameBufferPointer = this.module.getFrameBufferPointer(this.instance)
-    const playerOneBufferPointer = this.module.getPlayerOneBufferPointer(this.instance)
-    const playerTwoBufferPointer = this.module.getPlayerTwoBufferPointer(this.instance)
-    const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPointer, 256 * 240 * 4)
+    const frameBufferPtr = this.module.getFrameBufferPtr(this.instance)
+    const audioPtr = this.module.getAudioBufferPtr(this.instance)
+    const playerOnePtr = this.module.getPlayerOnePtr(this.instance)
+    const playerTwoPtr = this.module.getPlayerTwoPtr(this.instance)
+
+    const frameBuffer = new Uint8ClampedArray(buffer, frameBufferPtr, 256 * 240 * 4)
     this.frameImageData = new ImageData(frameBuffer, 256, 240)
-    this.input.playerOneButtons = new Uint8Array(buffer, playerOneBufferPointer, 8)
-    this.input.playerTwoButtons = new Uint8Array(buffer, playerTwoBufferPointer, 8)
+
+    const audioMeta = new Uint32Array(buffer, audioPtr[0], 3)
+    const audioBuffer = new Float32Array(buffer, audioPtr[1], 2048)
+    this.audioBuffer = new AudioBuffer(audioMeta, audioBuffer)
+
+    this.input.playerOneButtons = new Uint8Array(buffer, playerOnePtr, 8)
+    this.input.playerTwoButtons = new Uint8Array(buffer, playerTwoPtr, 8)
   }
 
   private resizeCanvas(width: number, height: number) {

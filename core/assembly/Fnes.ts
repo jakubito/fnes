@@ -1,4 +1,5 @@
 import { Drive, Inputs, Interrupts } from './main'
+import { Apu } from './apu'
 import { Ppu, Bus as PpuBus } from './ppu'
 import { Cpu, Bus as CpuBus } from './cpu'
 import { Interrupt } from './cpu/enums'
@@ -7,9 +8,10 @@ class Fnes {
   drive: Drive = new Drive()
   inputs: Inputs = new Inputs()
   interrupts: Interrupts = new Interrupts()
+  apu: Apu = new Apu(this.interrupts)
   ppuBus: PpuBus = new PpuBus(this.drive)
   ppu: Ppu = new Ppu(this.ppuBus, this.interrupts)
-  cpuBus: CpuBus = new CpuBus(this.drive, this.inputs, this.ppu)
+  cpuBus: CpuBus = new CpuBus(this.drive, this.inputs, this.apu, this.ppu)
   cpu: Cpu = new Cpu(this.cpuBus, this.interrupts)
 
   constructor() {}
@@ -22,6 +24,7 @@ class Fnes {
   reset(): void {
     this.cpu.reset()
     this.ppu.reset()
+    this.apu.reset()
     this.interrupts.reset()
     this.cpu.step()
   }

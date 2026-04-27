@@ -33,7 +33,10 @@ class Ppu {
   x: u8 = 0
   w: bool = false
 
-  constructor(private bus: Bus, private interrupts: Interrupts) {
+  constructor(
+    private bus: Bus,
+    private interrupts: Interrupts
+  ) {
     this.reset()
   }
 
@@ -61,7 +64,7 @@ class Ppu {
   }
 
   @inline
-  run(cycles: usize): void {
+  tick(cycles: usize): void {
     for (let i: usize = 0; i < cycles; i++) this.step()
   }
 

@@ -2,9 +2,9 @@ import { Mirroring } from '../ppu/enums'
 import { bit } from './helpers'
 
 class NesFile {
-  static TAG: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
-  static PRG_PAGE_SIZE: u16 = 0x4000
-  static CHR_PAGE_SIZE: u16 = 0x2000
+  static readonly TAG: StaticArray<u8> = [0x4e, 0x45, 0x53, 0x1a]
+  static readonly PRG_PAGE_SIZE: u16 = 0x4000
+  static readonly CHR_PAGE_SIZE: u16 = 0x2000
 
   prgRom: Uint8Array
   chrRom: Uint8Array

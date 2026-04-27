@@ -1,23 +1,34 @@
 import Fnes from './Fnes'
 
-function ptr(view: Uint8Array): usize {
-  return changetype<usize>(view.buffer) + view.byteOffset
-}
-
 export function createInstance(): Fnes {
   return new Fnes()
 }
 
-export function getFrameBufferPointer(instance: Fnes): usize {
-  return ptr(instance.ppu.frameBuffer)
+export function getFrameBufferPtr(instance: Fnes): usize {
+  return changetype<usize>(instance.ppu.frameBuffer.buffer) + instance.ppu.frameBuffer.byteOffset
 }
 
-export function getPlayerOneBufferPointer(instance: Fnes): usize {
-  return ptr(instance.inputs.playerOne.buttons)
+export function getAudioBufferPtr(instance: Fnes): StaticArray<usize> {
+  return [
+    changetype<usize>(instance.apu.resampler.output.meta.buffer) +
+      instance.apu.resampler.output.meta.byteOffset,
+    changetype<usize>(instance.apu.resampler.output.buffer.buffer) +
+      instance.apu.resampler.output.buffer.byteOffset,
+  ]
 }
 
-export function getPlayerTwoBufferPointer(instance: Fnes): usize {
-  return ptr(instance.inputs.playerTwo.buttons)
+export function getPlayerOnePtr(instance: Fnes): usize {
+  return (
+    changetype<usize>(instance.inputs.playerOne.buttons.buffer) +
+    instance.inputs.playerOne.buttons.byteOffset
+  )
+}
+
+export function getPlayerTwoPtr(instance: Fnes): usize {
+  return (
+    changetype<usize>(instance.inputs.playerTwo.buttons.buffer) +
+    instance.inputs.playerTwo.buttons.byteOffset
+  )
 }
 
 export function loadFile(instance: Fnes, buffer: ArrayBuffer): void {

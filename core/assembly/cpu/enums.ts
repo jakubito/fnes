@@ -45,6 +45,14 @@ export enum PpuRegister {
   OamDma = 0x4014,
 }
 
+export enum ApuRegister {
+  TriangleLinearCtr = 0x4008,
+  TriangleTimerLo = 0x400a,
+  TriangleTimerHi = 0x400b,
+  Control = 0x4015,
+  FrameCounter = 0x4017,
+}
+
 export enum ControllerAddress {
   PlayerOne = 0x4016,
   PlayerTwo = 0x4017,

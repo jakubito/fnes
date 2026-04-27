@@ -3,8 +3,8 @@ import { mirrorHorizontal, mirrorSingleScreen, mirrorVertical } from '../ppu/hel
 import Mapper from './Mapper'
 
 class Mapper1 extends Mapper {
-  static PRG_BANK: u16 = 0x4000
-  static CHR_BANK: u16 = 0x1000
+  static readonly PRG_BANK: u16 = 0x4000
+  static readonly CHR_BANK: u16 = 0x1000
   prgRam: Uint8Array = new Uint8Array(0x2000)
   chrRam: Uint8Array = new Uint8Array(0x2000)
   sr: u8 = 0b10000

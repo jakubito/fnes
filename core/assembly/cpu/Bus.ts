@@ -1,8 +1,9 @@
 import { Drive, Inputs } from '../main'
+import { Apu } from '../apu'
 import { Ppu } from '../ppu'
 import { between } from '../main/helpers'
 import { word } from './helpers'
-import { ControllerAddress, PpuRegister } from './enums'
+import { ApuRegister, ControllerAddress, PpuRegister } from './enums'
 
 class Bus {
   wram: Uint8Array = new Uint8Array(0x800)
@@ -10,6 +11,7 @@ class Bus {
   constructor(
     private drive: Drive,
     private inputs: Inputs,
+    private apu: Apu,
     private ppu: Ppu
   ) {}
 
@@ -19,7 +21,7 @@ class Bus {
 
   load(address: u16): u8 {
     switch (<i32>address) {
-      case between(address, 0, 0x1fff):
+      case between(0, 0x1fff, address):
         return this.loadWram(address)
       case PpuRegister.Status:
         return this.ppu.readStatus()
@@ -27,15 +29,17 @@ class Bus {
         return this.ppu.oam.load()
       case PpuRegister.Data:
         return this.ppu.loadFromAddress()
-      case between(address, 0x2008, 0x3fff):
+      case between(0x2008, 0x3fff, address):
         return this.load(address & 0x2007)
       case ControllerAddress.PlayerOne:
         return this.inputs.playerOne.read()
       case ControllerAddress.PlayerTwo:
         return this.inputs.playerTwo.read()
-      case between(address, 0x6000, 0x7fff):
+      case ApuRegister.Control:
+        return this.apu.readStatus()
+      case between(0x6000, 0x7fff, address):
         return this.drive.loadPrgRam(address)
-      case between(address, 0x8000, 0xffff):
+      case between(0x8000, 0xffff, address):
         return this.drive.loadPrg(address)
       default:
         return 0
@@ -44,7 +48,7 @@ class Bus {
 
   store(address: u16, value: u8): void {
     switch (<i32>address) {
-      case between(address, 0, 0x1fff):
+      case between(0, 0x1fff, address):
         return this.storeWram(address, value)
       case PpuRegister.Control:
         return this.ppu.setControl(value)
@@ -60,15 +64,17 @@ class Bus {
         return this.ppu.setAddress(value)
       case PpuRegister.Data:
         return this.ppu.storeToAddress(value)
-      case between(address, 0x2008, 0x3fff):
+      case between(0x2008, 0x3fff, address):
         return this.store(address & 0x2007, value)
       case PpuRegister.OamDma:
         return this.oamDmaTransfer(value)
       case ControllerAddress.PlayerOne:
         return this.inputs.setStrobe(value)
-      case between(address, 0x6000, 0x7fff):
+      case between(0x4000, 0x4017, address):
+        return this.apu.store(address, value)
+      case between(0x6000, 0x7fff, address):
         return this.drive.storePrgRam(address, value)
-      case between(address, 0x8000, 0xffff):
+      case between(0x8000, 0xffff, address):
         return this.drive.storePrg(address, value)
     }
   }
@@ -87,7 +93,8 @@ class Bus {
 
   @inline
   tick(cycles: usize): void {
-    this.ppu.run(cycles * 3)
+    this.ppu.tick(cycles * 3)
+    this.apu.tick(cycles)
   }
 
   @inline

@@ -2,6 +2,7 @@ import { render } from 'preact'
 import { Provider } from 'jotai'
 import { Toaster, toast } from 'react-hot-toast'
 import moduleUrl from '../core/build/core.wasm?url'
+import audioProcessorUrl from '/audio-processor.js?url'
 import { instantiate } from '../core/build/core'
 import type { CoreModule } from './types'
 import { setClient, store } from './state'
@@ -12,7 +13,13 @@ import './style.css'
 
 const compiledModule = await WebAssembly.compileStreaming(fetch(moduleUrl))
 const module = await instantiate(compiledModule, { env: {} })
-const client = new Client(module as CoreModule)
+
+const audioContext = new AudioContext({ sampleRate: 44100 })
+await audioContext.audioWorklet.addModule(audioProcessorUrl)
+const audioProcessorNode = new AudioWorkletNode(audioContext, 'audio-processor')
+audioProcessorNode.connect(audioContext.destination)
+
+const client = new Client(module as CoreModule, audioContext, audioProcessorNode)
 
 const introUrl = 'https://raw.githubusercontent.com/jakubito/fnes-intro/master/build/intro.nes'
 const introResponse = await fetch(introUrl)

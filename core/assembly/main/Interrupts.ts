@@ -1,36 +1,30 @@
 import { Interrupt } from '../cpu/enums'
+import { bit } from './helpers'
 
 class Interrupts {
-  value: StaticArray<bool> = new StaticArray(3)
+  pending: u8 = 0
 
   @inline
   poll(): Interrupt {
-    if (this.value[Interrupt.Nmi]) {
-      unchecked((this.value[Interrupt.Nmi] = false))
-      return Interrupt.Nmi
+    if (this.pending > 0) {
+      for (let i: u8 = 0; i < 3; i++) {
+        if (bit(this.pending, i)) {
+          this.pending &= ~(1 << i)
+          return i
+        }
+      }
     }
-
-    if (this.value[Interrupt.Reset]) {
-      unchecked((this.value[Interrupt.Reset] = false))
-      return Interrupt.Reset
-    }
-
-    if (this.value[Interrupt.Irq]) {
-      unchecked((this.value[Interrupt.Irq] = false))
-      return Interrupt.Irq
-    }
-
     return Interrupt.Null
   }
 
   @inline
   trigger(interrupt: Interrupt): void {
-    unchecked((this.value[interrupt] = true))
+    this.pending |= 1 << (<u8>interrupt)
   }
 
   @inline
   reset(): void {
-    this.value.fill(false)
+    this.pending = 0
   }
 }
 

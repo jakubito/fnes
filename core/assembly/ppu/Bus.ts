@@ -16,20 +16,20 @@ class Bus {
 
   load(address: u16): u8 {
     switch (<i32>address) {
-      case between(address, 0, 0x1fff):
+      case between(0, 0x1fff, address):
         return this.loadChr(address)
-      case between(address, 0x2000, 0x2fff):
+      case between(0x2000, 0x2fff, address):
         return this.loadVram(address - 0x2000)
-      case between(address, 0x3000, 0x3eff):
+      case between(0x3000, 0x3eff, address):
         return this.loadVram(address - 0x3000)
       case 0x3f10:
       case 0x3f14:
       case 0x3f18:
       case 0x3f1c:
         return this.loadPalette(address - 0x10)
-      case between(address, 0x3f00, 0x3f1f):
+      case between(0x3f00, 0x3f1f, address):
         return this.loadPalette(address)
-      case between(address, 0x3f20, 0x3fff):
+      case between(0x3f20, 0x3fff, address):
         return this.load(address & 0x3f1f)
       default:
         return 0
@@ -38,20 +38,20 @@ class Bus {
 
   store(address: u16, value: u8): void {
     switch (<i32>address) {
-      case between(address, 0, 0x1fff):
+      case between(0, 0x1fff, address):
         return this.drive.storeChr(address, value)
-      case between(address, 0x2000, 0x2fff):
+      case between(0x2000, 0x2fff, address):
         return this.storeVram(address - 0x2000, value)
-      case between(address, 0x3000, 0x3eff):
+      case between(0x3000, 0x3eff, address):
         return this.storeVram(address - 0x3000, value)
       case 0x3f10:
       case 0x3f14:
       case 0x3f18:
       case 0x3f1c:
         return this.storePalette(address - 0x10, value)
-      case between(address, 0x3f00, 0x3f1f):
+      case between(0x3f00, 0x3f1f, address):
         return this.storePalette(address, value)
-      case between(address, 0x3f20, 0x3fff):
+      case between(0x3f20, 0x3fff, address):
         return this.store(address & 0x3f1f, value)
     }
   }
