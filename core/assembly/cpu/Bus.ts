@@ -36,7 +36,7 @@ class Bus {
       case ControllerAddress.PlayerTwo:
         return this.inputs.playerTwo.read()
       case ApuRegister.Control:
-        return this.apu.getStatus()
+        return this.apu.channels.getStatus()
       case between(0x6000, 0x7fff, address):
         return this.drive.loadPrgRam(address)
       case between(0x8000, 0xffff, address):

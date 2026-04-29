@@ -1,5 +1,5 @@
 import { bit } from '../../main/helpers'
-import { LENGTH_TABLE } from '../shared'
+import { CHANNEL_LENGTH } from '../tables'
 import Sequencer from './Sequencer'
 
 class Triangle {
@@ -43,8 +43,10 @@ class Triangle {
   }
 
   getValue(): u8 {
-    if (this.isPlaying()) return this.sequencer.getValue()
-    else return 0
+    if (this.isPlaying()) {
+      return this.sequencer.getValue()
+    }
+    return 0
   }
 
   setLinearCounter(value: u8): void {
@@ -59,7 +61,7 @@ class Triangle {
   setTimerHi(value: u8): void {
     this.timerParam = (this.timerParam & 0xff) | (((<u16>value) & 0b111) << 8)
     this.timer = this.timerParam
-    this.length = LENGTH_TABLE[(value & 0b1111_1000) >> 3]
+    this.length = CHANNEL_LENGTH[(value & 0b1111_1000) >> 3]
     this.linearReload = true
   }
 

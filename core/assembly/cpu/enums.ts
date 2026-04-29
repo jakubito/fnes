@@ -49,6 +49,9 @@ export enum ApuRegister {
   TriangleLinearCtr = 0x4008,
   TriangleTimerLo = 0x400a,
   TriangleTimerHi = 0x400b,
+  NoiseEnvelope = 0x400c,
+  NoiseTimer = 0x400e,
+  NoiseLength = 0x400f,
   Control = 0x4015,
   FrameCounter = 0x4017,
 }

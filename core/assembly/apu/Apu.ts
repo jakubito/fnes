@@ -40,14 +40,10 @@ class Apu {
     this.resampler.put(this.mixer.getValue())
     this.channels.triangle.tick()
     if (this.oddStep) {
+      this.channels.noise.tick()
       this.frameCounter.tick()
     }
     this.oddStep = !this.oddStep
-  }
-
-  getStatus(): u8 {
-    const triangle: u8 = (<u8>this.channels.triangle.getStatus()) << Channel.Triangle
-    return triangle
   }
 
   store(address: u16, value: u8): void {
@@ -58,17 +54,17 @@ class Apu {
         return this.channels.triangle.setTimerLo(value)
       case ApuRegister.TriangleTimerHi:
         return this.channels.triangle.setTimerHi(value)
+      case ApuRegister.NoiseEnvelope:
+        return this.channels.noise.envelope.setup(value)
+      case ApuRegister.NoiseTimer:
+        return this.channels.noise.setTimer(value)
+      case ApuRegister.NoiseLength:
+        return this.channels.noise.setLength(value)
       case ApuRegister.Control:
-        return this.setControl(value)
+        return this.channels.setControl(value)
       case ApuRegister.FrameCounter:
         return this.frameCounter.setup(value)
     }
-  }
-
-  @inline
-  setControl(value: u8): void {
-    if (bit(value, Channel.Triangle)) this.channels.triangle.enable()
-    else this.channels.triangle.disable()
   }
 }
 

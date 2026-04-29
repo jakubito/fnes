@@ -71,11 +71,13 @@ class FrameCounter {
   @inline
   tickQuarter(): void {
     this.channels.triangle.tickLinearCounter()
+    this.channels.noise.envelope.tick()
   }
 
   @inline
   tickHalf(): void {
     this.channels.triangle.tickCounter()
+    this.channels.noise.tickCounter()
   }
 }
 
