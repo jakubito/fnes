@@ -45,11 +45,9 @@ class Apu {
     this.oddStep = !this.oddStep
   }
 
-  readStatus(): u8 {
-    return (
-      ((<u8>(<bool>(this.channels.triangle.length > 0))) << Channel.Triangle) |
-      ((<u8>(<bool>(this.channels.triangle.length > 0))) << Channel.Triangle)
-    )
+  getStatus(): u8 {
+    const triangle: u8 = (<u8>this.channels.triangle.getStatus()) << Channel.Triangle
+    return triangle
   }
 
   store(address: u16, value: u8): void {
@@ -69,9 +67,8 @@ class Apu {
 
   @inline
   setControl(value: u8): void {
-    if (bit(value, Channel.Triangle) == 0) {
-      this.channels.triangle.resetCounter()
-    }
+    if (bit(value, Channel.Triangle)) this.channels.triangle.enable()
+    else this.channels.triangle.disable()
   }
 }
 

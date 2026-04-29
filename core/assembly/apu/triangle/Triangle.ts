@@ -4,6 +4,7 @@ import Sequencer from './Sequencer'
 
 class Triangle {
   sequencer: Sequencer = new Sequencer()
+  enabled: bool = false
   control: bool = false
   linearReload: bool = false
   timerParam: u16 = 0
@@ -14,6 +15,7 @@ class Triangle {
 
   reset(): void {
     this.sequencer.reset()
+    this.enabled = false
     this.control = false
     this.linearReload = false
     this.timerParam = 0
@@ -23,8 +25,21 @@ class Triangle {
     this.length = 0
   }
 
-  resetCounter(): void {
+  enable(): void {
+    this.enabled = true
+  }
+
+  disable(): void {
+    this.enabled = false
     this.length = 0
+  }
+
+  getStatus(): bool {
+    return this.enabled && this.length > 0
+  }
+
+  isPlaying(): bool {
+    return this.getStatus() && this.linear > 0
   }
 
   getValue(): u8 {
@@ -74,10 +89,6 @@ class Triangle {
     if (!this.control && this.length > 0) {
       this.length--
     }
-  }
-
-  isPlaying(): bool {
-    return this.linear > 0 && this.length > 0
   }
 }
 
