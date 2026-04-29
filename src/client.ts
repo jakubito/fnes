@@ -25,8 +25,8 @@ export class Client {
   private readonly instance: CoreInstance
 
   private fileLoaded = false
-  private frameImageData: ImageData
-  private audioBuffer: AudioBuffer
+  private frameImageData!: ImageData
+  private audioBuffer!: AudioBuffer
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
 
@@ -117,9 +117,9 @@ export class Client {
     this.resizeCanvas(width, height)
   }
 
-  loadFile(buffer: ArrayBuffer) {
+  loadFile(buffer: ArrayBufferLike) {
     this.module.__collect() // perform garbage collection before loading a new file
-    this.module.loadFile(this.instance, buffer)
+    this.module.loadFile(this.instance, buffer as ArrayBuffer)
     this.bindBuffers()
     this.fileLoaded = true
   }

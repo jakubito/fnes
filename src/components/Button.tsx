@@ -1,12 +1,12 @@
-import type { JSXInternal } from 'preact/src/jsx'
+import type { ButtonHTMLAttributes } from 'preact'
 import { cx } from '../helpers'
 
-interface Props {
+interface Props extends ButtonHTMLAttributes {
   primary?: boolean
   secondary?: boolean
 }
 
-export function Button(props: Props & JSXInternal.HTMLAttributes<HTMLButtonElement>) {
+export function Button(props: Props) {
   const { primary, secondary, className, ...buttonProps } = props
   return (
     <button

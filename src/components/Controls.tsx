@@ -1,4 +1,4 @@
-import type { JSXInternal } from 'preact/src/jsx'
+import type { TargetedInputEvent } from 'preact'
 import { useClient } from '../state'
 import { Status } from '../client'
 import { loadFile } from '../helpers'
@@ -13,7 +13,7 @@ const statusLabel: Readonly<Record<Status, string>> = {
 export function Controls() {
   const { client, status } = useClient()
 
-  const onFileInput = async (event: JSXInternal.TargetedEvent<HTMLInputElement>) => {
+  const onFileInput = async (event: TargetedInputEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0]
     if (file) loadFile(client, file)
   }
