@@ -38,23 +38,29 @@ class Sweep {
   }
 
   isMuting(): bool {
-    return this.timer < 8 || this.target > 0x7ff
+    if (this.timer < 8) return true
+    if (this.enabled && this.shiftCount > 0 && this.target > 0x7ff) return true
+    return false
   }
 
   updateTarget(): void {
-    let change: i16 = this.timer >> this.shiftCount
-    if (this.negate) {
-      change *= -1
-      if (this.id == 0) {
-        change -= 1
+    if (this.shiftCount > 0) {
+      let change: i16 = this.timer >> this.shiftCount
+      if (this.negate) {
+        change *= -1
+        if (this.id == 0) {
+          change -= 1
+        }
       }
+      this.target = <u16>max(this.timer + change, 0)
+    } else {
+      this.target = this.timer
     }
-    this.target = <u16>max(this.timer + change, 0)
   }
 
   tick(): bool {
     const shouldUpdate =
-      this.enabled && this.divider == 0 && this.shiftCount > 0 && !this.isMuting()
+      this.divider == 0 && this.enabled && this.shiftCount > 0 && !this.isMuting()
     if (this.divider == 0 || this.reload) {
       this.divider = this.dividerParam
       this.reload = false

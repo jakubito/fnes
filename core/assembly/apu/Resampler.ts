@@ -1,7 +1,7 @@
 import AudioBuffer from './AudioBuffer'
 
 const SRC_RATE: f32 = 1789773.0
-const TGT_RATE: f32 = 44300.0
+const TGT_RATE: f32 = 44100.0
 const BUCKET_SIZE: f32 = SRC_RATE / TGT_RATE
 
 class Resampler {
