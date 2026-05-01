@@ -1,8 +1,6 @@
 import { ApuRegister } from '../cpu/enums'
 import { Interrupts } from '../main'
-import { bit } from '../main/helpers'
 import Channels from './Channels'
-import { Channel } from './enums'
 import FrameCounter from './FrameCounter'
 import Mixer from './Mixer'
 import Resampler from './Resampler'
@@ -40,6 +38,8 @@ class Apu {
     this.resampler.put(this.mixer.getValue())
     this.channels.triangle.tick()
     if (this.oddStep) {
+      this.channels.pulse1.tick()
+      this.channels.pulse2.tick()
       this.channels.noise.tick()
       this.frameCounter.tick()
     }
@@ -48,6 +48,22 @@ class Apu {
 
   store(address: u16, value: u8): void {
     switch (<i32>address) {
+      case ApuRegister.Pulse1Duty:
+        return this.channels.pulse1.setDuty(value)
+      case ApuRegister.Pulse1Sweep:
+        return this.channels.pulse1.sweep.setup(value)
+      case ApuRegister.Pulse1TimerLo:
+        return this.channels.pulse1.setTimerLo(value)
+      case ApuRegister.Pulse1TimerHi:
+        return this.channels.pulse1.setTimerHi(value)
+      case ApuRegister.Pulse2Duty:
+        return this.channels.pulse2.setDuty(value)
+      case ApuRegister.Pulse2Sweep:
+        return this.channels.pulse2.sweep.setup(value)
+      case ApuRegister.Pulse2TimerLo:
+        return this.channels.pulse2.setTimerLo(value)
+      case ApuRegister.Pulse2TimerHi:
+        return this.channels.pulse2.setTimerHi(value)
       case ApuRegister.TriangleLinearCtr:
         return this.channels.triangle.setLinearCounter(value)
       case ApuRegister.TriangleTimerLo:

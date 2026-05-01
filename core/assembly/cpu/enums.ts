@@ -46,6 +46,14 @@ export enum PpuRegister {
 }
 
 export enum ApuRegister {
+  Pulse1Duty = 0x4000,
+  Pulse1Sweep = 0x4001,
+  Pulse1TimerLo = 0x4002,
+  Pulse1TimerHi = 0x4003,
+  Pulse2Duty = 0x4004,
+  Pulse2Sweep = 0x4005,
+  Pulse2TimerLo = 0x4006,
+  Pulse2TimerHi = 0x4007,
   TriangleLinearCtr = 0x4008,
   TriangleTimerLo = 0x400a,
   TriangleTimerHi = 0x400b,

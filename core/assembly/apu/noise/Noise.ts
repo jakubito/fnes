@@ -1,7 +1,11 @@
 import { bit } from '../../main/helpers'
 import Envelope from '../Envelope'
-import { CHANNEL_LENGTH, NOISE_TIMER } from '../tables'
+import { CHANNEL_LENGTH } from '../tables'
 import ShiftRegister from './ShiftRegister'
+
+const TIMER: StaticArray<u16> = [
+  2, 4, 8, 16, 32, 48, 64, 80, 101, 127, 190, 254, 381, 508, 1017, 2034,
+]
 
 class Noise {
   shiftRegister: ShiftRegister = new ShiftRegister()
@@ -42,7 +46,7 @@ class Noise {
 
   setTimer(value: u8): void {
     this.shiftRegister.setMode(<bool>bit(value, 7))
-    this.timerParam = NOISE_TIMER[value & 0b1111]
+    this.timerParam = TIMER[value & 0b1111]
   }
 
   setLength(value: u8): void {

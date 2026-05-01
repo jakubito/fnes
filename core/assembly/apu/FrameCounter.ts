@@ -68,14 +68,18 @@ class FrameCounter {
     }
   }
 
-  @inline
   tickQuarter(): void {
-    this.channels.triangle.tickLinearCounter()
+    this.channels.pulse1.envelope.tick()
+    this.channels.pulse2.envelope.tick()
     this.channels.noise.envelope.tick()
+    this.channels.triangle.tickLinearCounter()
   }
 
-  @inline
   tickHalf(): void {
+    this.channels.pulse1.tickSweep()
+    this.channels.pulse2.tickSweep()
+    this.channels.pulse1.tickCounter()
+    this.channels.pulse2.tickCounter()
     this.channels.triangle.tickCounter()
     this.channels.noise.tickCounter()
   }

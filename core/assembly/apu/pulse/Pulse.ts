@@ -1,27 +1,28 @@
-import { bit } from '../../main/helpers'
+import Envelope from '../Envelope'
 import { CHANNEL_LENGTH } from '../tables'
 import Sequencer from './Sequencer'
+import Sweep from './Sweep'
 
-class Triangle {
+class Pulse {
   sequencer: Sequencer = new Sequencer()
+  envelope: Envelope = new Envelope()
+  sweep: Sweep
   enabled: bool = false
-  control: bool = false
-  linearReload: bool = false
   timerParam: u16 = 0
   timer: u16 = 0
-  linearParam: u8 = 0
-  linear: u8 = 0
   length: u8 = 0
+
+  constructor(public readonly id: u8) {
+    this.sweep = new Sweep(id)
+  }
 
   reset(): void {
     this.sequencer.reset()
+    this.envelope.reset()
+    this.sweep.reset()
     this.enabled = false
-    this.control = false
-    this.linearReload = false
     this.timerParam = 0
     this.timer = 0
-    this.linearParam = 0
-    this.linear = 0
     this.length = 0
   }
 
@@ -38,20 +39,16 @@ class Triangle {
     return this.enabled && this.length > 0
   }
 
-  isPlaying(): bool {
-    return this.getStatus() && this.linear > 0
-  }
-
   getValue(): u8 {
-    if (this.isPlaying()) {
-      return this.sequencer.output()
+    if (this.getStatus() && this.sequencer.output() && !this.sweep.isMuting()) {
+      return this.envelope.getValue()
     }
     return 0
   }
 
-  setLinearCounter(value: u8): void {
-    this.linearParam = value & 0b0111_1111
-    this.control = <bool>bit(value, 7)
+  setDuty(value: u8): void {
+    this.sequencer.setDuty(value >> 6)
+    this.envelope.setup(value)
   }
 
   setTimerLo(value: u8): void {
@@ -61,12 +58,14 @@ class Triangle {
   setTimerHi(value: u8): void {
     this.timerParam = (this.timerParam & 0xff) | (((<u16>value) & 0b111) << 8)
     this.timer = this.timerParam
+    this.sweep.setTimer(this.timerParam)
     this.length = CHANNEL_LENGTH[(value & 0b1111_1000) >> 3]
-    this.linearReload = true
+    this.sequencer.restart()
+    this.envelope.setStart()
   }
 
   tick(): void {
-    if (this.isPlaying()) {
+    if (this.getStatus()) {
       if (this.timer > 0) {
         this.timer--
       } else {
@@ -76,22 +75,18 @@ class Triangle {
     }
   }
 
-  tickLinearCounter(): void {
-    if (this.linearReload) {
-      this.linear = this.linearParam
-    } else if (this.control && this.linear > 0) {
-      this.linear--
-    }
-    if (!this.control) {
-      this.linearReload = false
+  tickCounter(): void {
+    if (!this.envelope.loop && this.length > 0) {
+      this.length--
     }
   }
 
-  tickCounter(): void {
-    if (!this.control && this.length > 0) {
-      this.length--
+  tickSweep(): void {
+    if (this.sweep.tick()) {
+      this.timerParam = this.sweep.target
+      this.sweep.setTimer(this.timerParam)
     }
   }
 }
 
-export default Triangle
+export default Pulse

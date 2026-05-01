@@ -10,7 +10,7 @@ class Sequencer {
     this.index = 0
   }
 
-  getValue(): u8 {
+  output(): u8 {
     return SEQUENCE[this.index]
   }
 
