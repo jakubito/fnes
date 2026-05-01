@@ -18,6 +18,8 @@ const aspectRatio: Readonly<Record<DisplayMode, number>> = {
   [DisplayMode.Original]: 8 / 7,
 }
 
+const NTSC_FRAMERATE = 60.0988
+
 export class Client {
   onStatusChange?: (status: Status) => void
   readonly input = new Input()
@@ -100,7 +102,7 @@ export class Client {
   }
 
   private get frameTime() {
-    return 1000 / 60 / this.speed
+    return 1000 / NTSC_FRAMERATE / this.speed
   }
 
   appendCanvasTo(target: HTMLElement) {

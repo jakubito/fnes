@@ -79,7 +79,7 @@ class Triangle {
   tickLinearCounter(): void {
     if (this.linearReload) {
       this.linear = this.linearParam
-    } else if (this.control && this.linear > 0) {
+    } else if (this.linear > 0) {
       this.linear--
     }
     if (!this.control) {

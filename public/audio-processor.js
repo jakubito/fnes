@@ -10,13 +10,11 @@ class AudioProcessor extends AudioWorkletProcessor {
   }
 
   process(inputs, outputs, parameters) {
-    const output = outputs[0]
-    output.forEach((channel) => {
-      for (let i = 0; i < channel.length; i++) {
-        const sample = this.queue.shift() ?? 0
-        channel[i] = sample * 2 - 1
-      }
-    })
+    const channel = outputs[0][0]
+    for (let i = 0; i < channel.length; i++) {
+      const sample = this.queue.shift() ?? 0
+      channel[i] = sample * 2 - 1
+    }
     return true
   }
 }
