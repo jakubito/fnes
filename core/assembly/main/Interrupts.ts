@@ -3,28 +3,54 @@ import { bit } from './helpers'
 
 class Interrupts {
   pending: u8 = 0
+  pendingIrq: u8 = 0
+  irqDisabled: bool = false
 
   @inline
-  poll(): Interrupt {
-    if (this.pending > 0) {
-      for (let i: u8 = 0; i < 3; i++) {
+  reset(): void {
+    this.pendingIrq = 0
+    this.pending = 0
+  }
+
+  @inline
+  poll(): u8 {
+    if (this.pending) {
+      for (let i: u8 = 1; i < 4; i++) {
         if (bit(this.pending, i)) {
           this.pending &= ~(1 << i)
           return i
         }
       }
     }
-    return Interrupt.Null
+    if (this.pendingIrq && !this.irqDisabled) {
+      return Interrupt.Irq
+    }
+    return 0
   }
 
   @inline
-  trigger(interrupt: Interrupt): void {
-    this.pending |= 1 << (<u8>interrupt)
+  trigger(interrupt: u8): void {
+    this.pending |= 1 << interrupt
   }
 
   @inline
-  reset(): void {
-    this.pending = 0
+  triggerIrq(source: u8): void {
+    this.pendingIrq |= 1 << source
+  }
+
+  @inline
+  clearIrq(source: u8): void {
+    this.pendingIrq &= ~(1 << source)
+  }
+
+  @inline
+  enableIrq(): void {
+    this.irqDisabled = false
+  }
+
+  @inline
+  disableIrq(): void {
+    this.irqDisabled = true
   }
 }
 

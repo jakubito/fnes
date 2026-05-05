@@ -9,10 +9,10 @@ class Mixer {
     const pulse2 = this.channels.pulse2.getValue()
     const triangle = this.channels.triangle.getValue()
     const noise = this.channels.noise.getValue()
+    const dmc = this.channels.dmc.getValue()
 
     const pulseOut = MIXER_PULSE[pulse1 + pulse2]
-    // const tndOut = TND[3 * triangle + 2 * noise + dmc]
-    const tndOut = MIXER_TND[3 * triangle + 2 * noise]
+    const tndOut = MIXER_TND[3 * triangle + 2 * noise + dmc]
 
     return pulseOut + tndOut
   }

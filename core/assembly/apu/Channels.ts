@@ -1,20 +1,28 @@
 import { bit } from '../main/helpers'
 import { Channel } from './enums'
+import Dmc from './dmc/Dmc'
 import Noise from './noise/Noise'
 import Pulse from './pulse/Pulse'
 import Triangle from './triangle/Triangle'
+import { Interrupts } from '../main'
 
 class Channels {
   pulse1: Pulse = new Pulse(0)
   pulse2: Pulse = new Pulse(1)
   triangle: Triangle = new Triangle()
   noise: Noise = new Noise()
+  dmc: Dmc
+
+  constructor(interrupts: Interrupts) {
+    this.dmc = new Dmc(interrupts)
+  }
 
   reset(): void {
     this.pulse1.reset()
     this.pulse2.reset()
     this.triangle.reset()
     this.noise.reset()
+    this.dmc.reset()
   }
 
   @inline
@@ -23,7 +31,8 @@ class Channels {
     const pulse2: u8 = (<u8>this.pulse2.getStatus()) << Channel.Pulse2
     const triangle: u8 = (<u8>this.triangle.getStatus()) << Channel.Triangle
     const noise: u8 = (<u8>this.noise.getStatus()) << Channel.Noise
-    return pulse1 | pulse2 | triangle | noise
+    const dmc: u8 = (<u8>this.dmc.getStatus()) << Channel.Dmc
+    return pulse1 | pulse2 | triangle | noise | dmc
   }
 
   @inline
@@ -36,6 +45,9 @@ class Channels {
     else this.triangle.disable()
     if (bit(value, Channel.Noise)) this.noise.enable()
     else this.noise.disable()
+    if (bit(value, Channel.Dmc)) this.dmc.enable()
+    else this.dmc.disable()
+    this.dmc.reader.clearIrq()
   }
 }
 

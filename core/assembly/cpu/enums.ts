@@ -1,11 +1,15 @@
-export enum Interrupt {
-  Null = -1,
-  Nmi,
-  Reset,
-  Irq,
+export class Interrupt {
+  static readonly Nmi: u8 = 1
+  static readonly Reset: u8 = 2
+  static readonly Irq: u8 = 3
 }
 
-export const InterruptVector: StaticArray<u16> = [0xfffa, 0xfffc, 0xfffe]
+export class Irq {
+  static readonly Frame: u8 = 0
+  static readonly Dmc: u8 = 1
+}
+
+export const InterruptVector: StaticArray<u16> = [0, 0xfffa, 0xfffc, 0xfffe]
 
 export enum Mode {
   Implied,
@@ -60,6 +64,10 @@ export enum ApuRegister {
   NoiseEnvelope = 0x400c,
   NoiseTimer = 0x400e,
   NoiseLength = 0x400f,
+  DmcRate = 0x4010,
+  DmcDirectLoad = 0x4011,
+  DmcSampleAddress = 0x4012,
+  DmcSampleLength = 0x4013,
   Control = 0x4015,
   FrameCounter = 0x4017,
 }

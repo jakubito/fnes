@@ -1,4 +1,4 @@
-import { Interrupt } from '../cpu/enums'
+import { Irq } from '../cpu/enums'
 import { Interrupts } from '../main'
 import { bit } from '../main/helpers'
 import Channels from './Channels'
@@ -6,6 +6,7 @@ import Channels from './Channels'
 class FrameCounter {
   mode: bool = 0
   irqDisabled: bool = false
+  irqTriggered: bool = false
   frameFinished: bool = false
   counter: u16 = 0
 
@@ -17,14 +18,22 @@ class FrameCounter {
   reset(): void {
     this.mode = 0
     this.irqDisabled = false
+    this.irqTriggered = false
     this.frameFinished = false
     this.counter = 0
   }
 
+  @inline
+  clearIrq(): void {
+    this.irqTriggered = false
+    this.interrupts.clearIrq(Irq.Frame)
+  }
+
   setup(value: u8): void {
+    this.counter = 0
     this.mode = <bool>bit(value, 7)
     this.irqDisabled = <bool>bit(value, 6)
-    this.counter = 0
+    if (this.irqDisabled) this.clearIrq()
     if (this.mode) {
       this.tickHalf()
       this.tickQuarter()
@@ -45,7 +54,10 @@ class FrameCounter {
   tickMode0(): void {
     switch (this.counter) {
       case 14914:
-        if (!this.irqDisabled) this.interrupts.trigger(Interrupt.Irq)
+        if (!this.irqDisabled) {
+          this.irqTriggered = true
+          this.interrupts.triggerIrq(Irq.Frame)
+        }
         this.frameFinished = true
       case 7456:
         this.tickHalf()

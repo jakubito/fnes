@@ -1,5 +1,3 @@
-import { bit } from '../../main/helpers'
-
 class ShiftRegister {
   value: u16 = 1
   mode: bool = 0

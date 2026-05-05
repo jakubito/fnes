@@ -3,12 +3,12 @@ import Bus from './Bus'
 import Instruction from './Instruction'
 import bindings from './instructions'
 import { word } from './helpers'
-import { Interrupt, InterruptVector, Mode, PpuRegister, Status } from './enums'
+import { Interrupt, InterruptVector, Mode, Status } from './enums'
 import { InstructionHandler } from './types'
 
 class Cpu {
   instructions: StaticArray<Instruction | null> = new StaticArray(0x100)
-  pendingInterrupt: Interrupt = Interrupt.Null
+  pendingInterrupt: u8 = 0
   totalCycles: usize = 0
   cycles: usize = 0
 
@@ -19,8 +19,12 @@ class Cpu {
   x: u8 = 0
   y: u8 = 0
 
-  constructor(private bus: Bus, private interrupts: Interrupts) {
+  constructor(
+    public bus: Bus,
+    public interrupts: Interrupts
+  ) {
     for (let i = 0; i < bindings.length; i++) bindings.at(i)(this)
+    this.bus.init(this)
     this.reset()
   }
 
@@ -47,11 +51,11 @@ class Cpu {
     this.instructions[opcode] = new Instruction(this, handler, mode, cycles, pageCheck)
   }
 
-  step(): Interrupt {
+  step(): u8 {
     const interrupt = this.pendingInterrupt
-    this.pendingInterrupt = this.pollInterrupt()
-    if (interrupt != Interrupt.Null) this.handleInterrupt(interrupt)
-    else this.runNextInstruction()
+    this.pendingInterrupt = this.interrupts.poll()
+    if (interrupt) this.handleInterrupt(interrupt)
+    else this.runNext()
     this.bus.tick(this.cycles)
     this.totalCycles += this.cycles
     this.cycles = 0
@@ -59,14 +63,7 @@ class Cpu {
   }
 
   @inline
-  pollInterrupt(): Interrupt {
-    const interrupt = this.interrupts.poll()
-    if (interrupt == Interrupt.Irq && this.sr.get(Status.IrqDisable)) return Interrupt.Null
-    return interrupt
-  }
-
-  @inline
-  handleInterrupt(interrupt: Interrupt): void {
+  handleInterrupt(interrupt: u8): void {
     this.pushWordToStack(this.pc)
     this.pushToStack(this.sr.value | 0b0010_0000)
     this.sr.set(Status.IrqDisable, true)
@@ -75,7 +72,7 @@ class Cpu {
   }
 
   @inline
-  runNextInstruction(): void {
+  runNext(): void {
     const opcode = this.readByte()
     unchecked(this.instructions[opcode])!.run()
   }
@@ -100,7 +97,6 @@ class Cpu {
   @inline
   store(address: u16, value: u8): void {
     this.bus.store(address, value)
-    if (address == PpuRegister.OamDma) this.cycles += 513 + (this.totalCycles & 1)
   }
 
   @inline

@@ -7,6 +7,7 @@ function bind(cpu: Cpu): void {
 
 function cli(cpu: Cpu, param: u16, mode: Mode): void {
   cpu.sr.set(Status.IrqDisable, false)
+  cpu.interrupts.enableIrq()
 }
 
 export default bind

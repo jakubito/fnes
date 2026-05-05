@@ -4,8 +4,10 @@ import { Ppu } from '../ppu'
 import { between } from '../main/helpers'
 import { word } from './helpers'
 import { ApuRegister, ControllerAddress, PpuRegister } from './enums'
+import Cpu from './Cpu'
 
 class Bus {
+  cpu: Cpu | null = null
   wram: Uint8Array = new Uint8Array(0x800)
 
   constructor(
@@ -13,7 +15,13 @@ class Bus {
     private inputs: Inputs,
     private apu: Apu,
     private ppu: Ppu
-  ) {}
+  ) {
+    this.apu.init(this)
+  }
+
+  init(cpu: Cpu): void {
+    this.cpu = cpu
+  }
 
   reset(): void {
     this.wram.fill(0)
@@ -36,7 +44,7 @@ class Bus {
       case ControllerAddress.PlayerTwo:
         return this.inputs.playerTwo.read()
       case ApuRegister.Control:
-        return this.apu.channels.getStatus()
+        return this.apu.readStatus()
       case between(0x6000, 0x7fff, address):
         return this.drive.loadPrgRam(address)
       case between(0x8000, 0xffff, address):
@@ -113,6 +121,7 @@ class Bus {
     for (let i: u16 = 0; i < 0x100; i++) {
       this.ppu.oam.store(this.load(startAddress + i))
     }
+    this.cpu!.cycles += 513 + (this.cpu!.totalCycles & 1)
   }
 }
 

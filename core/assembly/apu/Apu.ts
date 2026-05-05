@@ -1,3 +1,4 @@
+import { Bus as CpuBus } from '../cpu'
 import { ApuRegister } from '../cpu/enums'
 import { Interrupts } from '../main'
 import Channels from './Channels'
@@ -13,7 +14,7 @@ class Apu {
   oddStep: bool = false
 
   constructor(interrupts: Interrupts) {
-    const channels: Channels = new Channels()
+    const channels: Channels = new Channels(interrupts)
     this.frameCounter = new FrameCounter(channels, interrupts)
     this.mixer = new Mixer(channels)
     this.resampler = new Resampler()
@@ -21,11 +22,23 @@ class Apu {
     this.reset()
   }
 
+  init(bus: CpuBus): void {
+    this.channels.dmc.reader.init(bus)
+  }
+
   reset(): void {
     this.channels.reset()
     this.resampler.reset()
     this.frameCounter.reset()
     this.oddStep = false
+  }
+
+  readStatus(): u8 {
+    const dmcIrq: u8 = (<u8>this.channels.dmc.reader.irqTriggered) << 7
+    const frameIrq: u8 = (<u8>this.frameCounter.irqTriggered) << 6
+    const channelsStatus = this.channels.getStatus()
+    this.frameCounter.clearIrq()
+    return dmcIrq | frameIrq | channelsStatus
   }
 
   @inline
@@ -41,6 +54,7 @@ class Apu {
       this.channels.pulse1.tick()
       this.channels.pulse2.tick()
       this.channels.noise.tick()
+      this.channels.dmc.tick()
       this.frameCounter.tick()
     }
     this.oddStep = !this.oddStep
@@ -76,6 +90,14 @@ class Apu {
         return this.channels.noise.setTimer(value)
       case ApuRegister.NoiseLength:
         return this.channels.noise.setLength(value)
+      case ApuRegister.DmcRate:
+        return this.channels.dmc.setRate(value)
+      case ApuRegister.DmcDirectLoad:
+        return this.channels.dmc.setValue(value)
+      case ApuRegister.DmcSampleAddress:
+        return this.channels.dmc.reader.setAddress(value)
+      case ApuRegister.DmcSampleLength:
+        return this.channels.dmc.reader.setLength(value)
       case ApuRegister.Control:
         return this.channels.setControl(value)
       case ApuRegister.FrameCounter:
