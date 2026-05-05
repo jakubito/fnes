@@ -43,10 +43,7 @@ class Triangle {
   }
 
   getValue(): u8 {
-    if (this.isPlaying()) {
-      return this.sequencer.output()
-    }
-    return 0
+    return this.sequencer.output()
   }
 
   setLinearCounter(value: u8): void {
