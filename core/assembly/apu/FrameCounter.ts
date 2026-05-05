@@ -9,6 +9,8 @@ class FrameCounter {
   irqTriggered: bool = false
   frameFinished: bool = false
   counter: u16 = 0
+  queueSetup: u8 = 0
+  queueDelay: i8 = -1
 
   constructor(
     private channels: Channels,
@@ -21,6 +23,8 @@ class FrameCounter {
     this.irqTriggered = false
     this.frameFinished = false
     this.counter = 0
+    this.queueSetup = 0
+    this.queueDelay = -1
   }
 
   @inline
@@ -29,14 +33,29 @@ class FrameCounter {
     this.interrupts.clearIrq(Irq.Frame)
   }
 
-  setup(value: u8): void {
+  setup(value: u8, delay: u8): void {
+    this.queueSetup = value
+    this.queueDelay = delay
+    if (bit(value, 6)) this.clearIrq()
+  }
+
+  tickQueue(): void {
+    if (this.queueDelay < 0) return
+    this.queueDelay--
+    if (this.queueDelay == 0) {
+      this.applySetup(this.queueSetup)
+      this.queueDelay = -1
+    }
+  }
+
+  applySetup(value: u8): void {
     this.counter = 0
+    this.frameFinished = false
     this.mode = <bool>bit(value, 7)
     this.irqDisabled = <bool>bit(value, 6)
-    if (this.irqDisabled) this.clearIrq()
     if (this.mode) {
-      this.tickHalf()
       this.tickQuarter()
+      this.tickHalf()
     }
   }
 

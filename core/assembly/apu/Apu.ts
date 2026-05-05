@@ -48,6 +48,7 @@ class Apu {
 
   @inline
   step(): void {
+    this.frameCounter.tickQueue()
     this.resampler.put(this.mixer.getValue())
     this.channels.triangle.tick()
     if (this.oddStep) {
@@ -101,7 +102,7 @@ class Apu {
       case ApuRegister.Control:
         return this.channels.setControl(value)
       case ApuRegister.FrameCounter:
-        return this.frameCounter.setup(value)
+        return this.frameCounter.setup(value, 4)
     }
   }
 }

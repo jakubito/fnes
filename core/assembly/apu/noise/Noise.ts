@@ -50,7 +50,9 @@ class Noise {
   }
 
   setLength(value: u8): void {
-    this.length = CHANNEL_LENGTH[(value & 0b1111_1000) >> 3]
+    if (this.enabled) {
+      this.length = CHANNEL_LENGTH[(value & 0b1111_1000) >> 3]
+    }
     this.envelope.setStart()
   }
 

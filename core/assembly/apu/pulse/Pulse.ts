@@ -59,7 +59,9 @@ class Pulse {
     this.timerParam = (this.timerParam & 0xff) | (((<u16>value) & 0b111) << 8)
     this.timer = this.timerParam
     this.sweep.setTimer(this.timerParam)
-    this.length = CHANNEL_LENGTH[(value & 0b1111_1000) >> 3]
+    if (this.enabled) {
+      this.length = CHANNEL_LENGTH[(value & 0b1111_1000) >> 3]
+    }
     this.sequencer.restart()
     this.envelope.setStart()
   }
