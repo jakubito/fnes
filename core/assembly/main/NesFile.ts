@@ -23,7 +23,12 @@ class NesFile {
     const start = bit(header[6], 2) * 512 + 16
 
     this.prgRom = Uint8Array.wrap(buffer, start, prgSize)
-    this.chrRom = Uint8Array.wrap(buffer, start + prgSize, chrSize)
+    this.chrRom = new Uint8Array(0)
+
+    if (buffer.byteLength >= start + prgSize + chrSize) {
+      this.chrRom = Uint8Array.wrap(buffer, start + prgSize, chrSize)
+    }
+
     this.mapper = parseMapper(header)
     this.mirroring = parseMirroring(header)
   }
