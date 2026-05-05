@@ -5,6 +5,8 @@ const TGT_RATE: f32 = 44100.0
 const STEP: f32 = SRC_RATE / TGT_RATE
 const LP_CUTOFF: f32 = 13000.0
 const LP_Q: f32 = 0.70710677 // Butterworth
+const DC_CUTOFF: f32 = 20.0
+const DC_R: f32 = Mathf.exp((-2.0 * Mathf.PI * DC_CUTOFF) / SRC_RATE)
 
 class Resampler {
   output: AudioBuffer = new AudioBuffer(2048)
@@ -22,6 +24,10 @@ class Resampler {
   // Biquad state (Direct Form II Transposed)
   z1: f32 = 0
   z2: f32 = 0
+
+  // DC blocker state
+  dcX1: f32 = 0
+  dcY1: f32 = 0
 
   constructor() {
     const w0: f32 = (2.0 * Mathf.PI * LP_CUTOFF) / SRC_RATE
@@ -51,6 +57,8 @@ class Resampler {
     this.prevSet = false
     this.z1 = 0
     this.z2 = 0
+    this.dcX1 = 0
+    this.dcY1 = 0
   }
 
   @inline
@@ -61,8 +69,16 @@ class Resampler {
     return y
   }
 
+  @inline
+  private dcBlock(x: f32): f32 {
+    const y: f32 = x - this.dcX1 + DC_R * this.dcY1
+    this.dcX1 = x
+    this.dcY1 = y
+    return y
+  }
+
   put(value: f32): void {
-    const filtered: f32 = this.lowPass(value)
+    const filtered: f32 = this.lowPass(this.dcBlock(value))
     if (!this.prevSet) {
       this.prev = filtered
       this.prevSet = true
