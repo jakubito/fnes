@@ -56,10 +56,8 @@ class Dmc {
   }
 
   tick(): void {
-    if (this.timer > 0) {
-      this.timer--
-      return
-    }
+    if (this.timer > 0) this.timer--
+    if (this.timer > 0) return
 
     if (this.bitsRemaining == 0) {
       this.bitsRemaining = 8

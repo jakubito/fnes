@@ -56,10 +56,19 @@ class Cpu {
     this.pendingInterrupt = this.interrupts.poll()
     if (interrupt) this.handleInterrupt(interrupt)
     else this.runNext()
-    this.bus.tick(this.cycles)
-    this.totalCycles += this.cycles
-    this.cycles = 0
+    while (this.cycles > 0) {
+      const cycles = this.takeCycles()
+      this.bus.tick(cycles)
+      this.totalCycles += cycles
+    }
     return this.pendingInterrupt
+  }
+
+  @inline
+  takeCycles(): usize {
+    const cycles = this.cycles
+    this.cycles = 0
+    return cycles
   }
 
   @inline

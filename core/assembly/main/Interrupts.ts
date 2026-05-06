@@ -15,7 +15,7 @@ class Interrupts {
   @inline
   poll(): u8 {
     if (this.pending) {
-      for (let i: u8 = 1; i < 4; i++) {
+      for (let i: u8 = 1; i < 3; i++) {
         if (bit(this.pending, i)) {
           this.pending &= ~(1 << i)
           return i
