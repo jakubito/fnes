@@ -62,12 +62,12 @@ class Reader {
 
   @inline
   setAddress(value: u8): void {
-    this.addressParam = 0xc000 + value * 64
+    this.addressParam = 0xc000 + <u16>value * 64
   }
 
   @inline
   setLength(value: u8): void {
-    this.lengthParam = value * 16 + 1
+    this.lengthParam = <u16>value * 16 + 1
   }
 
   @inline
