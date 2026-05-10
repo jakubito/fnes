@@ -15,6 +15,7 @@ export const speedAtom = persistedAtom('speed', 1)
 export const displayModeAtom = persistedAtom('displayMode', DisplayMode.Original)
 export const imageSmoothingAtom = persistedAtom('imageSmoothing', true)
 export const buttonMapAtom = persistedAtom('buttonMap', defaultButtonMap)
+export const volumeAtom = persistedAtom('volume', 0.5)
 
 function persistedAtom<T>(key: string, value: T) {
   const newAtom = atomWithReset(value)
@@ -36,12 +37,14 @@ export function setClient(client: Client) {
   store.set(clientStatusAtom, client.status)
 
   client.onStatusChange = (status) => store.set(clientStatusAtom, status)
+  client.volume = store.get(volumeAtom)
   client.speed = store.get(speedAtom)
   client.screenScale = store.get(screenScaleAtom)
   client.displayMode = store.get(displayModeAtom)
   client.imageSmoothing = store.get(imageSmoothingAtom)
   client.input.buttonMap = store.get(buttonMapAtom)
 
+  store.sub(volumeAtom, () => (client.volume = store.get(volumeAtom)))
   store.sub(speedAtom, () => (client.speed = store.get(speedAtom)))
   store.sub(screenScaleAtom, () => (client.screenScale = store.get(screenScaleAtom)))
   store.sub(displayModeAtom, () => (client.displayMode = store.get(displayModeAtom)))

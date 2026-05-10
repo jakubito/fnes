@@ -15,11 +15,12 @@ const compiledModule = await WebAssembly.compileStreaming(fetch(moduleUrl))
 const module = await instantiate(compiledModule, { env: {} })
 
 const audioContext = new AudioContext({ sampleRate: 44100 })
+const gainNode = new GainNode(audioContext)
 await audioContext.audioWorklet.addModule(audioProcessorUrl)
 const audioProcessorNode = new AudioWorkletNode(audioContext, 'audio-processor')
-audioProcessorNode.connect(audioContext.destination)
+audioProcessorNode.connect(gainNode).connect(audioContext.destination)
 
-const client = new Client(module as CoreModule, audioContext, audioProcessorNode)
+const client = new Client(module as CoreModule, audioContext, audioProcessorNode, gainNode)
 
 const introUrl = 'https://raw.githubusercontent.com/jakubito/fnes-intro/master/build/intro.nes'
 const introResponse = await fetch(introUrl)

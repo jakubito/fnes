@@ -6,17 +6,20 @@ import {
   screenElementAtom,
   screenScaleAtom,
   speedAtom,
+  volumeAtom,
 } from '../state'
 import { DisplayMode } from '../client'
 import { clamp } from '../helpers'
 import { Button } from './Button'
 
 export function Settings() {
+  const [volume, setVolume] = useAtom(volumeAtom)
   const [speed, setSpeed] = useAtom(speedAtom)
   const [screenScale, setScreenScale] = useAtom(screenScaleAtom)
   const [displayMode, setDisplayMode] = useAtom(displayModeAtom)
   const [imageSmoothing, setImageSmoothing] = useAtom(imageSmoothingAtom)
   const screenElement = useAtomValue(screenElementAtom)
+  const resetVolume = useResetAtom(volumeAtom)
   const resetSpeed = useResetAtom(speedAtom)
   const resetScreenScale = useResetAtom(screenScaleAtom)
   const resetDisplayMode = useResetAtom(displayModeAtom)
@@ -26,6 +29,7 @@ export function Settings() {
   const setClampedScreenScale = (value: number) => setScreenScale(clamp(value, 1, 10))
 
   const reset = () => {
+    resetVolume()
     resetSpeed()
     resetScreenScale()
     resetDisplayMode()
@@ -35,8 +39,21 @@ export function Settings() {
   return (
     <>
       <div className="flex items-center gap-5 mb-1">
-        <div className="text-lg font-medium">Emulation settings</div>
+        <div className="text-lg font-medium">Settings</div>
         <Button onClick={reset}>↺</Button>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="w-28">Sound volume</div>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          className="w-36"
+          value={volume}
+          onChange={(event) => setVolume(parseFloat(event.currentTarget.value))}
+        />
+        <div>{(volume * 100).toFixed()}%</div>
       </div>
       <div className="flex items-center gap-3">
         <div className="w-28">Speed</div>

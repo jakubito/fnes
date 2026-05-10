@@ -34,7 +34,7 @@ export class Client {
 
   private _stop?: () => void
   private _status = Status.Ready
-  private _volume = 50
+  private _volume = 0.5
   private _screenScale = 2
   private _speed = 1
   private _imageSmoothing = true
@@ -43,7 +43,8 @@ export class Client {
   constructor(
     private readonly module: CoreModule,
     private readonly audioContext: AudioContext,
-    private readonly audioProcessorNode: AudioWorkletNode
+    private readonly audioProcessorNode: AudioWorkletNode,
+    private readonly gainNode: GainNode
   ) {
     this.instance = module.createInstance()
     this.bindBuffers()
@@ -72,7 +73,9 @@ export class Client {
   }
 
   set volume(value: number) {
-    this._volume = value
+    const clamped = Math.max(Math.min(value, 1), 0)
+    this._volume = clamped
+    this.gainNode.gain.value = clamped
   }
 
   get speed() {

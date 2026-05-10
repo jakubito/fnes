@@ -30,7 +30,11 @@ export function Controls() {
         <Button primary onClick={() => client.start()} disabled={status === Status.Running}>
           Start
         </Button>
-        <Button primary onClick={() => client.stop()} disabled={status === Status.Stopped}>
+        <Button
+          primary
+          onClick={() => client.stop()}
+          disabled={status === Status.Ready || status === Status.Stopped}
+        >
           Stop
         </Button>
         <Button primary onClick={() => client.reset()}>
