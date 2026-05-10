@@ -34,9 +34,8 @@ Click on the links below to see which games _should_ be currently compatible wit
 ## Todo
 
 - Implement more mappers (MMC3 being top priority)
-- Increase PPU accuracy
+- Increase PPU accuracy fo fix various freezes (e.g. second level in Battletoads)
 - Save states
-- APU (sound)
 
 ## Useful resources
 
