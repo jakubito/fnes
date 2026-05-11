@@ -10,47 +10,40 @@ class AudioBuffer {
     this.setMask(size - 1)
   }
 
+  @inline
+  get readIndex(): u32 {
+    return this.meta[0]
+  }
+
+  @inline
+  get writeIndex(): u32 {
+    return this.meta[1]
+  }
+
+  @inline
+  get mask(): u32 {
+    return this.meta[2]
+  }
+
   reset(): void {
     this.meta[0] = 0
     this.meta[1] = 0
   }
 
   put(value: f32): void {
-    this.buffer[this.writeIndex()] = value
+    this.buffer[this.writeIndex] = value
     this.incWriteIndex()
-    if (this.readIndex() == this.writeIndex()) this.incReadIndex()
-  }
-
-  get(): f32 | null {
-    if (this.readIndex() == this.writeIndex()) return null
-    const value = this.buffer[this.readIndex()]
-    this.incReadIndex()
-    return value
-  }
-
-  @inline
-  readIndex(): u32 {
-    return this.meta[0]
-  }
-
-  @inline
-  writeIndex(): u32 {
-    return this.meta[1]
-  }
-
-  @inline
-  mask(): u32 {
-    return this.meta[2]
+    if (this.readIndex == this.writeIndex) this.incReadIndex()
   }
 
   @inline
   incReadIndex(): void {
-    this.meta[0] = (this.meta[0] + 1) & this.mask()
+    this.meta[0] = (this.meta[0] + 1) & this.mask
   }
 
   @inline
   incWriteIndex(): void {
-    this.meta[1] = (this.meta[1] + 1) & this.mask()
+    this.meta[1] = (this.meta[1] + 1) & this.mask
   }
 
   @inline

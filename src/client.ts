@@ -1,6 +1,6 @@
 import type { CoreInstance, CoreModule } from './types'
 import { Input } from './input'
-import { AudioBuffer } from './audio'
+import { MappedAudioBuffer } from './audio'
 
 export enum Status {
   Ready,
@@ -28,7 +28,7 @@ export class Client {
 
   private fileLoaded = false
   private frameImageData!: ImageData
-  private audioBuffer!: AudioBuffer
+  private audioBuffer!: MappedAudioBuffer
   private readonly canvasElement: HTMLCanvasElement
   private readonly canvas: CanvasRenderingContext2D
 
@@ -147,6 +147,10 @@ export class Client {
 
       while (timeAvailable >= this.frameTime) {
         this.module.renderFrame(this.instance)
+        this.audioProcessorNode.port.postMessage({
+          samples: this.audioBuffer.samples(),
+          replace: this.speed > 1,
+        })
         timeAvailable -= this.frameTime
         frameReady = true
       }
@@ -154,8 +158,6 @@ export class Client {
       if (frameReady) {
         this.drawFrame()
         frameReady = false
-        const samples = this.audioBuffer.samples()
-        this.audioProcessorNode.port.postMessage(samples)
       }
 
       id.value = requestAnimationFrame(clientFrame)
@@ -200,7 +202,7 @@ export class Client {
 
     const audioMeta = new Uint32Array(buffer, audioPtr[0], 3)
     const audioBuffer = new Float32Array(buffer, audioPtr[1], 2048)
-    this.audioBuffer = new AudioBuffer(audioMeta, audioBuffer)
+    this.audioBuffer = new MappedAudioBuffer(audioMeta, audioBuffer)
 
     this.input.playerOneButtons = new Uint8Array(buffer, playerOnePtr, 8)
     this.input.playerTwoButtons = new Uint8Array(buffer, playerTwoPtr, 8)

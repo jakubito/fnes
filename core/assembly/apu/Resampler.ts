@@ -79,11 +79,6 @@ class Resampler {
 
   put(value: f32): void {
     const filtered: f32 = this.lowPass(this.dcBlock(value))
-    if (!this.prevSet) {
-      this.prev = filtered
-      this.prevSet = true
-      return
-    }
     this.phase += 1.0
     while (this.phase >= STEP) {
       const frac: f32 = 1.0 - (this.phase - STEP)
