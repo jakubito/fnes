@@ -1,9 +1,8 @@
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom } from 'jotai'
 import { useResetAtom } from 'jotai/utils'
 import {
   displayModeAtom,
   imageSmoothingAtom,
-  screenElementAtom,
   screenScaleAtom,
   speedAtom,
   volumeAtom,
@@ -18,7 +17,6 @@ export function Settings() {
   const [screenScale, setScreenScale] = useAtom(screenScaleAtom)
   const [displayMode, setDisplayMode] = useAtom(displayModeAtom)
   const [imageSmoothing, setImageSmoothing] = useAtom(imageSmoothingAtom)
-  const screenElement = useAtomValue(screenElementAtom)
   const resetVolume = useResetAtom(volumeAtom)
   const resetSpeed = useResetAtom(speedAtom)
   const resetScreenScale = useResetAtom(screenScaleAtom)
@@ -94,24 +92,19 @@ export function Settings() {
           </label>
         </div>
       </div>
-      <div className="flex items-center">
-        <input
-          type="checkbox"
-          id="imageSmoothing"
-          className="peer"
-          checked={imageSmoothing}
-          disabled={displayMode === DisplayMode.PixelPerfect}
-          onChange={(event) => setImageSmoothing(event.currentTarget.checked)}
-        />
-        <label htmlFor="imageSmoothing" className="peer-disabled:text-neutral-500 pl-2">
-          Enable image smoothing
-        </label>
-      </div>
-      <div className="flex items-center gap-3">
-        <Button onClick={() => screenElement?.requestFullscreen({ navigationUI: 'hide' })}>
-          Go full screen
-        </Button>
-      </div>
+      {displayMode === DisplayMode.Original && (
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="imageSmoothing"
+            checked={imageSmoothing}
+            onChange={(event) => setImageSmoothing(event.currentTarget.checked)}
+          />
+          <label htmlFor="imageSmoothing" className="pl-2">
+            Enable image smoothing
+          </label>
+        </div>
+      )}
     </>
   )
 }
